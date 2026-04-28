@@ -1,0 +1,848 @@
+function renderEstadoLocal(){
+  const pill = document.getElementById('local-status-pill');
+  if(!pill) return;
+  const { estado, texto, color } = getEstadoLocal();
+  const dot = estado==='abierto' ? '🟢' : estado==='cerrando' ? '🟡' : '🔴';
+  pill.textContent = dot + ' ' + texto;
+  pill.style.color = color;
+  pill.title = texto;
+}
+// ── TABS ──
+function showTab(id,el){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='produccion'){
+    // Activar la subpestaña activa de producción
+    const elTab=document.getElementById('prodtab-'+_prodTabActiva);
+    showProdTab(_prodTabActiva, elTab||document.getElementById('prodtab-hoy'));
+  }
+  if(id==='cuba')renderCuba();
+  if(id==='config'){ const activePanel=document.querySelector('.cfg-panel.active'); const activePanelId=activePanel?activePanel.id.replace('cfgpanel-',''):'catalogo'; showCfgTab(activePanelId, document.getElementById('cfgtab-'+activePanelId)); }
+}
+
+function renderAll(){
+  renderPedidos();renderStats();renderDiaBanner();renderArchivadosSeccion();renderEstadoLocal();
+  const cubaTab=document.getElementById('tab-cuba');
+  if(cubaTab&&cubaTab.classList.contains('active'))renderCuba();
+  const prodTab=document.getElementById('tab-produccion');
+  if(prodTab&&prodTab.classList.contains('active'))renderProduccion();
+}
+// ── BANNER DÍA ──
+function renderDiaBanner(){
+  const hoy=fechaKey(new Date());
+  const esHoy=diaActual===hoy;
+  const [y,m,d]=diaActual.split('-').map(Number);
+  const f=new Date(y,m-1,d);
+  const dow=f.getDay(); // 0=dom
+  const nombreDia=DIAS_FULL[dow].toUpperCase();
+  const fechaStr=`${d} de ${MESES[m-1]} de ${y}`;
+  const dd=diaData();
+  const especial=dd.especial||false;
+
+  // banner principal
+  const banner=document.getElementById('dia-principal-banner');
+  // quitar clases anteriores
+  banner.className='dia-principal-banner';
+  banner.classList.add(DIA_CLASES[dow]);
+
+  document.getElementById('dpb-dia').textContent=`${nombreDia} ${d}`;
+  document.getElementById('dpb-fecha').textContent=fechaStr;
+
+  const badgeHoy=document.getElementById('dpb-hoy-badge');
+  badgeHoy.style.display=esHoy?'':'none';
+
+
+
+  const btnEsp=document.getElementById('btn-dia-especial-top');
+  btnEsp.textContent=especial?'⚡ Día especial activo':'⚡ Día especial';
+  btnEsp.className='btn-dia-especial'+(especial?' activo':'');
+
+  // config bar día especial
+  let cfg=document.getElementById('dia-especial-config-bar');
+  if(!cfg){
+    cfg=document.createElement('div');
+    cfg.id='dia-especial-config-bar';
+    banner.parentNode.insertBefore(cfg,banner.nextSibling);
+  }
+  if(especial){
+    const corte=dd.corteHora||'15:00';
+    const nombreEsp=dd.nombreEspecial||'';
+    cfg.className='dia-especial-config';
+    cfg.innerHTML=`
+      <span style="font-size:.9rem">⚡</span>
+      <span class="dec-label">Nombre:</span>
+      <input type="text" value="${esc(nombreEsp)}" placeholder="Día de la madre..." onchange="setDiaEspecialCampo('nombreEspecial',this.value)">
+      <div class="dec-sep"></div>
+      <span class="dec-label">Corte:</span>
+      <input type="time" value="${esc(corte)}" onchange="setDiaEspecialCampo('corteHora',this.value)">
+      <span style="font-size:.62rem;opacity:.6;margin-left:2px;">← divide turnos</span>
+      <button class="btn-dia-normal" onclick="confirmarDiaNormal()">Volver a normal</button>
+    `;
+  } else {
+    cfg.className='';cfg.innerHTML='';
+  }
+
+  // dots en dias nav
+  renderDiasNav();
+}
+
+function toggleDiaEspecial(){
+  const dd=diaData();
+  if(!dd.especial){
+    dd.especial=true;
+    if(!dd.corteHora)dd.corteHora='15:00';
+    guardar();renderDiaBanner();renderProduccion();renderCuba();
+  } else {
+    // ya está activo, ignorar (usar botón "volver a normal")
+  }
+}
+function confirmarDiaNormal(){
+  abrirModalGen('¿Volver a día normal?','Se desactivará el modo día especial para este día.',()=>{
+    diaData().especial=false;
+    guardar();renderDiaBanner();renderProduccion();renderCuba();
+  },'danger');
+}
+function setDiaEspecialCampo(campo,valor){
+  diaData()[campo]=valor;
+  guardar();renderProduccion();renderCuba();
+}
+
+//archivo días pasados
+function renderArchivadosGlobalContent(){
+  const wrap=document.getElementById('archivados-global-lista');
+  if(!wrap)return;
+  if(!datos.archivados.length){wrap.innerHTML='<div class="vacio" style="padding:14px;">Sin archivados.</div>';return;}
+  const ordenados=[...datos.archivados].sort((a,b)=>(b._archivadoTs||0)-(a._archivadoTs||0));
+  wrap.innerHTML=ordenados.map(a=>{
+    const prods=(a.productos||[]).map(r=>{
+      const nom=r.tipo==='catalogo'?r.nombre:r.libre;
+      const _cantN=Number(r.cantidad);const cant=isNaN(_cantN)?1:_cantN;
+      return`${nom} x${cant}`;
+    }).join(', ');
+    return`<div class="arch-item">
+      <div class="arch-item-top">
+        <span class="arch-fecha">${a._nomDia||''} ${(a._fecha||'').slice(8)}/${(a._fecha||'').slice(5,7)}</span>
+        <span class="arch-nombre">${esc(a.cliente_input||a.cliente||'Sin nombre')}</span>
+        <span class="arch-hora">${a.hora_entrega||'--:--'}</span>
+      </div>
+      <div class="arch-prods">${esc(prods)||'(sin productos)'}</div>
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <button onclick="restaurarArchivado('${a.id}')" style="font-family:'Outfit',sans-serif;font-size:.65rem;font-weight:500;padding:4px 10px;border:1.5px solid var(--green);border-radius:6px;background:transparent;color:var(--green);cursor:pointer;">↩ Restaurar</button>
+        <button onclick="eliminarArchivado('${a.id}')" style="font-family:'Outfit',sans-serif;font-size:.65rem;font-weight:500;padding:4px 10px;border:1.5px solid var(--border);border-radius:6px;background:transparent;color:var(--ink-light);cursor:pointer;">✕ Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderDiasNav(){
+  const nav=document.getElementById('dias-nav');
+  const hoy=fechaKey(new Date());
+  // Auto-archivar días pasados (sin datos no archivados pendientes)
+  archivarDiasPasadosAuto(hoy);
+  const keys=Object.keys(datos.dias).filter(k=>k>=hoy||k===diaActual).sort();
+  nav.innerHTML='';
+  keys.forEach(k=>{
+    const[y,m,d]=k.split('-').map(Number);
+    const f=new Date(y,m-1,d);
+    const dow=f.getDay();
+    const btn=document.createElement('div');
+    btn.className='dia-tab'+(k===diaActual?' active':'')+(k===hoy?' hoy':'');
+    const dot=`<span class="dia-dot" style="background:${DIA_DOTS[dow]}"></span>`;
+    btn.innerHTML=`<span class="dia-num">${d}</span>${dot}${DIAS_S[dow]} ${MESES[m-1]}`;
+    btn.onclick=()=>{
+      diaActual=k;_expandido=null;
+      // auto-ir a pestaña Pedidos al cambiar día
+      const tabPedidos=document.querySelector('.tab');
+      if(tabPedidos)showTab('pedidos',tabPedidos);
+      renderDiasNav();renderAll();
+    };
+    nav.appendChild(btn);
+  });
+  const add=document.createElement('button');
+  add.className='btn-add-dia';add.textContent='+';add.onclick=agregarDia;
+  nav.appendChild(add);
+  setTimeout(()=>{const a=nav.querySelector('.dia-tab.active');if(a)a.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});},50);
+}
+
+function agregarDia(){
+  const hoy=fechaKey(new Date());
+  const keys=Object.keys(datos.dias).sort();
+  const ultimo=keys[keys.length-1]||hoy;
+  const base=new Date(ultimo+'T12:00:00');
+  base.setDate(base.getDate()+1);
+  const nuevo=fechaKey(base);
+  if(!datos.dias[nuevo])datos.dias[nuevo]={pedidos:[],ventas:[]};
+  diaActual=nuevo;
+  guardar();renderDiasNav();renderAll();
+}
+
+// ── STATS ──
+function renderStats(){
+  // Contar todos los días >= hoy que se muestran en la vista multi-día
+  const hoy=fechaKey(new Date());
+  const diasVisibles=Object.keys(datos.dias).filter(k=>k>=hoy||k===diaActual).sort();
+  const psAll=diasVisibles.flatMap(k=>(datos.dias[k]?.pedidos||[]));
+
+  const fcPedidos=psAll.length;
+  const fcTortasReal=psAll.reduce((s,p)=>s+(p.productos||[]).filter(r=>{const cat=datos.catalogo.find(c=>c.nombre===r.nombre);return cat&&cat.tiene_talle;}).reduce((ss,r)=>ss+(()=>{const _n=Number(r.cantidad);return isNaN(_n)?1:_n;})(),0),0);
+  const fcOtros=psAll.reduce((s,p)=>s+(p.productos||[]).filter(r=>{const cat=datos.catalogo.find(c=>c.nombre===r.nombre);return !(cat&&cat.tiene_talle);}).reduce((ss,r)=>ss+(()=>{const _n=Number(r.cantidad);return isNaN(_n)?1:_n;})(),0),0);
+  const elFcP=document.getElementById('fc-pedidos');if(elFcP)elFcP.textContent=fcPedidos;
+  const elFcT=document.getElementById('fc-tortas');if(elFcT)elFcT.textContent=fcTortasReal;
+  const elFcO=document.getElementById('fc-productos');if(elFcO)elFcO.textContent=fcOtros;
+}
+// Autocomplete en buscador (frecuentes primero con ⭐)
+function onBuscadorInput(){
+  renderPedidos();
+  const q=(document.getElementById('buscador').value||'').toLowerCase().trim();
+  const lista=document.getElementById('autocomplete-lista');
+  if(!q||q.length<2){lista.classList.remove('visible');return;}
+  const frecs=datos.clientes.filter(c=>c.nombre.toLowerCase().includes(q)&&!esCuba(c.nombre));
+  if(!frecs.length){lista.classList.remove('visible');return;}
+  // frecuentes marcados primero
+  const sorted=[...frecs].sort((a,b)=>(b.frecuente?1:0)-(a.frecuente?1:0));
+  lista.innerHTML=sorted.map(c=>`
+    <div class="autocomplete-item" onclick="seleccionarAutocompletado('${c.id}')">
+      <span>${c.frecuente?'<span class="ac-star">⭐</span>':''} ${esc(c.nombre)}</span>
+      <span class="ac-tel">${esc(c.tel||'')}</span>
+    </div>
+  `).join('');
+  lista.classList.add('visible');
+}
+function seleccionarAutocompletado(clienteId){
+  const cl=datos.clientes.find(c=>c.id===clienteId);
+  if(!cl)return;
+  document.getElementById('buscador').value=cl.nombre;
+  document.getElementById('autocomplete-lista').classList.remove('visible');
+  renderPedidos();
+}
+// ── FILTRO ── filtrar pedidos (cuba clientes, pendientes, retirados,etc)
+function setFiltro(f,el){
+  filtro=f;
+  document.querySelectorAll('.filtros button').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderPedidos();
+}
+
+// ── PEDIDOS ──
+function getPedidosFiltradosDeDia(diaKey){
+  const dData=datos.dias[diaKey];
+  if(!dData)return[];
+  let ps=dData.pedidos||[];
+  const q=(document.getElementById('buscador').value||'').toLowerCase().trim();
+  if(q)ps=ps.filter(p=>(p.cliente||'').toLowerCase().includes(q)||(p.cliente_input||'').toLowerCase().includes(q));
+  if(filtro==='pendientes')ps=ps.filter(p=>p.estado==='pendiente'||p.estado==='prod');
+  if(filtro==='listos')ps=ps.filter(p=>p.estado==='listo');
+  if(filtro==='noRetirados')ps=ps.filter(p=>p.estado!=='entregado');
+  if(filtro==='cuba')ps=ps.filter(p=>esCuba(p.cliente));
+  if(filtro==='sinTacc')ps=ps.filter(p=>(p.productos||[]).some(r=>r.tacc==='s'));
+  if(filtro==='clientes')ps=ps.filter(p=>!esCuba(p.cliente));
+  return ps.sort((a,b)=>(a.hora_entrega||'99:99').localeCompare(b.hora_entrega||'99:99'));
+}
+
+// Alias para compatibilidad con el resto del código que usa getPedidosFiltrados()
+function getPedidosFiltrados(){
+  return getPedidosFiltradosDeDia(diaActual);
+}
+
+// ── Banner de día divisor (inline, dentro de la planilla) ──
+function buildDiaBanner(diaKey){
+  const hoy=fechaKey(new Date());
+  const [y,m,d]=diaKey.split('-').map(Number);
+  const f=new Date(y,m-1,d);
+  const dow=f.getDay();
+  const nombreDia=DIAS_FULL[dow].toUpperCase();
+  const fechaStr=`${d} de ${MESES[m-1]}`;
+  const esHoy=diaKey===hoy;
+  const esMañana=diaKey===fechaKey(new Date(new Date().setDate(new Date().getDate()+1)));
+  const dData=datos.dias[diaKey]||{};
+  const ps=(dData.pedidos||[]);
+  const total=ps.length;
+  const pendientes=ps.filter(p=>p.estado==='pendiente'||p.estado==='prod').length;
+  const listos=ps.filter(p=>p.estado==='listo').length;
+  const retirados=ps.filter(p=>p.estado==='entregado').length;
+
+  const etiquetaDia=esHoy?'HOY':esMañana?'MAÑANA':'';
+
+  const div=document.createElement('div');
+  div.className=`dia-banner-divisor ${DIA_CLASES[dow]}`;
+  div.dataset.diaKey=diaKey;
+  div.innerHTML=`
+    <div class="dbd-left">
+      <div class="dbd-dia">${nombreDia} ${d}</div>
+      <div class="dbd-fecha">${fechaStr} de ${y}</div>
+    </div>
+    <div class="dbd-right">
+      ${etiquetaDia?`<span class="dbd-badge">${etiquetaDia}</span>`:''}
+      <div class="dbd-stats">
+        ${pendientes>0?`<span class="dbd-stat pend">${pendientes} pend.</span>`:''}
+        ${listos>0?`<span class="dbd-stat listo">${listos} listo${listos>1?'s':''}</span>`:''}
+        ${retirados>0?`<span class="dbd-stat ret">${retirados} ret.</span>`:''}
+        ${total===0?`<span class="dbd-stat vacio">sin pedidos</span>`:''}
+      </div>
+    </div>
+  `;
+  return div;
+}
+
+function renderPedidos(){
+  renderStats();
+  const wrap=document.getElementById('planilla-wrap');
+  const vacio=document.getElementById('vacio-pedidos');
+  wrap.innerHTML='';
+
+  const hoy=fechaKey(new Date());
+  // Todos los días desde hoy en adelante + diaActual si es pasado (para no perder el contexto)
+  const diasKeys=Object.keys(datos.dias)
+    .filter(k=>k>=hoy||k===diaActual)
+    .sort();
+
+  // Si hay búsqueda/filtro activo, también incluir días pasados donde haya match
+  const q=(document.getElementById('buscador').value||'').toLowerCase().trim();
+  const hayFiltroActivo=filtro!=='todos'||q;
+  let diasAMostrar;
+  if(hayFiltroActivo){
+    // Con filtro: mostrar TODOS los días que tengan resultados
+    diasAMostrar=Object.keys(datos.dias).sort().filter(k=>{
+      return getPedidosFiltradosDeDia(k).length>0;
+    });
+  } else {
+    diasAMostrar=diasKeys;
+  }
+
+  if(!diasAMostrar.length){
+    vacio.style.display='';wrap.style.display='none';return;
+  }
+  vacio.style.display='none';wrap.style.display='';
+
+  let hayAlgo=false;
+  diasAMostrar.forEach(diaKey=>{
+    const ps=getPedidosFiltradosDeDia(diaKey);
+    // Mostrar banner siempre para días futuros sin filtro, o solo si hay pedidos con filtro
+    if(!hayFiltroActivo||ps.length>0){
+      wrap.appendChild(buildDiaBanner(diaKey));
+      hayAlgo=true;
+    }
+    if(ps.length===0){
+      if(!hayFiltroActivo){
+        // Día vacío: mostrar placeholder
+        const empty=document.createElement('div');
+        empty.className='planilla planilla-vacia';
+        empty.innerHTML=`<div class="vacio" style="padding:14px 12px;font-size:.78rem;">Sin pedidos para este día.</div>`;
+        wrap.appendChild(empty);
+      }
+      return;
+    }
+
+    const planilla=document.createElement('div');
+    planilla.className='planilla';
+    planilla.dataset.diaKey=diaKey;
+
+    ps.forEach(p=>{
+    const isCuba=esCuba(p.cliente);
+    const estado=p.estado||'pendiente';
+    const esEspecial=p.dia_especial||false;
+
+    const row=document.createElement('div');
+    let rowClass='pedido-row';
+    if(isCuba)rowClass+=' cuba';
+    if(estado==='entregado')rowClass+=' retirado';
+    if(esEspecial)rowClass+=' dia-especial-row';
+    row.className=rowClass;
+    row.dataset.id=p.id;
+
+    const prodsHTML=(p.productos||[]).map(r=>{
+      const nom=r.tipo==='catalogo'?r.nombre:r.libre;
+      const tam=r.tamano?' · '+r.tamano:'';
+      const _cantN=Number(r.cantidad);const cant=isNaN(_cantN)?1:_cantN;
+      const pill=r.tacc==='s'?'<span class="tacc-pill s">ST</span>':'<span class="tacc-pill c">C</span>';
+      const cubaPedidoChk=r.tacc==='c'
+        ?`<div onclick="event.stopPropagation();toggleCubaPedido('${p.id}','${r.id}')" title="${r.pedido_cuba?'Pedido a Cuba ✓':'Pedir a Cuba'}" style="width:16px;height:16px;border-radius:50%;border:2px solid ${r.pedido_cuba?'var(--accent)':'var(--border)'};background:${r.pedido_cuba?'var(--accent)':'transparent'};display:flex;align-items:center;justify-content:center;font-size:8px;color:${r.pedido_cuba?'#fff':'transparent'};flex-shrink:0;cursor:pointer;transition:all .15s;">✓</div>`
+        :'';
+      const notaProdLine=r.nota_prod?`<div style="font-size:.68rem;color:var(--ink-light);font-style:italic;padding-left:22px;margin-top:1px;">↳ ${esc(r.nota_prod)}</div>`:'';
+      return`<div class="row-prod-line">
+        <div style="width:14px;height:14px;border-radius:3px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;cursor:pointer;${r.listo?'background:var(--green-mid);border-color:var(--green-mid);color:#fff;':'color:transparent;'}" onclick="event.stopPropagation();toggleProdListo('${p.id}','${r.id}')">✓</div>
+        ${pill}<span style="${r.listo?'color:var(--green-mid);font-weight:500;':''}">${r.listo?'✓ ':''}${esc(nom)}${tam} x${cant}</span>
+        ${cubaPedidoChk}
+      </div>${notaProdLine}`;
+    }).join('');
+
+    const estadoBadge={
+      pendiente:'<span class="badge-estado pendiente">Pendiente</span>',
+      prod:'<span class="badge-estado prod">En prod.</span>',
+      listo:'<span class="badge-estado listo">Listo</span>',
+      entregado:'<span class="badge-estado entregado">Retirado</span>',
+    }[estado]||'';
+
+    const totalPedido=calcularTotalPedido(p);
+    const totalStr=totalPedido>0?`<span style="font-size:.65rem;color:var(--green);font-weight:500;margin-left:4px;">$${totalPedido.toLocaleString('es-AR')}</span>`:'';
+    const notaIcon=p.notas?'<span style="font-size:.75rem;color:var(--amber);margin-left:2px;" title="'+esc(p.notas)+'">📝</span>':'';
+
+    row.innerHTML=`
+      <div class="row-top">
+        <div class="row-check${p.estado==='listo'||p.estado==='entregado'?' on':''}" onclick="toggleListoPedido('${p.id}')">✓</div>
+        <div class="row-hora">${p.hora_entrega||'--:--'}${p.fuera_horario?'<span title="Fuera de horario" style="font-size:.6rem;margin-left:2px;vertical-align:middle;">🌙</span>':''}</div>
+        <div class="row-nombre${isCuba?' cuba':''}">
+          ${esEspecial?'<span class="badge-especial">⚡</span> ':''}${(()=>{const nombreMostrar=p.cliente_input||p.cliente||'Sin nombre';const esFrecuente=!isCuba&&datos.clientes.some(c=>c.frecuente&&c.nombre.toLowerCase()===(nombreMostrar).toLowerCase());return (esFrecuente?'<span style="font-size:.75rem;" title="Cliente frecuente">⭐</span> ':'')+esc(nombreMostrar);})()}${totalStr}${notaIcon}
+        </div>
+        <div class="row-badges">${estadoBadge}${p.pagado?'<span style="font-size:.7rem">💲</span>':''}</div>
+        ${estado!=='entregado'
+          ? `<div onclick="setEstado('${p.id}','entregado')" style="font-size:.58rem;font-weight:600;padding:3px 8px;border-radius:10px;border:1px solid var(--ink-light);color:var(--ink-light);background:transparent;cursor:pointer;flex-shrink:0;white-space:nowrap;">Retirado</div>`
+          : `<div onclick="setEstado('${p.id}','listo')" style="font-size:.58rem;font-weight:600;padding:3px 8px;border-radius:10px;border:1px solid var(--green);color:var(--green);background:var(--green-soft);cursor:pointer;flex-shrink:0;white-space:nowrap;">↩ Deshacer</div>`
+        }
+        <div onclick="abrirModalVista('${p.id}')" title="Ver pedido" style="font-size:1.1rem;color:var(--accent);margin-left:2px;font-weight:700;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--accent-soft);flex-shrink:0;cursor:pointer;">＋</div>
+      </div>
+      <div class="row-prods">${prodsHTML}</div>
+      ${p.creado ? `<div class="pedido-ts">cargado ${(()=>{const d=new Date(p.creado);const h=String(d.getHours()).padStart(2,'0');const m=String(d.getMinutes()).padStart(2,'0');const dd=String(d.getDate()).padStart(2,'0');const mm=String(d.getMonth()+1).padStart(2,'0');return dd+'/'+mm+' '+h+':'+m;})()}</div>` : ''}
+    `;
+    planilla.appendChild(row);
+    });// cierre forEach pedidos del día
+
+    wrap.appendChild(planilla);
+  });// cierre forEach días
+
+  if(!hayAlgo){vacio.style.display='';wrap.style.display='none';}
+}
+
+function calcularTotalPedido(p){
+  return (p.productos||[]).reduce((s,r)=>{
+    const cat=datos.catalogo.find(c=>c.nombre===r.nombre&&((r.tacc==='s'&&c.tipo==='sin_tacc')||(r.tacc==='c'&&c.tipo==='con_tacc')));
+    const cant=Number(r.cantidad)||1;
+    const base=r.tipo==='libre'?(r.precio_libre||0):getPrecioCat(cat,r.tamano);
+    const extras=(r.extras||[]).reduce((s2,ex)=>s2+(parseFloat(ex.precio)||0),0);
+    return s+(base*cant)+extras;
+  },0);
+}
+
+function buildPanel(p){
+  const isCuba=esCuba(p.cliente);
+  const estado=p.estado||'pendiente';
+  const estadoOpts=['pendiente','prod','listo','entregado'];
+  const estadoLabels={pendiente:'Pendiente',prod:'En producción',listo:'Listo',entregado:'Retirado'};
+  const estadoHTML=estadoOpts.map(e=>`<div class="estado-opt${estado===e?' active-'+e:''}" onclick="setEstado('${p.id}','${e}')">${estadoLabels[e]}</div>`).join('');
+  const prodsHTML=(p.productos||[]).map((r,i)=>buildProdEdit(p.id,r,i)).join('');
+  const pagadoBar=p.pagado
+    ?`<div class="pago-bar si">✅ Pagado · ${esc(p.metodoPago||'')} <button class="btn-pagar despagar" onclick="abrirModalPago('${p.id}',true)">Deshacer</button></div>`
+    :`<div class="pago-bar no">💳 Sin confirmar pago <button class="btn-pagar pagar" onclick="abrirModalPago('${p.id}',false)">Confirmar pago</button></div>`;
+  const dd=diaData();
+  const especial=dd.especial||false;
+  const corte=dd.corteHora||'15:00';
+  const totalPedido=calcularTotalPedido(p);
+  const esEspecialPedido=p.dia_especial||false;
+
+  return`
+    ${isCuba ? `
+    <div style="background:var(--cuba-bg);border:1.5px solid var(--cuba-border);border-radius:var(--radius-sm);padding:6px 12px;margin-bottom:10px;font-size:.75rem;color:var(--cuba-ink);font-weight:500;">🏪 Pedido de Cuba</div>
+    ${especial ? `
+    <div class="campo"><label>Turno de envío</label>
+      <div class="cuba-turno-sel">
+        <div class="cuba-turno-btn t1${(p.hora_entrega||'')<=corte&&p.hora_entrega?' active':''}" onclick="updatePedido('${p.id}','hora_entrega','${corte}');renderPedidos()">🟠 Turno 1 — ${esc(corte)}</div>
+        <div class="cuba-turno-btn t2${(p.hora_entrega||'')>corte?' active':''}" onclick="updatePedido('${p.id}','hora_entrega','18:00');renderPedidos()">🔵 Turno 2 — 18:00</div>
+      </div>
+    </div>` : ''}
+    ` : `
+    <div class="campos-2">
+      <div class="campo autocomplete-wrap">
+        <label>Cliente</label>
+        <input type="text" id="inp-cliente-${p.id}" value="${esc(p.cliente_input||p.cliente||'')}" placeholder="Nombre..." oninput="onClienteInput('${p.id}',this.value)" autocomplete="off">
+        <div class="autocomplete-lista" id="ac-${p.id}"></div>
+      </div>
+      <div class="campo"><label>Teléfono</label><input type="tel" value="${esc(p.tel||'')}" placeholder="11 1234-5678" onchange="updatePedido('${p.id}','tel',this.value)"></div>
+    </div>
+    <div class="campo" style="max-width:140px"><label>Hora de entrega</label><input type="time" value="${esc(p.hora_entrega||'')}" onchange="updatePedido('${p.id}','hora_entrega',this.value)"></div>
+    `}
+
+    <!-- Día especial pedido -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+      <label style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-light);font-weight:500;">Marcar como:</label>
+      ${esEspecialPedido
+        ? `<span style="font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:10px;background:var(--amber);color:#fff;">⚡ DÍA ESPECIAL</span>
+           <button onclick="confirmarDesmarcarEspecial('${p.id}')" style="font-size:.6rem;padding:2px 8px;border:1.5px solid var(--amber);border-radius:8px;background:transparent;color:var(--amber);cursor:pointer;">Cambiar a normal</button>`
+        : `<button onclick="marcarDiaEspecialPedido('${p.id}')" style="font-size:.62rem;padding:3px 10px;border:1.5px dashed var(--amber);border-radius:10px;background:transparent;color:var(--amber);cursor:pointer;">⚡ Día especial</button>`
+      }
+    </div>
+
+    <div class="sep-line"></div>
+    <div class="campo"><label>Productos</label></div>
+    <div class="prod-edit-wrap" id="prods-${p.id}">${prodsHTML}</div>
+    <button class="btn-add-prod" onclick="agregarProducto('${p.id}')">＋ Agregar producto</button>
+
+    ${totalPedido>0?`<div class="pedido-total-bar"><span>Total del pedido</span><span class="ptb-num">$${totalPedido.toLocaleString('es-AR')}</span></div>`:''}
+
+    <div class="sep-line"></div>
+    <div class="campo"><label>Estado</label><div class="estado-sel">${estadoHTML}</div></div>
+    <div class="sep-line"></div>
+    ${isCuba ? '' : pagadoBar}
+    <div class="campo">
+      <button class="nota-general-toggle" onclick="toggleNotaGeneral('${p.id}')">📝 ${p.notas?'Nota: '+esc(p.notas.slice(0,40))+(p.notas.length>40?'…':''):'Agregar nota general'}</button>
+      <div class="nota-general-wrap" id="nota-gen-${p.id}" style="${p.notas?'display:block':'display:none'}">
+        <textarea class="notas-input" placeholder="${isCuba?'Aclaraciones para Cuba...':'Sin dulce de leche, avisame cuando esté...'}" onchange="updatePedido('${p.id}','notas',this.value);actualizarBotonNota('${p.id}',this.value)">${esc(p.notas||'')}</textarea>
+      </div>
+    </div>
+    <div class="sep-line"></div>
+    <div class="mover-dia-wrap">
+      <div style="font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-light);font-weight:500;margin-bottom:4px;">Mover a otro día</div>
+      <div class="mover-dia-opts">${buildMoverOpts(p.id)}</div>
+    </div>
+    <div class="btns-accion">
+      <button class="btn-guardar" onclick="guardarCerrar('${p.id}')">Guardar</button>
+      <button class="btn-danger" onclick="confirmarEliminar('${p.id}')">Eliminar</button>
+    </div>
+  `;
+}
+
+
+// Autocomplete en campo cliente del panel
+function onClienteInput(pedidoId,valor){
+  updateClienteInput(pedidoId,valor);
+  const q=valor.toLowerCase().trim();
+  const lista=document.getElementById('ac-'+pedidoId);
+  if(!lista)return;
+  if(!q||q.length<2){lista.classList.remove('visible');return;}
+  const matches=datos.clientes.filter(c=>c.nombre.toLowerCase().includes(q)&&!esCuba(c.nombre)).slice(0,6);
+  if(!matches.length){lista.classList.remove('visible');return;}
+  // frecuentes primero
+  const sorted=[...matches].sort((a,b)=>(b.frecuente?1:0)-(a.frecuente?1:0));
+  lista.innerHTML=sorted.map(c=>`
+    <div class="autocomplete-item" onclick="aplicarClientePanel('${pedidoId}','${c.id}')">
+      <span>${c.frecuente?'<span class="ac-star">⭐</span> ':''} ${esc(c.nombre)}</span>
+      <span class="ac-tel">${esc(c.tel||'')}</span>
+    </div>
+  `).join('');
+  lista.classList.add('visible');
+}
+function aplicarClientePanel(pedidoId,clienteId){
+  const cl=datos.clientes.find(c=>c.id===clienteId);
+  if(!cl)return;
+  const p=getAllPedidos().find(x=>x.id===pedidoId);
+  if(!p)return;
+  p.cliente_input=cl.nombre;
+  p.cliente=normalizarCliente(cl.nombre);
+  if(cl.tel)p.tel=cl.tel;
+  guardar();
+  const lista=document.getElementById('ac-'+pedidoId);
+  if(lista)lista.classList.remove('visible');
+  const inp=document.getElementById('inp-cliente-'+pedidoId);
+  if(inp)inp.value=cl.nombre;
+  const telInp=document.getElementById('inp-tel-'+pedidoId);
+  if(telInp)telInp.value=cl.tel||'';
+}
+
+function marcarDiaEspecialPedido(id){
+  const p=getAllPedidos().find(x=>x.id===id);if(!p)return;
+  p.dia_especial=true;guardar();renderPedidos();
+}
+function confirmarDesmarcarEspecial(id){
+  abrirModalGen('¿Cambiar a pedido normal?','Este pedido dejará de marcarse como día especial.',()=>{
+    const p=getAllPedidos().find(x=>x.id===id);if(!p)return;
+    p.dia_especial=false;guardar();renderPedidos();
+  },'danger');
+}
+
+function buildProdEdit(pedidoId,r,idx){
+  const cat=datos.catalogo.find(c=>c.nombre===r.nombre&&c.tipo===(r.tacc==='s'?'sin_tacc':'con_tacc'));
+  const tieneTalle=r.tipo==='catalogo'?(cat?cat.tiene_talle:true):true;
+  const nom=r.tipo==='catalogo'?r.nombre:r.libre;
+  const precio=(cat&&cat.precio)||0;
+  const precioStr=precio>0?`<span class="prod-precio">$${precio.toLocaleString('es-AR')}</span>`:'';
+
+  let taccBar='';
+  if(r.tacc==='s'){
+    taccBar=`<div class="tacc-info-bar s">🌿 Sin TACC — va a Producción</div>`;
+  } else if(r.tacc==='c'){
+    taccBar=`<div class="tacc-info-bar c">🌾 Común — va a Cuba
+      <div class="tacc-checks">
+        <label class="tacc-chk-item" onclick="toggleTaccChk('${pedidoId}','${r.id}','pedido_cuba')">
+          <div class="tacc-chk-box${r.pedido_cuba?' on':''}">✓</div>Pedido a Cuba
+        </label>
+        <label class="tacc-chk-item" onclick="toggleTaccChk('${pedidoId}','${r.id}','separado_cuba')">
+          <div class="tacc-chk-box${r.separado_cuba?' on':''}">✓</div>Separado
+        </label>
+      </div>
+    </div>`;
+  }
+
+  let tamHTML='';
+  if(tieneTalle){
+    const libreActivo=r._tamLibre||(!!(r.tamano)&&!TAMANIOS.includes(r.tamano));
+    const tamBtns=TAMANIOS.map(t=>`<button class="tam-btn${!libreActivo&&r.tamano===t?' active':''}" onclick="setTamano('${pedidoId}','${r.id}','${t}')">${t}</button>`).join('');
+    tamHTML=`
+      <div class="campo"><label>Tamaño</label>
+        <div class="tam-btns">
+          ${tamBtns}
+          <button class="tam-btn tam-btn-libre${libreActivo?' active':''}" onclick="setTamano('${pedidoId}','${r.id}','__libre__')">Libre</button>
+        </div>
+        <input type="text" class="tam-libre-input${libreActivo?' visible':''}" value="${esc(libreActivo&&r.tamano?r.tamano:'')}" placeholder="ej: 2kg, bandeja..."
+          oninput="setTamanoLibre('${pedidoId}','${r.id}',this.value)">
+      </div>
+    `;
+  }
+
+  return`<div class="prod-edit-fila" id="prod-${r.id}">
+    <div class="prod-edit-top">
+      <div class="prod-listo-chk${r.listo?' on':''}" onclick="toggleProdListo('${pedidoId}','${r.id}')">✓</div>
+      <div class="prod-edit-nombre${r.tipo==='libre'?' libre':''}">${esc(nom||'(sin nombre)')}</div>
+      ${precioStr}
+      <button class="btn-cambiar-prod" onclick="abrirSelector('${pedidoId}','${r.id}')">Cambiar</button>
+      <button class="btn-remove-prod" onclick="eliminarProducto('${pedidoId}','${r.id}')">✕</button>
+    </div>
+    ${taccBar}
+    <div class="prod-fila-mid">
+      ${tamHTML||'<div></div>'}
+      <div class="campo"><label>Cantidad</label>
+        <div style="display:flex;align-items:center;gap:5px;margin-top:2px;">
+          <button onclick="event.stopPropagation();ajustarCantidad('${pedidoId}','${r.id}',-1)" style="width:28px;height:28px;border:1.5px solid var(--border);border-radius:6px;background:var(--paper);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-mid)">−</button>
+          <input type="text" inputmode="numeric" value="${esc(String(r.cantidad||1))}" onfocus="this.select()" onchange="setProdCampo('${pedidoId}','${r.id}','cantidad',parseInt(this.value)||1)" style="text-align:center;width:44px;border:none;border-bottom:1.5px solid var(--border);background:transparent;font-size:1rem;font-family:'Lora',serif;color:var(--accent);font-weight:600;padding:2px 0;outline:none;">
+          <button onclick="event.stopPropagation();ajustarCantidad('${pedidoId}','${r.id}',+1)" style="width:28px;height:28px;border:1.5px solid var(--border);border-radius:6px;background:var(--paper);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-mid)">＋</button>
+        </div>
+      </div>
+    </div>
+    <div style="padding-top:3px;">
+      <button class="prod-nota-toggle" onclick="toggleNotaProd('${pedidoId}','${r.id}')">${r.nota_prod?'✏️ '+esc(r.nota_prod):'＋ Agregar nota'}</button>
+      <textarea class="prod-nota-textarea${r.nota_prod?' visible':''}" id="nota-prod-${r.id}" placeholder="ej: sin flambear, sin DDL..." onchange="setProdCampo('${pedidoId}','${r.id}','nota_prod',this.value)">${esc(r.nota_prod||'')}</textarea>
+    </div>
+  </div>`;
+}
+
+// ── ACCIONES PEDIDO ──
+function updatePedido(id,campo,valor){
+  const p=getAllPedidos().find(x=>x.id===id);if(!p)return;
+  if(campo==='cliente_input'){
+    p.cliente_input=valor;
+    p.cliente=normalizarCliente(valor);
+  } else {
+    p[campo]=valor;
+  }
+  guardar();setSyncPendiente();
+}
+function updateClienteInput(id,valor){
+  const p=getAllPedidos().find(x=>x.id===id);if(!p)return;
+  p.cliente_input=valor;
+  p.cliente=normalizarCliente(valor);
+  guardar();
+}
+function setEstado(id,estado){
+  const p=getAllPedidos().find(x=>x.id===id);if(!p)return;
+  p.estado=estado;
+  if(!p.historial)p.historial=[];
+  p.historial.push({estado,ts:Date.now()});
+  guardar();renderPedidos();
+}
+function toggleListoPedido(id){
+  const p=getAllPedidos().find(x=>x.id===id);if(!p)return;
+  const nuevo=p.estado==='listo'?'pendiente':'listo';
+  setEstado(id,nuevo);
+}
+function validarPedido(p){
+  const isCuba=esCuba(p.cliente);
+  const errores=[];
+  if(!isCuba&&!(p.cliente||'').trim())errores.push('Falta el nombre del cliente');
+  if(!isCuba&&!(p.hora_entrega||'').trim())errores.push('Falta la hora de entrega');
+  if(!p.productos||!p.productos.length)errores.push('Agregá al menos un producto');
+  return errores;
+}
+function guardarCerrar(id){
+  const p=getAllPedidos().find(x=>x.id===id);if(!p)return;
+  const errores=validarPedido(p);
+  if(errores.length){
+    let warn=document.getElementById('warn-'+id);
+    if(!warn){
+      warn=document.createElement('div');
+      warn.id='warn-'+id;
+      warn.className='validacion-warn';
+      const btns=document.querySelector(`[onclick="guardarCerrar('${id}')"]`).closest('.btns-accion');
+      btns.parentNode.insertBefore(warn,btns);
+    }
+    warn.innerHTML=`⚠️ Faltan datos:<ul>${errores.map(e=>`<li>${e}</li>`).join('')}</ul>`;
+    warn.scrollIntoView({behavior:'smooth',block:'nearest'});
+    return;
+  }
+  // NO se guardan clientes automáticamente — solo los frecuentes cargados manualmente
+  _expandido=null;
+  guardar();renderPedidos();
+}
+function confirmarEliminar(id){
+  abrirModalGen('¿Eliminar pedido?','Esta acción no se puede deshacer.',()=>{
+    // buscar en qué día está el pedido
+    let eliminado=false;
+    Object.values(datos.dias).forEach(dData=>{
+      if(eliminado)return;
+      const ps=dData.pedidos||[];
+      const idx=ps.findIndex(x=>x.id===id);
+      if(idx>=0){ps.splice(idx,1);eliminado=true;}
+    });
+    _expandido=null;
+    guardar();renderPedidos();
+  },'danger');
+}
+
+// ARCHIVAR (en lugar de eliminar)
+function archivarRetirados(){
+  const hoy=fechaKey(new Date());
+  const diasVisibles=Object.keys(datos.dias).filter(k=>k>=hoy||k===diaActual).sort();
+  // Juntar todos los retirados de todos los días visibles
+  const retiradosPorDia=[];
+  diasVisibles.forEach(dKey=>{
+    const ps=(datos.dias[dKey]?.pedidos||[]).filter(p=>p.estado==='entregado');
+    if(ps.length)retiradosPorDia.push({dKey,ps});
+  });
+  const totalRet=retiradosPorDia.reduce((s,x)=>s+x.ps.length,0);
+  if(!totalRet){alert('No hay pedidos retirados para archivar.');return;}
+  abrirModalGen(`Archivar ${totalRet} pedido(s)`,
+    `Los pedidos marcados como "Retirado" se moverán a Archivados y podrás consultarlos después.`,
+    ()=>{
+      retiradosPorDia.forEach(({dKey,ps})=>{
+        const [y,m,d]=dKey.split('-').map(Number);
+        const f=new Date(y,m-1,d);
+        const nomDia=DIAS_FULL[f.getDay()];
+        ps.forEach(p=>{
+          datos.archivados.push({...p,_fecha:dKey,_nomDia:nomDia,_archivadoTs:Date.now()});
+        });
+        datos.dias[dKey].pedidos=(datos.dias[dKey].pedidos||[]).filter(p=>p.estado!=='entregado');
+      });
+      _expandido=null;
+      guardar();renderPedidos();renderArchivadosSeccion();
+    },'confirm');
+}
+function toggleArchivadosLista(){
+  const lista=document.getElementById('archivados-lista');
+  lista.classList.toggle('open');
+  if(lista.classList.contains('open'))renderArchivadosContent('archivados-lista',false);
+}
+function toggleArchivadosGlobal(){
+  const lista=document.getElementById('archivados-global-lista');
+  lista.classList.toggle('open');
+  if(lista.classList.contains('open'))renderArchivadosGlobalContent();
+}
+function renderArchivadosContent(wrapperId,global){
+  const wrap=document.getElementById(wrapperId);
+  const fuente=global?datos.archivados:datos.archivados.filter(a=>a._fecha===diaActual);
+  if(!fuente.length){wrap.innerHTML='<div class="vacio" style="padding:14px;">Sin archivados.</div>';return;}
+  const ordenados=[...fuente].sort((a,b)=>(b._archivadoTs||0)-(a._archivadoTs||0));
+  wrap.innerHTML=ordenados.map(a=>{
+    const prods=(a.productos||[]).map(r=>{
+      const nom=r.tipo==='catalogo'?r.nombre:r.libre;
+      const _cantN=Number(r.cantidad);const cant=isNaN(_cantN)?1:_cantN;
+      return`${nom} x${cant}`;
+    }).join(', ');
+    return`<div class="arch-item">
+      <div class="arch-item-top">
+        ${global?`<span class="arch-fecha">${a._nomDia||''} ${(a._fecha||'').slice(8)}/${(a._fecha||'').slice(5,7)}</span>`:''}
+        <span class="arch-nombre">${esc(a.cliente||'Sin nombre')}</span>
+        <span class="arch-hora">${a.hora_entrega||'--:--'}</span>
+      </div>
+      <div class="arch-prods">${esc(prods)||'(sin productos)'}</div>
+    </div>`;
+  }).join('');
+}
+function renderArchivadosSeccion(){
+  const delDia=datos.archivados.filter(a=>a._fecha===diaActual);
+  const sec=document.getElementById('archivados-section');
+  sec.style.display=delDia.length?'':'none';
+  document.getElementById('archivados-count').textContent=delDia.length+' archivado(s)';
+}
+function renderArchivadosGlobal(){
+  const total=datos.archivados.length;
+  const countEl=document.getElementById('archivados-global-count');
+  if(countEl)countEl.textContent=total+' total';
+}
+
+function ajustarCantidad(pedidoId,rId,delta){
+  const p=getAllPedidos().find(x=>x.id===pedidoId);if(!p)return;
+  const r=p.productos.find(x=>x.id===rId);if(!r)return;
+  r.cantidad=Math.max(1,(()=>{const _n=Number(r.cantidad);return isNaN(_n)?1:_n;})()+delta);
+  guardar();renderPedidos();
+}
+function setProdCampo(pedidoId,rId,campo,valor){
+  const p=getAllPedidos().find(x=>x.id===pedidoId);if(!p)return;
+  const r=p.productos.find(x=>x.id===rId);if(!r)return;
+  r[campo]=valor;guardar();setSyncPendiente();
+}
+function toggleNotaProd(pedidoId,rId){
+  const ta=document.getElementById('nota-prod-'+rId);
+  if(!ta)return;
+  ta.classList.toggle('visible');
+  if(ta.classList.contains('visible'))ta.focus();
+}
+function toggleNotaGeneral(pedidoId){
+  const wrap=document.getElementById('nota-gen-'+pedidoId);
+  if(!wrap)return;
+  const visible=wrap.style.display!=='none';
+  wrap.style.display=visible?'none':'block';
+  if(!visible)wrap.querySelector('textarea').focus();
+}
+function actualizarBotonNota(pedidoId,valor){
+  const btn=document.querySelector(`[onclick="toggleNotaGeneral('${pedidoId}')"]`);
+  if(btn)btn.textContent=(valor?'📝 Nota: '+valor.slice(0,40)+(valor.length>40?'…':''):'📝 Agregar nota general');
+}
+function toggleProdListo(pedidoId,rId){
+  const p=getAllPedidos().find(x=>x.id===pedidoId);if(!p)return;
+  const r=p.productos.find(x=>x.id===rId);if(!r)return;
+  r.listo=!r.listo;
+  if(r.tacc==='c') r.separado_cuba=r.listo;
+  const todosListos=p.productos.every(x=>x.listo);
+  if(todosListos&&(p.estado==='pendiente'||p.estado==='prod'))p.estado='listo';
+  guardar();renderPedidos();
+  // Actualizar semana si está activa
+  if(_prodTabActiva==='semana')renderProduccionSemanal();
+  const cubaTab=document.getElementById('tab-cuba');
+  if(cubaTab&&cubaTab.classList.contains('active'))renderEncargos();
+}
+function toggleTaccChk(pedidoId,rId,campo){
+  const p=getAllPedidos().find(x=>x.id===pedidoId);if(!p)return;
+  const r=p.productos.find(x=>x.id===rId);if(!r)return;
+  r[campo]=!r[campo];guardar();renderPedidos();
+}
+function setTamano(pedidoId,rId,tam){
+  const p=getAllPedidos().find(x=>x.id===pedidoId);if(!p)return;
+  const r=p.productos.find(x=>x.id===rId);if(!r)return;
+  if(tam==='__libre__'){
+    r._tamLibre=true;
+    const wrap=document.getElementById('prod-'+rId);
+    if(wrap){
+      wrap.querySelectorAll('.tam-btn').forEach(b=>b.classList.remove('active'));
+      const libreBtn=wrap.querySelector('.tam-btn-libre');
+      if(libreBtn)libreBtn.classList.add('active');
+      const inp=wrap.querySelector('.tam-libre-input');
+      if(inp){inp.classList.add('visible');inp.focus();}
+    }
+    guardar();return;
+  }
+  r._tamLibre=false;r.tamano=tam;
+  guardar();renderPedidos();
+}
+function setTamanoLibre(pedidoId,rId,valor){
+  const p=getAllPedidos().find(x=>x.id===pedidoId);if(!p)return;
+  const r=p.productos.find(x=>x.id===rId);if(!r)return;
+  r.tamano=valor;r._tamLibre=true;
+  guardar();setSyncPendiente();
+}
+function eliminarProducto(pedidoId,rId){
+  const p=getAllPedidos().find(x=>x.id===pedidoId);if(!p)return;
+  p.productos=p.productos.filter(x=>x.id!==rId);
+  guardar();renderPedidos();
+}
+function agregarProducto(pedidoId){abrirSelector(pedidoId,null);}
+
+function buildMoverOpts(pedidoId){
+  const otrosDias=Object.keys(datos.dias).filter(k=>k!==diaActual).sort();
+  if(!otrosDias.length)return'<span style="font-size:.7rem;color:var(--ink-light);font-style:italic;">No hay otros días cargados.</span>';
+  return otrosDias.map(k=>{
+    const[y,m,d]=k.split('-').map(Number);
+    const f=new Date(y,m-1,d);
+    const hoy=fechaKey(new Date());
+    const label=k===hoy?`Hoy ${d}/${m}`:`${DIAS_S[f.getDay()]} ${d}/${m}`;
+    return`<div class="mover-dia-opt" onclick="moverPedido('${pedidoId}','${k}')">${label}</div>`;
+  }).join('');
+}
+function moverPedido(pedidoId,diaDestino){
+  const origen=diaData();
+  const idx=origen.pedidos.findIndex(x=>x.id===pedidoId);
+  if(idx<0)return;
+  const [pedido]=origen.pedidos.splice(idx,1);
+  if(!datos.dias[diaDestino])datos.dias[diaDestino]={pedidos:[],ventas:[]};
+  datos.dias[diaDestino].pedidos.push(pedido);
+  _expandido=null;
+  guardar();renderDiasNav();renderAll();
+}

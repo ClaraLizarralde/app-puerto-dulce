@@ -1,0 +1,412 @@
+/* ══════════════════════════════════════
+   TEMA: default (terracota original)
+   ══════════════════════════════════════ */
+:root {
+  --bg:#faf7f4;
+  --paper:#ffffff;
+  --ink:#1e1410;
+  --ink-mid:#6b4f3a;
+  --ink-light:#a8856e;
+  --border:#e8d8cc;
+  --shadow:rgba(100,50,20,0.08);
+
+  --accent:#c95d3f;
+  --accent-soft:#fdf0eb;
+  --accent2:#e8956a;
+
+  --green:#4a8c5c;
+  --green-soft:#eaf4ed;
+  --green-mid:#6aab7e;
+
+  --amber:#b87a2a;
+  --amber-soft:#fdf3e3;
+
+  --blue:#4a7fa5;
+  --blue-soft:#e8f2f9;
+
+  --cuba-bg:#fdf6e3;
+  --cuba-border:#d4a843;
+  --cuba-ink:#7a5a10;
+  --cuba-soft:#fef9ed;
+
+  --tacc-s:#4a8c5c;
+  --tacc-s-soft:#eaf4ed;
+  --tacc-c:#b05a2a;
+  --tacc-c-soft:#fdecd8;
+
+  --red:#c0392b;
+  --red-soft:#fdecea;
+
+  --radius:12px;
+  --radius-sm:8px;
+
+  --header-grad:linear-gradient(135deg,#c95d3f,#b84a30);
+
+  /* Colores por día */
+  --dia-lunes:#2563eb;
+  --dia-lunes-text:#fff;
+  --dia-martes:#7c3aed;
+  --dia-martes-text:#fff;
+  --dia-miercoles:#ca8a04;
+  --dia-miercoles-text:#1e1410;
+  --dia-jueves:#dc2626;
+  --dia-jueves-text:#fff;
+  --dia-viernes:#16a34a;
+  --dia-viernes-text:#fff;
+  --dia-sabado:#ea580c;
+  --dia-sabado-text:#fff;
+  --dia-domingo:#4b5563;
+  --dia-domingo-text:#fff;
+}
+
+/* ══════════════════════════════════════
+   TEMA: girly — Verde Bosque · Rose Gold · Dorado
+   Timber Green / Hooker's Green / Charm / Rose Gold
+   ══════════════════════════════════════ */
+[data-theme="girly"] {
+  --bg:#18332E;
+  --paper:#213d37;
+  --ink:#f5ece8;
+  --ink-mid:#D07B87;
+  --ink-light:#A9BA9D;
+  --border:#2e4e47;
+  --shadow:rgba(0,0,0,0.4);
+
+  --accent:#D07B87;
+  --accent-soft:#1e2e2a;
+  --accent2:#B76E78;
+
+  --green:#49796B;
+  --green-soft:#162620;
+  --green-mid:#A9BA9D;
+
+  --amber:#c9a040;
+  --amber-soft:#1e1a08;
+
+  --blue:#8aabcc;
+  --blue-soft:#0e1e28;
+
+  --cuba-bg:#1a1e10;
+  --cuba-border:#c9a040;
+  --cuba-ink:#e8d080;
+  --cuba-soft:#202010;
+
+  --tacc-s:#49796B;
+  --tacc-s-soft:#162620;
+  --tacc-c:#A56269;
+  --tacc-c-soft:#2a1418;
+
+  --red:#A56269;
+  --red-soft:#2a1018;
+
+  --header-grad:linear-gradient(135deg,#0e2018,#18332E,#1e3a32);
+
+  --dia-lunes:#49796B;
+  --dia-lunes-text:#f5ece8;
+  --dia-martes:#D07B87;
+  --dia-martes-text:#fff;
+  --dia-miercoles:#c9a040;
+  --dia-miercoles-text:#18332E;
+  --dia-jueves:#B76E78;
+  --dia-jueves-text:#fff;
+  --dia-viernes:#A9BA9D;
+  --dia-viernes-text:#18332E;
+  --dia-sabado:#A56269;
+  --dia-sabado-text:#fff;
+  --dia-domingo:#2e4e47;
+  --dia-domingo-text:#A9BA9D;
+}
+
+/* ══════════════════════════════════════
+   TEMA: neon — Retro Futuristic Dark
+   Negro azulado · Cyan · Magenta · Violeta
+   ══════════════════════════════════════ */
+[data-theme="neon"] {
+  --bg:#090b12;
+  --paper:#0f1220;
+  --ink:#e8f0ff;
+  --ink-mid:#8898cc;
+  --ink-light:#404870;
+  --border:#181e38;
+  --shadow:rgba(0,230,200,0.12);
+
+  --accent:#00e5b0;
+  --accent-soft:#001a14;
+  --accent2:#00c899;
+
+  --green:#00e5b0;
+  --green-soft:#001a14;
+  --green-mid:#00c899;
+
+  --amber:#f0d020;
+  --amber-soft:#181400;
+
+  --blue:#7060ff;
+  --blue-soft:#0a0820;
+
+  --cuba-bg:#100e00;
+  --cuba-border:#f0d020;
+  --cuba-ink:#f0e060;
+  --cuba-soft:#161200;
+
+  --tacc-s:#00e5b0;
+  --tacc-s-soft:#001a14;
+  --tacc-c:#f0d020;
+  --tacc-c-soft:#181400;
+
+  --red:#ff2d8a;
+  --red-soft:#1a0010;
+
+  --header-grad:linear-gradient(135deg,#08091a,#0c0e20,#080a18);
+
+  --dia-lunes:#7060ff;
+  --dia-lunes-text:#fff;
+  --dia-martes:#ff2d8a;
+  --dia-martes-text:#fff;
+  --dia-miercoles:#f0d020;
+  --dia-miercoles-text:#090b12;
+  --dia-jueves:#00e5b0;
+  --dia-jueves-text:#090b12;
+  --dia-viernes:#00e060;
+  --dia-viernes-text:#090b12;
+  --dia-sabado:#ff6020;
+  --dia-sabado-text:#fff;
+  --dia-domingo:#c040ff;
+  --dia-domingo-text:#fff;
+}
+
+/* ══════════════════════════════════════
+   TEMA: pro — Slate & Sage
+   ══════════════════════════════════════ */
+[data-theme="pro"] {
+  --bg:#f4f5f7;
+  --paper:#ffffff;
+  --ink:#1a2030;
+  --ink-mid:#4a5568;
+  --ink-light:#8896a8;
+  --border:#d8dde8;
+  --shadow:rgba(26,32,48,0.08);
+
+  --accent:#3d7aaf;
+  --accent-soft:#eaf2f9;
+  --accent2:#5a9acc;
+
+  --green:#2e8c68;
+  --green-soft:#e8f5f0;
+  --green-mid:#4aab88;
+
+  --amber:#d4840a;
+  --amber-soft:#fdf3e3;
+
+  --blue:#3d7aaf;
+  --blue-soft:#eaf2f9;
+
+  --cuba-bg:#fdf8ee;
+  --cuba-border:#c8a030;
+  --cuba-ink:#6a5010;
+  --cuba-soft:#fefbf0;
+
+  --tacc-s:#2e8c68;
+  --tacc-s-soft:#e8f5f0;
+  --tacc-c:#b86020;
+  --tacc-c-soft:#fdecd8;
+
+  --red:#c0392b;
+  --red-soft:#fdecea;
+
+  --header-grad:linear-gradient(135deg,#1a2e48,#2e4a6a);
+
+  --dia-lunes:#3d7aaf;
+  --dia-lunes-text:#fff;
+  --dia-martes:#5a4a8a;
+  --dia-martes-text:#fff;
+  --dia-miercoles:#c8a030;
+  --dia-miercoles-text:#fff;
+  --dia-jueves:#b83030;
+  --dia-jueves-text:#fff;
+  --dia-viernes:#2e8c68;
+  --dia-viernes-text:#fff;
+  --dia-sabado:#b86020;
+  --dia-sabado-text:#fff;
+  --dia-domingo:#5a6878;
+  --dia-domingo-text:#fff;
+}
+
+
+/* ══════════════════════════════════════
+   TEMA: dark — Noche Violeta
+   #0E0C12 fondo · #C084FC violeta
+   #F472B6 rosa · #EDD9FF texto
+   ══════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg:#0E0C12;
+  --paper:#13101C;
+  --ink:#EDD9FF;
+  --ink-mid:#A78BFA;
+  --ink-light:#6A5A80;
+  --border:#2A2240;
+  --shadow:rgba(192,132,252,0.12);
+
+  --accent:#C084FC;
+  --accent-soft:#1E1530;
+  --accent2:#A855F7;
+
+  --green:#86EFAC;
+  --green-soft:#0F1F15;
+  --green-mid:#4ADE80;
+
+  --amber:#FCD34D;
+  --amber-soft:#1A1510;
+
+  --blue:#818CF8;
+  --blue-soft:#12122A;
+
+  --cuba-bg:#16101E;
+  --cuba-border:#7C3AED;
+  --cuba-ink:#C084FC;
+  --cuba-soft:#13101C;
+
+  --tacc-s:#86EFAC;
+  --tacc-s-soft:#0F1F15;
+  --tacc-c:#F472B6;
+  --tacc-c-soft:#200F1A;
+
+  --red:#F472B6;
+  --red-soft:#200F1A;
+
+  --radius:14px;
+  --radius-sm:10px;
+
+  --header-grad:linear-gradient(135deg,#13101C,#1A1228,#13101C);
+
+  --dia-lunes:#818CF8;
+  --dia-lunes-text:#EDD9FF;
+  --dia-martes:#F472B6;
+  --dia-martes-text:#fff;
+  --dia-miercoles:#C084FC;
+  --dia-miercoles-text:#0E0C12;
+  --dia-jueves:#A78BFA;
+  --dia-jueves-text:#0E0C12;
+  --dia-viernes:#86EFAC;
+  --dia-viernes-text:#0E0C12;
+  --dia-sabado:#FB7185;
+  --dia-sabado-text:#fff;
+  --dia-domingo:#6A5A80;
+  --dia-domingo-text:#EDD9FF;
+}
+
+/* ── DARK: fuente única del tema ── */
+[data-theme="dark"] body {
+  font-family: 'Inter', 'Outfit', sans-serif;
+}
+
+/* ── DARK: header — sin cursiva en el logo ── */
+[data-theme="dark"] .header {
+  box-shadow: 0 2px 20px var(--shadow);
+}
+[data-theme="dark"] .header-logo {
+  font-style: normal;
+}
+
+/* ══════════════════════════════════════
+   TEMA: pooh — Winnie the Pooh
+   #FAD749 fondo · #EF7F01 highlights
+   #F52532 botones/alertas · #110000 texto
+   ══════════════════════════════════════ */
+[data-theme="pooh"] {
+  --bg:#FAD749;
+  --paper:#ffffff;
+  --ink:#110000;
+  --ink-mid:#7A4500;
+  --ink-light:#B07020;
+  --border:#EF7F01;
+  --shadow:rgba(239,127,1,0.15);
+
+  --accent:#EF7F01;
+  --accent-soft:#FFF3CC;
+  --accent2:#FAD749;
+
+  --green:#5A8A1A;
+  --green-soft:#EEF5DC;
+  --green-mid:#8AB84A;
+
+  --amber:#EF7F01;
+  --amber-soft:#FFF3CC;
+
+  --blue:#5A8FAA;
+  --blue-soft:#E0EEF5;
+
+  --cuba-bg:#FFF8DC;
+  --cuba-border:#EF7F01;
+  --cuba-ink:#7A4500;
+  --cuba-soft:#FFFBEE;
+
+  --tacc-s:#5A8A1A;
+  --tacc-s-soft:#EEF5DC;
+  --tacc-c:#EF7F01;
+  --tacc-c-soft:#FFF3CC;
+
+  --red:#F52532;
+  --red-soft:#FDECEA;
+
+  --radius:14px;
+  --radius-sm:10px;
+
+  --header-grad:linear-gradient(135deg,#EF7F01,#d96e00);
+
+  --dia-lunes:#EF7F01;
+  --dia-lunes-text:#110000;
+  --dia-martes:#F52532;
+  --dia-martes-text:#fff;
+  --dia-miercoles:#FAD749;
+  --dia-miercoles-text:#110000;
+  --dia-jueves:#d96e00;
+  --dia-jueves-text:#fff;
+  --dia-viernes:#8AB84A;
+  --dia-viernes-text:#110000;
+  --dia-sabado:#F52532;
+  --dia-sabado-text:#fff;
+  --dia-domingo:#EF7F01;
+  --dia-domingo-text:#110000;
+}
+
+/* ── POOH: fuente y fondo con pattern ── */
+[data-theme="pooh"] body {
+  font-family: 'Nunito', 'Outfit', sans-serif;
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><text y='32' font-size='22' opacity='0.08'>🐝</text><text x='65' y='75' font-size='20' opacity='0.08'>🍯</text><text x='10' y='110' font-size='18' opacity='0.07'>🐻</text><text x='90' y='125' font-size='15' opacity='0.07'>🌸</text><text x='50' y='135' font-size='13' opacity='0.06'>🐝</text></svg>");
+  background-repeat: repeat;
+}
+
+/* ── POOH: logo con emoji y sin cursiva ── */
+[data-theme="pooh"] .header {
+  box-shadow: 0 2px 14px var(--shadow);
+}
+[data-theme="pooh"] .header-logo {
+  font-style: normal;
+  font-weight: 800;
+}
+[data-theme="pooh"] .header-logo::before {
+  content: "🍯 ";
+}
+
+/* ── POOH: cuba banner emoji ── */
+[data-theme="pooh"] .cuba-banner h3::before {
+  content: "🍯 ";
+}
+
+/* ── POOH: fab con emoji ── */
+[data-theme="pooh"] .fab::before {
+  content: "🐝 ";
+}
+
+/* ── POOH: navs con fondo semitransparente sobre el amarillo del --bg ── */
+[data-theme="pooh"] .dias-nav {
+  background: rgba(250,215,73,0.4);
+}
+[data-theme="pooh"] .tabs {
+  background: rgba(250,215,73,0.5);
+}
+[data-theme="pooh"] .prod-tabs,
+[data-theme="pooh"] .cfg-tabs {
+  background: rgba(250,215,73,0.3);
+}
