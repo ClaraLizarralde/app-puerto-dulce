@@ -8,13 +8,13 @@ function mostrarToastGuardado(){
 }
 // ── SYNC ──
 function setSyncPendiente(){
-  document.getElementById('sync-dot').className='sync-dot amarillo';
-  document.getElementById('sync-txt').textContent='Sin guardar';
+  ['sync-dot','sync-dot-banner'].forEach(id=>{const el=document.getElementById(id);if(el)el.className='sync-dot amarillo';});
+  ['sync-txt','sync-txt-banner'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Sin guardar';});
   hayCambios=true;
 }
 function setSyncGuardado(){
-  document.getElementById('sync-dot').className='sync-dot verde';
-  document.getElementById('sync-txt').textContent='Guardado';
+  ['sync-dot','sync-dot-banner'].forEach(id=>{const el=document.getElementById(id);if(el)el.className='sync-dot verde';});
+  ['sync-txt','sync-txt-banner'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Guardado';});
   hayCambios=false;
 }
 window.addEventListener('beforeunload',e=>{if(hayCambios){e.preventDefault();e.returnValue='';}});

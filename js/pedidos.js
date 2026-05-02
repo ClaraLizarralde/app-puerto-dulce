@@ -1,11 +1,15 @@
+let filtroDia = 'todos';
+let filtroDiaKey = null;
 function renderEstadoLocal(){
-  const pill = document.getElementById('local-status-pill');
-  if(!pill) return;
-  const { estado, texto, color } = getEstadoLocal();
-  const dot = estado==='abierto' ? '🟢' : estado==='cerrando' ? '🟡' : '🔴';
-  pill.textContent = dot + ' ' + texto;
-  pill.style.color = color;
-  pill.title = texto;
+  const {estado,texto,color}=getEstadoLocal();
+  const dot=estado==='abierto'?'🟢':estado==='cerrando'?'🟡':'🔴';
+  ['local-status-pill','local-status-pill-banner'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.textContent=dot+' '+texto;
+    el.style.color=color;
+    el.title=texto;
+  });
 }
 // ── TABS ──
 function showTab(id,el){
@@ -52,12 +56,6 @@ function renderDiaBanner(){
 
   const badgeHoy=document.getElementById('dpb-hoy-badge');
   badgeHoy.style.display=esHoy?'':'none';
-
-
-
-  const btnEsp=document.getElementById('btn-dia-especial-top');
-  btnEsp.textContent=especial?'⚡ Día especial activo':'⚡ Día especial';
-  btnEsp.className='btn-dia-especial'+(especial?' activo':'');
 
   // config bar día especial
   let cfg=document.getElementById('dia-especial-config-bar');
@@ -138,8 +136,8 @@ function renderArchivadosGlobalContent(){
 
 function renderDiasNav(){
   const nav=document.getElementById('dias-nav');
+  if(!nav) return;
   const hoy=fechaKey(new Date());
-  // Auto-archivar días pasados (sin datos no archivados pendientes)
   archivarDiasPasadosAuto(hoy);
   const keys=Object.keys(datos.dias).filter(k=>k>=hoy||k===diaActual).sort();
   nav.innerHTML='';
@@ -153,7 +151,6 @@ function renderDiasNav(){
     btn.innerHTML=`<span class="dia-num">${d}</span>${dot}${DIAS_S[dow]} ${MESES[m-1]}`;
     btn.onclick=()=>{
       diaActual=k;_expandido=null;
-      // auto-ir a pestaña Pedidos al cambiar día
       const tabPedidos=document.querySelector('.tab');
       if(tabPedidos)showTab('pedidos',tabPedidos);
       renderDiasNav();renderAll();
@@ -218,15 +215,53 @@ function seleccionarAutocompletado(clienteId){
   renderPedidos();
 }
 // ── FILTRO ── filtrar pedidos (cuba clientes, pendientes, retirados,etc)
-function setFiltro(f,el){
-  filtro=f;
-  document.querySelectorAll('.filtros button').forEach(b=>b.classList.remove('active'));
+function setFiltro(f, el){
+  filtro = f;
+  document.querySelectorAll('.filtros button:not([id^="filtro-dia"])').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   renderPedidos();
 }
 
+function setFiltroDia(tipo, el){
+  filtroDia = tipo;
+  document.querySelectorAll('#filtro-dia-hoy,#filtro-dia-manana,#filtro-dia-otro')
+    .forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const sel = document.getElementById('filtro-dia-select');
+  if(tipo === 'otro'){
+    const keys = Object.keys(datos.dias).sort();
+    sel.innerHTML = keys.map(k=>{
+      const [y,m,d]=k.split('-').map(Number);
+      const f=new Date(y,m-1,d);
+      const dow=f.getDay();
+      return `<option value="${k}">${DIAS_FULL[dow]} ${d} de ${MESES[m-1]}</option>`;
+    }).join('');
+    sel.style.display='';
+    filtroDiaKey = keys[0]||null;
+    sel.value = filtroDiaKey;
+  } else {
+    sel.style.display='none';
+    filtroDiaKey = null;
+  }
+  renderPedidos();
+}
+
+function setFiltroDiaKey(k){
+  filtroDiaKey = k;
+  renderPedidos();
+}
+
+
+
 // ── PEDIDOS ──
 function getPedidosFiltradosDeDia(diaKey){
+  if(filtroDia !== 'todos'){
+    const hoy = fechaKey(new Date());
+    const manana = fechaKey(new Date(Date.now()+86400000));
+    if(filtroDia==='hoy' && diaKey!==hoy) return[];
+    if(filtroDia==='manana' && diaKey!==manana) return[];
+    if(filtroDia==='otro' && diaKey!==filtroDiaKey) return[];
+  }
   const dData=datos.dias[diaKey];
   if(!dData)return[];
   let ps=dData.pedidos||[];

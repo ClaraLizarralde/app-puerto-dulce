@@ -228,17 +228,17 @@ function setLayout(layout) {
   applySidebarCollapseState();
   localStorage.setItem('pd_layout', layout);
 }
-(function() {
+document.addEventListener('DOMContentLoaded', function() {
   const l = localStorage.getItem('pd_layout') || 'horizontal';
   setLayout(l);
-})();
-
+});
 function applySidebarCollapseState(){
   const collapsed = localStorage.getItem('pd_sidebar_collapsed') === '1';
   const tabs = document.getElementById('main-tabs');
   const btn = document.getElementById('tabs-collapse-btn');
   if(!tabs || !btn) return;
   tabs.classList.toggle('collapsed', collapsed);
+  document.body.classList.toggle('sidebar-collapsed', collapsed); // ← agregar esta línea
   btn.textContent = collapsed ? '⇥' : '⇤';
 }
 function toggleSidebarCollapse(){
