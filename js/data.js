@@ -31,6 +31,13 @@
 const BACKUP_MAX = 6;
 const BACKUP_INTERVAL_MS = 60 * 60 * 1000; // 1 hora
 
+let usuarioActivo = {
+  id: 'admin',
+  nombre: 'Admin',
+  rol: 'admin',        // 'admin' | 'usuario'
+  local: null          // null = todos, 'matienzo' | 'cuba' = solo ese
+};
+
 let filtro='todos';
 let hayCambios=false;
 let _selCb=null;

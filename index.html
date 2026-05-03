@@ -2,8 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Puerto Dulce</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"><title>Puerto Dulce</title>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/themes.css">
@@ -78,10 +77,21 @@
   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
 </svg> Configuración</div>
   </div>
+<div class="tabs-divider"></div>
+  <button class="btn-usuario" id="btn-usuario" onclick="toggleUsuarioMenu()">
+    <span class="usuario-avatar" id="usuario-avatar">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-sm">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+      </svg>
+    </span>
+    <span class="usuario-nombre" id="usuario-nombre">Admin</span>
+  </button>
   <div class="tabs-divider"></div>
-  <button class="tabs-collapse-btn" id="tabs-collapse-btn" type="button" onclick="toggleSidebarCollapse()"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7M18 19l-7-7 7-7" />
-</svg></button>
+  <button class="tabs-collapse-btn" id="tabs-collapse-btn" type="button" onclick="toggleSidebarCollapse()">
+    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7M18 19l-7-7 7-7" />
+    </svg>
+  </button>
 </div>
 
 <div class="app-content">  
@@ -94,6 +104,14 @@
     <span id="sync-txt">Guardado</span>
   </div>
   <div id="local-status-pill" style="font-size:.68rem;font-weight:500;padding:3px 9px;border-radius:12px;background:var(--paper);border:1.5px solid var(--border);white-space:nowrap;margin-left:6px;cursor:default;"></div>
+  <button class="btn-usuario btn-usuario-header" id="btn-usuario-header" onclick="toggleUsuarioMenu()">
+  <span class="usuario-avatar" id="usuario-avatar">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-sm">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+  </svg>
+</span>
+  <span id="usuario-nombre-header">Usuario</span>
+</button>
 </div>
 
 <!-- BANNER DÍA PRINCIPAL -->
@@ -955,6 +973,11 @@
   <div id="setup-locales-lista" style="display:none;"></div>
 </div>
 
+<div class="usuario-menu hidden" id="usuario-menu">
+  <div class="usuario-menu-item" onclick="cambiarUsuario('admin','Admin','admin')">👑 Admin</div>
+  <div class="usuario-menu-item" onclick="cambiarUsuario('u1','Usuario 1','usuario')">👤 Usuario 1</div>
+  <div class="usuario-menu-item" onclick="cambiarUsuario('u2','Usuario 2','usuario')">👤 Usuario 2</div>
+</div>
    <script src="js/utils.js"></script>
    <script src="js/data.js"></script>
    <script src="js/modales.js"></script>
@@ -969,5 +992,6 @@
    <script src="js/html-events.js"></script>
    <script src="js/app.js"></script>
 
+   
 </body>
 </html>

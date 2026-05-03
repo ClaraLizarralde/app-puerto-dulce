@@ -842,6 +842,7 @@ function npToggleNota(){
 
 // ── Abrir / Cerrar ──
 function abrirModalNP(){
+   document.getElementById('fab-nuevo-pedido').style.display = 'none';
   _npDia=null;
   _npDiaKey=null;
   _npPedido={id:'__np__',productos:[]};
@@ -886,6 +887,7 @@ function abrirModalNP(){
 }
 
 function cerrarModalNP(){
+  document.getElementById('fab-nuevo-pedido').style.display = '';
   document.getElementById('modal-np').classList.add('hidden');
   _npPedido=null;
 }

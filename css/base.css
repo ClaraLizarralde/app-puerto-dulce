@@ -66,6 +66,7 @@ body{
   min-height: 0;
   display: flex;
   flex-direction: column;
+  padding-top: env(safe-area-inset-top);
 }
 
 /* SOLO en horizontal (cuando NO es layout-vertical) */
@@ -82,6 +83,8 @@ body:not(.layout-vertical) .tab-contents {
   min-height: 0;
   overflow-y: auto;
 } 
+body:not(.layout-vertical) .btn-usuario{ display:none !important; }
+body:not(.layout-vertical) .btn-usuario-header{ display:flex !important; }
 /* ══════════════════════════════════════
    4. HEADER
    ══════════════════════════════════════ */
@@ -92,6 +95,8 @@ body:not(.layout-vertical) .tab-contents {
   display:flex;
   align-items:center;
   gap:10px;
+  padding-top: max(10px, env(safe-area-inset-top));
+
 }
 .header-logo{
   font-family:'Lora',serif;
@@ -459,6 +464,45 @@ body.layout-vertical .dpb-pills { display: flex; align-items: center; gap: 6px; 
   display: block;
 }
 
+/* Botón de usuario (en header o sidebar según layout) */
+.btn-usuario{
+  display:flex;align-items:center;gap:8px;
+  width:100%;padding:8px 10px;
+  border:1.5px solid var(--border);border-radius:10px;
+  background:var(--paper);color:var(--ink);
+  cursor:pointer;font-family:'Outfit',sans-serif;
+  font-size:.74rem;font-weight:500;
+  margin-bottom:6px;
+}
+.btn-usuario:hover{border-color:var(--accent);color:var(--accent);}
+.usuario-avatar{
+  width:24px;height:24px;border-radius:50%;
+  background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;font-weight:700;flex-shrink:0;
+}
+.btn-usuario-header{
+  width:auto;margin-bottom:0;padding:5px 10px;border-radius:20px;
+}
+.usuario-menu{
+  position:fixed;z-index:500;
+  background:var(--paper);border:1.5px solid var(--border);
+  border-radius:10px;box-shadow:0 6px 20px var(--shadow);
+  min-width:160px;overflow:hidden;
+}
+.usuario-menu.hidden{display:none;}
+.usuario-menu-item{
+  padding:10px 14px;font-size:.82rem;cursor:pointer;
+  color:var(--ink);font-family:'Outfit',sans-serif;
+  border-bottom:1px solid var(--border);
+}
+.usuario-menu-item:last-child{border-bottom:none;}
+.usuario-menu-item:hover{background:var(--accent-soft);color:var(--accent);}
+
+/* ocultar en horizontal (lo muestra el header) */
+body:not(.layout-vertical) .btn-usuario{ display:flex; }
+/* ocultar en vertical (lo muestra el sidebar) */
+body.layout-vertical .btn-usuario-header{ display:none; }
 
 /* ══════════════════════════════════════
    10. STATS
@@ -2443,23 +2487,35 @@ body.layout-vertical .toast-guardado{left:16px;}
   }
   body.layout-vertical{overflow:hidden;}
 
-  body.layout-vertical .app-main > .tabs{
-    order:0;
-    width:240px;min-width:240px;max-width:240px;
-    height:100vh !important;
-    min-height:0 !important;
-    flex-direction:column;
-    justify-content:flex-start;
-    border-top:none;
-    border-right:1.5px solid var(--border);
-    position:sticky !important;
-    top:0 !important;
-    bottom:auto;
-    padding:10px 8px;
-    overflow:hidden;
-    transition:width .2s ease, min-width .2s ease, max-width .2s ease;
-  }
+body.layout-vertical .app-main > .tabs {
+  order: 0;
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+  height: 100vh !important;
+  min-height: 0 !important;
+  flex-direction: column;
+  border-top: none;
+  border-right: 1.5px solid var(--border);
+  position: sticky !important;
+  top: 0 !important;
+  bottom: auto;
+  padding: 10px 8px;
+  overflow: hidden;
+  transition: width .2s ease, min-width .2s ease, max-width .2s ease;
+  display: flex;
+    padding-bottom: 48px;
 
+}
+
+body.layout-vertical .tabs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
   body.layout-vertical .tabs-side-head{
     display:flex;align-items:center;gap:10px;
     min-height:48px;padding:6px 8px 10px;
@@ -2477,9 +2533,6 @@ body.layout-vertical .toast-guardado{left:16px;}
     letter-spacing:.04em;text-transform:uppercase;
   }
 
-  body.layout-vertical .tabs-list{
-    display:flex;flex-direction:column;gap:4px;flex:1;min-height:0;
-  }
 
   body.layout-vertical .tabs .tab{
     flex:none;width:100%;min-height:44px;padding:0 10px;
@@ -2495,16 +2548,32 @@ body.layout-vertical .toast-guardado{left:16px;}
     background:var(--accent-soft);color:var(--accent);
   }
 
-  body.layout-vertical .tabs-collapse-btn{
-    display:flex;align-items:center;justify-content:center;
-    width:100%;margin-top:auto;height:38px;
-    border:1.5px solid var(--border);border-radius:10px;
-    background:var(--paper);color:var(--ink-mid);
-    font-size:1rem;cursor:pointer;flex-shrink:0;transition:all .15s;
-  }
-  body.layout-vertical .tabs-collapse-btn:hover{
-    border-color:var(--accent);color:var(--accent);background:var(--accent-soft);
-  }
+body.layout-vertical .tabs-collapse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 38px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink-mid);
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all .15s;
+  margin-top: 0;
+}
+ body.layout-vertical #btn-usuario {
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+body.layout-vertical .tabs-collapse-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
 
   body.layout-vertical .toast-guardado{left:74px;}
 
@@ -2607,6 +2676,9 @@ body.layout-vertical .tab-content.active {
 
 /* Mobile: tabs al fondo como footer */
 @media(max-width:900px){
+  #btn-usuario {
+    display: none !important;
+  }
 
   body .app-body {
     flex-direction: column !important;

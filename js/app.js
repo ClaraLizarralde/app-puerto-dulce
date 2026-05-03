@@ -28,3 +28,23 @@ document.addEventListener('click',e=>{
 setInterval(renderEstadoLocal, 60000);
 
 renderDiasNav();renderAll();renderCatalogo();renderArchivadosGlobal(); 
+
+
+function toggleUsuarioMenu(){
+  document.getElementById('usuario-menu').classList.toggle('hidden');
+}
+
+function cambiarUsuario(id, nombre, rol){
+  usuarioActivo = { id, nombre, rol, local: id==='u1'?'cuba': id==='u2'?'matienzo':null };
+  const inicial = nombre[0].toUpperCase();
+  document.querySelectorAll('.usuario-avatar').forEach(el => el.textContent = inicial);
+  document.getElementById('usuario-nombre').textContent = nombre;
+  document.getElementById('usuario-nombre-header').textContent = nombre;
+  document.getElementById('usuario-menu').classList.add('hidden');
+}
+
+// cerrar al clickear afuera
+document.addEventListener('click', e => {
+  if(!e.target.closest('.btn-usuario') && !e.target.closest('.usuario-menu'))
+    document.getElementById('usuario-menu').classList.add('hidden');
+});
