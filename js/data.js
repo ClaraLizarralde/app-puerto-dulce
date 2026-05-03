@@ -297,6 +297,16 @@ if(!datos.localId){
   }, 400);
 }
 
+// ── PERMISOS ──
+const PERMISOS = {
+  admin:   ['exportar', 'importar', 'reportes', 'config', 'pedidos'],
+  empleado:['pedidos'],
+};
+
+function tienePermiso(permiso) {
+  const rol = usuarioActivo?.rol || 'empleado';
+  return PERMISOS[rol]?.includes(permiso) ?? false;
+}
 /* ================================================================
    MODAL BIENVENIDA — PIZARRÓN
 ================================================================ */
@@ -309,18 +319,94 @@ if(!datos.localId){
     { id: 'cuba',     nombre: 'Cuba',     tag: 'EN CONSTRUCCIÓN', disabled: true },
   ];
 
-  const USUARIOS_PIZ = {
-    matienzo: [
-      { id: 'admin', nombre: '👑 Admin',    rol: 'administrador' },
-      { id: 'u1',    nombre: '👤 Usuario 1', rol: 'empleado' },
-      { id: 'u2',    nombre: '👤 Usuario 2', rol: 'empleado' },
-    ],
-    cuba: [
-      { id: 'admin', nombre: '👑 Admin',    rol: 'administrador' },
-      { id: 'u1',    nombre: '👤 Usuario 1', rol: 'empleado' },
-    ],
-  };
+const USUARIOS_PIZ = {
+  matienzo: [
+    { id: 'admin', nombre: '👑 Admin',    rol: 'admin',    pin: '1234' },
+    { id: 'u1',    nombre: '👤 Usuario 1', rol: 'empleado', pin: '0001' },
+    { id: 'u2',    nombre: '👤 Usuario 2', rol: 'empleado', pin: '0002' },
+  ],
+  cuba: [
+    { id: 'admin', nombre: '👑 Admin',    rol: 'admin',    pin: '1234' },
+    { id: 'u1',    nombre: '👤 Usuario 1', rol: 'empleado', pin: '0001' },
+  ],
+};
+function pizPantallaPin(localId, userId) {
+  const postits = document.getElementById('piz-postits-area');
+  if (postits) postits.style.display = 'none';
+  const lineas = document.querySelectorAll('.piz-line');
+  lineas.forEach(l => l.style.display = 'none');
 
+  const usuario = (USUARIOS_PIZ[localId]||[]).find(u=>u.id===userId);
+  if (!usuario) return;
+  const sec = document.getElementById('piz-login-section');
+  if (!sec) return;
+  sec.innerHTML = `
+    <div class="piz-pantalla piz-pin-wrap">
+      <p class="piz-label">ingresá tu PIN · ${usuario.nombre.replace(/^\S+\s*/,'')}</p>
+      <div class="piz-pin-dots">
+        <span class="piz-pin-dot" id="piz-dot-0"></span>
+        <span class="piz-pin-dot" id="piz-dot-1"></span>
+        <span class="piz-pin-dot" id="piz-dot-2"></span>
+        <span class="piz-pin-dot" id="piz-dot-3"></span>
+      </div>
+      <p class="piz-pin-error" id="piz-pin-error"></p>
+      <div class="piz-teclado">
+        ${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k => `
+          <button class="piz-tecla${k===''?' invisible':''}" 
+            ${k!==''?`onclick="pizTecla('${k}','${localId}','${usuario.id}')"`:''}>
+            ${k}
+          </button>
+        `).join('')}
+      </div>
+      <button class="piz-back-btn" onclick="pizPantallaUsuarios('${localId}')">← volver</button>
+    </div>
+  `;
+  window._pinActual = '';
+}
+window.pizPantallaPin = pizPantallaPin;
+
+window.pizTecla = function(tecla, localId, userId) {
+  const usuario = (USUARIOS_PIZ[localId]||[]).find(u=>u.id===userId);
+  if (!usuario) return;
+
+  if (tecla === '⌫') {
+    window._pinActual = (window._pinActual||'').slice(0,-1);
+  } else {
+    if ((window._pinActual||'').length >= 4) return;
+    window._pinActual = (window._pinActual||'') + tecla;
+  }
+
+  // Actualizar dots
+  for (let i=0; i<4; i++) {
+    const dot = document.getElementById(`piz-dot-${i}`);
+    if (dot) dot.classList.toggle('activo', i < window._pinActual.length);
+  }
+
+  // Verificar PIN cuando llega a 4
+  if (window._pinActual.length === 4) {
+    if (window._pinActual === usuario.pin) {
+      window.pizEntrar(localId, userId, usuario.nombre, usuario.rol);
+    } else {
+      // Error — shake
+      window._pinActual = '';
+      for (let i=0; i<4; i++) {
+        const dot = document.getElementById(`piz-dot-${i}`);
+        if (dot) dot.classList.remove('activo');
+      }
+      const err = document.getElementById('piz-pin-error');
+      if (err) {
+        err.textContent = 'PIN incorrecto, intentá de nuevo';
+        err.classList.add('visible');
+        setTimeout(()=>err.classList.remove('visible'), 2000);
+      }
+      const dots = document.querySelector('.piz-pin-dots');
+      if (dots) {
+        dots.classList.add('shake');
+        setTimeout(()=>dots.classList.remove('shake'), 400);
+      }
+    }
+  }
+};
   function renderPizPostits() {
     const area = document.getElementById('piz-postits-area');
     if (!area) return;
@@ -350,6 +436,10 @@ if(!datos.localId){
   }
 
   function pizPantallaLocales() {
+    const postits = document.getElementById('piz-postits-area');
+if (postits) postits.style.display = 'flex';
+const lineas = document.querySelectorAll('.piz-line');
+lineas.forEach(l => l.style.display = 'block');
     const sec = document.getElementById('piz-login-section');
     if (!sec) return;
     sec.innerHTML = `
@@ -368,26 +458,31 @@ if(!datos.localId){
     `;
   }
 
-  window.pizPantallaUsuarios = function(localId) {
-    const local = LOCALES_PIZ.find(l => l.id === localId);
-    const users = USUARIOS_PIZ[localId] || [];
-    const sec = document.getElementById('piz-login-section');
-    if (!sec) return;
-    sec.innerHTML = `
-      <div class="piz-pantalla">
-        <p class="piz-label">quién sos · ${local.nombre}</p>
-        <div class="piz-usuarios">
-          ${users.map(u => `
-            <button class="piz-usuario-btn" onclick="pizEntrar('${localId}','${u.id}','${u.nombre}','${u.rol}')">
-              ${u.nombre}
-              <span class="piz-rol">${u.rol}</span>
-            </button>
-          `).join('')}
-        </div>
-        <button class="piz-back-btn" onclick="pizPantallaLocales()">← volver</button>
+window.pizPantallaUsuarios = function(localId) {
+  const postits = document.getElementById('piz-postits-area');
+if (postits) postits.style.display = 'flex';
+const lineas = document.querySelectorAll('.piz-line');
+lineas.forEach(l => l.style.display = 'block');
+
+  const local = LOCALES_PIZ.find(l => l.id === localId);
+  const users = USUARIOS_PIZ[localId] || [];
+  const sec = document.getElementById('piz-login-section');
+  if (!sec) return;
+  sec.innerHTML = `
+    <div class="piz-pantalla">
+      <p class="piz-label">quién sos · ${local.nombre}</p>
+      <div class="piz-usuarios">
+        ${users.map(u => `
+          <button class="piz-usuario-btn" onclick="pizPantallaPin('${localId}', '${u.id}')">
+            ${u.nombre}
+            <span class="piz-rol">${u.rol}</span>
+          </button>
+        `).join('')}
       </div>
-    `;
-  };
+      <button class="piz-back-btn" onclick="pizPantallaLocales()">← volver</button>
+    </div>
+  `;
+};
 
   window.pizPantallaLocales = pizPantallaLocales;
 
