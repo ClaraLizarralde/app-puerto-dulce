@@ -308,16 +308,9 @@ function setLocal(id){
 }
 
 function mostrarSetupLocal(){
-  // Modo un solo local: si no hay localId, auto-setear matienzo y mostrar bienvenida
-  if(!datos.localId){
-    datos.localId = 'matienzo';
-    datos.nombre_local = 'Puerto Dulce — Matienzo';
-    guardar();
+  if (typeof abrirModalBienvenida === 'function') {
+    abrirModalBienvenida();
   }
-  const modal = document.getElementById('modal-setup-local');
-  if(!modal) return;
-  // renderBotonesLocales('setup-locales-lista', setLocal); // oculto en modo 1 local
-  modal.style.display = 'flex';
 }
 
 function renderCfgLocal(){

@@ -78,6 +78,7 @@ if(typeof datos.notasCuba==='string')datos.notasCuba=datos.notasCuba.trim()?[{id
 if(!datos.localId) datos.localId = null;
 if(!datos.nombre_local) datos.nombre_local = null;
 
+
 // ── HORARIOS POR LOCAL ──
 // Estructura: { [localId]: { [diaSemana 0-6]: { open: "HH:MM", close: "HH:MM" } | null } }
 // null = cerrado ese día. 0=domingo,1=lunes,...,6=sábado
@@ -160,8 +161,11 @@ function getEstadoLocal(){
 }
 
 
-function guardar(){localStorage.setItem('pd_v8',JSON.stringify(datos));setSyncGuardado();autoBackupCheck();}
-
+function guardar(){
+  localStorage.setItem('pd_v8',JSON.stringify(datos));
+  if (typeof setSyncGuardado === 'function') setSyncGuardado();
+  if (typeof autoBackupCheck === 'function') autoBackupCheck();
+}
 
 
 function autoBackupCheck(){
@@ -288,6 +292,146 @@ if(!datos.localId){
   datos.nombre_local = 'Puerto Dulce — Matienzo';
   guardar();
   // Mostrar bienvenida la primera vez
-  setTimeout(mostrarSetupLocal, 400);
+  setTimeout(() => {
+    if (typeof abrirModalBienvenida === 'function') abrirModalBienvenida();
+  }, 400);
 }
 
+/* ================================================================
+   MODAL BIENVENIDA — PIZARRÓN
+================================================================ */
+(function(){
+  const COLORES_POSTIT = ['y','b','g','p'];
+  const EMOJIS_POSTIT  = ['🍮','📦','☎','✏','🧁','📝'];
+
+  const LOCALES_PIZ = [
+    { id: 'matienzo', nombre: 'Matienzo', tag: 'LOCAL PRINCIPAL' },
+    { id: 'cuba',     nombre: 'Cuba',     tag: 'EN CONSTRUCCIÓN', disabled: true },
+  ];
+
+  const USUARIOS_PIZ = {
+    matienzo: [
+      { id: 'admin', nombre: '👑 Admin',    rol: 'administrador' },
+      { id: 'u1',    nombre: '👤 Usuario 1', rol: 'empleado' },
+      { id: 'u2',    nombre: '👤 Usuario 2', rol: 'empleado' },
+    ],
+    cuba: [
+      { id: 'admin', nombre: '👑 Admin',    rol: 'administrador' },
+      { id: 'u1',    nombre: '👤 Usuario 1', rol: 'empleado' },
+    ],
+  };
+
+  function renderPizPostits() {
+    const area = document.getElementById('piz-postits-area');
+    if (!area) return;
+
+    // Toma notas reales del pizarrón, o usa placeholders
+    let notas = [];
+    try {
+      notas = (datos.pizarron && datos.pizarron.notas && datos.pizarron.notas.length)
+        ? datos.pizarron.notas.slice(0, 3)
+        : [];
+    } catch(e) {}
+
+    if (!notas.length) {
+      notas = [
+        { texto: 'Bienvenida al sistema 🍮' },
+        { texto: 'Revisá los pedidos del día' },
+        { texto: 'Agregá notas en el Pizarrón' },
+      ];
+    }
+
+    area.innerHTML = notas.map((n, i) => `
+      <div class="piz-postit ${COLORES_POSTIT[i % 4]}">
+        <span class="piz-postit-emoji">${EMOJIS_POSTIT[i % 6]}</span>
+        ${n.texto || n.contenido || ''}
+      </div>
+    `).join('');
+  }
+
+  function pizPantallaLocales() {
+    const sec = document.getElementById('piz-login-section');
+    if (!sec) return;
+    sec.innerHTML = `
+      <div class="piz-pantalla">
+        <p class="piz-label">seleccioná tu local</p>
+        <div class="piz-locales">
+          ${LOCALES_PIZ.map(l => `
+            <button class="piz-local-btn${l.disabled ? ' disabled' : ''}"
+              onclick="${l.disabled ? 'pizMensajeConstruccion()' : `pizPantallaUsuarios('${l.id}')`}">
+              ${l.nombre}
+              <span class="piz-local-tag">${l.tag}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  window.pizPantallaUsuarios = function(localId) {
+    const local = LOCALES_PIZ.find(l => l.id === localId);
+    const users = USUARIOS_PIZ[localId] || [];
+    const sec = document.getElementById('piz-login-section');
+    if (!sec) return;
+    sec.innerHTML = `
+      <div class="piz-pantalla">
+        <p class="piz-label">quién sos · ${local.nombre}</p>
+        <div class="piz-usuarios">
+          ${users.map(u => `
+            <button class="piz-usuario-btn" onclick="pizEntrar('${localId}','${u.id}','${u.nombre}','${u.rol}')">
+              ${u.nombre}
+              <span class="piz-rol">${u.rol}</span>
+            </button>
+          `).join('')}
+        </div>
+        <button class="piz-back-btn" onclick="pizPantallaLocales()">← volver</button>
+      </div>
+    `;
+  };
+
+  window.pizPantallaLocales = pizPantallaLocales;
+
+  window.pizEntrar = function(localId, userId, nombre, rol) {
+    // Setea usuario activo
+    if (typeof usuarioActivo !== 'undefined') {
+      usuarioActivo.id     = userId;
+      usuarioActivo.nombre = nombre.replace(/^.+?\s/, '');
+      usuarioActivo.rol    = (userId === 'admin') ? 'admin' : 'usuario';
+      usuarioActivo.local  = (localId === 'matienzo') ? null : localId;
+    }
+    // Actualiza UI de usuario si existe
+    if (typeof actualizarUIUsuario === 'function') actualizarUIUsuario();
+    // Llama al setLocal real
+    if (typeof setLocal === 'function') setLocal(localId);
+     const modal = document.getElementById('modal-setup-local');
+    if (modal) modal.style.display = 'none';
+  };
+
+  // Abre el modal
+  window.abrirModalBienvenida = function() {
+    const modal = document.getElementById('modal-setup-local');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    renderPizPostits();
+    pizPantallaLocales();
+  };
+
+  // Exponer para que el flow de inicio lo llame
+  // Si ya tenés lógica de "mostrar setup al iniciar", reemplazala por:
+  //   abrirModalBienvenida()
+  function pizMensajeConstruccion() {
+  const sec = document.getElementById('piz-login-section');
+  if (!sec) return;
+  sec.innerHTML = `
+    <div class="piz-pantalla" style="text-align:center;">
+      <p style="font-family:'Shadows Into Light',cursive; color:var(--chalk-dim); font-size:1.4rem; letter-spacing:2px; margin-bottom:8px;">
+        🚧 en construcción 🚧
+      </p>
+      <p style="font-family:'Caveat',cursive; color:var(--chalk-dim); font-size:1rem; letter-spacing:1px; opacity:.7;">
+        este local todavía no está disponible.      </p>
+      <button class="piz-back-btn" onclick="pizPantallaLocales()" style="margin-top:14px;">← volver</button>
+    </div>
+  `;
+}
+window.pizMensajeConstruccion = pizMensajeConstruccion;
+})();

@@ -256,17 +256,17 @@ function pizStartDragPostit(e,id){
   document.addEventListener('touchend',onEnd);
 }
 
-// ── Auto-abrir una vez por día ──
-(function pizAutoAbrir(){
-  const hoyKey=fechaKey(new Date());
-  const lastOpen=localStorage.getItem('pd_piz_lastopen');
-  if(lastOpen!==hoyKey){
-    setTimeout(()=>{
-      localStorage.setItem('pd_piz_lastopen',hoyKey);
-      abrirPizarron();
-    }, datos.localId ? 700 : 1300);
-  }
-})();
+// // ── Auto-abrir una vez por día ──
+// (function pizAutoAbrir(){
+//   const hoyKey=fechaKey(new Date());
+//   const lastOpen=localStorage.getItem('pd_piz_lastopen');
+//   if(lastOpen!==hoyKey){
+//     setTimeout(()=>{
+//       localStorage.setItem('pd_piz_lastopen',hoyKey);
+//       abrirPizarron();
+//     }, datos.localId ? 700 : 1300);
+//   }
+// })();
 
 // Cerrar con Escape
 document.addEventListener('keydown',e=>{
