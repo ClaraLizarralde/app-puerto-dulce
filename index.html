@@ -866,76 +866,110 @@
 
 
 <!-- MODAL PIZARRÓN -->
+
 <div class="bb-overlay" id="modal-pizarron">
-  <div class="bb-modal">
+  <div class="bb-pizarron">
+
+    <!-- Clavos -->
+    <div class="piz-clavo tl"></div>
+    <div class="piz-clavo tr"></div>
+    <div class="piz-clavo bl"></div>
+    <div class="piz-clavo br"></div>
+
+    <!-- Decos tiza -->
+    <span class="piz-deco tl">★</span>
+    <span class="piz-deco tr">✦</span>
+    <span class="piz-deco bl">✿</span>
+    <span class="piz-deco br">♦</span>
 
     <!-- HEADER -->
     <div class="bb-header">
-      <span class="bb-titulo">📌 Pizarrón</span>
+      <span class="bb-titulo-chalk">📌 pizarrón</span>
       <div class="bb-header-actions">
-        <button class="bb-btn-icon" onclick="bbCerrar()" title="Cerrar">✕</button>
+        <button class="bb-tab-btn" onclick="bbAbrirEditorNota(null)" title="Nueva nota (Alt+N)">
+          📝 nota
+        </button>
+        <div class="bb-sellos-wrap">
+          <button class="bb-tab-btn" id="bb-btn-sellos" onclick="bbToggleGridSellos()" title="Sellos (Alt+S)">
+            🎨 sellos
+          </button>
+          <!-- Grid flotante de sellos -->
+          <div class="bb-sellos-flotante" id="bb-sellos-flotante">
+            <div class="bb-sellos-flotante-titulo">elegí un sello · click en el tablero para pegarlo</div>
+            <div class="bb-sellos-grid" id="bb-sellos-grid"></div>
+            <div class="bb-sellos-flotante-footer">
+              <span class="bb-sello-activo-label" id="bb-sello-activo-label"></span>
+              <button class="bb-btn-chalk-sm" onclick="bbDeseleccionarSello()">cancelar</button>
+            </div>
+          </div>
+        </div>
+        <button class="bb-cerrar-chalk" onclick="bbCerrar()" title="Cerrar (Esc)">✕</button>
       </div>
     </div>
 
-    <!-- BODY: dos columnas -->
-    <div class="bb-body">
+    <div class="piz-line"></div>
 
-      <!-- ── COLUMNA IZQUIERDA: Block de notas ── -->
-      <aside class="bb-notas-panel">
-        <div class="bb-notas-header">
-          <span class="bb-notas-titulo">Notas</span>
-          <button class="bb-nueva-nota-btn" onclick="bbNuevaNota()" title="Nueva nota">＋ Nueva</button>
-        </div>
-
-        <!-- Lista de notas (tarjetas) -->
-        <div class="bb-notas-lista" id="bb-notas-lista"></div>
-
-        <!-- Editor inline de la nota activa -->
-        <div class="bb-nota-editor bb-hidden" id="bb-nota-editor">
-          <input  type="text" id="bb-editor-titulo" class="bb-nota-editor-titulo"
-                  placeholder="Título de la nota"
-                  oninput="bbGuardarEditorActivo()">
-          <textarea id="bb-editor-cuerpo" class="bb-nota-editor-cuerpo"
-                    placeholder="Escribí tu nota acá..."
-                    oninput="bbGuardarEditorActivo()"></textarea>
-        </div>
-      </aside>
-
-      <!-- ── COLUMNA DERECHA: Tablero libre (post-its + sellitos) ── -->
-      <main class="bb-tablero" id="bb-tablero">
-
-        <!-- Toolbar flotante arriba del tablero -->
-        <div class="bb-tablero-toolbar">
-          <!-- Post-its por color -->
-          <div class="bb-tool-group">
-            <span class="bb-tool-label">Post-it</span>
-            <button class="bb-postit-color" style="--c:#fde68a;" onclick="bbAgregarPostit('#fde68a')" title="Amarillo"></button>
-            <button class="bb-postit-color" style="--c:#fca5a5;" onclick="bbAgregarPostit('#fca5a5')" title="Rosa"></button>
-            <button class="bb-postit-color" style="--c:#86efac;" onclick="bbAgregarPostit('#86efac')" title="Verde"></button>
-            <button class="bb-postit-color" style="--c:#93c5fd;" onclick="bbAgregarPostit('#93c5fd')" title="Azul"></button>
-            <button class="bb-postit-color" style="--c:#c4b5fd;" onclick="bbAgregarPostit('#c4b5fd')" title="Violeta"></button>
-          </div>
-
-          <!-- Sellitos -->
-          <div class="bb-tool-group">
-            <span class="bb-tool-label">Sellitos</span>
-            <div class="bb-stamps-row" id="bb-stamps-row">
-              <!-- generados por JS -->
-            </div>
-          </div>
-
-          <button class="bb-btn-limpiar" onclick="bbLimpiarTablero()" title="Limpiar tablero">🗑 Limpiar</button>
-        </div>
-
-        <!-- Área donde se sueltan post-its y sellitos -->
-        <div class="bb-tablero-area" id="bb-tablero-area"></div>
-
-      </main>
+    <!-- TABLERO LIBRE -->
+    <div class="bb-tablero" id="bb-tablero">
+      <div class="bb-tablero-vacio" id="bb-tablero-vacio">
+        <span>pizarrón vacío</span>
+        <small>creá una nota o pegá un sello</small>
+      </div>
+      <!-- post-its y sellos generados por JS -->
     </div>
 
   </div>
 </div>
 
+<!-- MODAL EDITOR DE NOTA -->
+<div class="bb-nota-overlay" id="bb-nota-overlay">
+  <div class="bb-nota-modal">
+
+    <!-- Color picker -->
+    <div class="bb-nota-colores">
+      <span class="bb-nota-colores-label">color:</span>
+      <button class="bb-color-dot" style="--c:#fef08a;" data-color="#fef08a" onclick="bbSetColorNota('#fef08a',this)"></button>
+      <button class="bb-color-dot" style="--c:#bae6fd;" data-color="#bae6fd" onclick="bbSetColorNota('#bae6fd',this)"></button>
+      <button class="bb-color-dot" style="--c:#bbf7d0;" data-color="#bbf7d0" onclick="bbSetColorNota('#bbf7d0',this)"></button>
+      <button class="bb-color-dot" style="--c:#fecdd3;" data-color="#fecdd3" onclick="bbSetColorNota('#fecdd3',this)"></button>
+      <button class="bb-color-dot" style="--c:#e9d5ff;" data-color="#e9d5ff" onclick="bbSetColorNota('#e9d5ff',this)"></button>
+    </div>
+
+    <!-- Preview post-it -->
+    <div class="bb-nota-preview" id="bb-nota-preview">
+      <div class="bb-nota-pin"></div>
+
+      <!-- Sello dentro de la nota -->
+      <div class="bb-nota-sello-wrap">
+        <span class="bb-nota-sello-actual" id="bb-nota-sello-actual"></span>
+        <button class="bb-nota-sello-pick" onclick="bbToggleSelloPicker()">＋ sello</button>
+        <div class="bb-sello-picker-mini" id="bb-sello-picker-mini"></div>
+      </div>
+
+      <input    type="text" id="bb-nota-titulo" class="bb-nota-titulo-input" placeholder="título...">
+      <textarea             id="bb-nota-cuerpo" class="bb-nota-cuerpo-input" placeholder="escribí tu nota..." rows="4"></textarea>
+    </div>
+
+    <div class="bb-nota-acciones">
+      <button class="piz-local-btn bb-guardar-btn" onclick="bbGuardarNota()">guardar</button>
+      <button class="bb-btn-chalk-sm"              onclick="bbCerrarEditorNota()">cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LEER NOTA -->
+<div class="bb-nota-leer-overlay" id="bb-nota-leer-overlay">
+  <div class="bb-nota-leer-modal" id="bb-nota-leer-modal">
+    <div class="bb-nota-leer-pin"></div>
+    <span class="bb-nota-leer-sello"  id="bb-leer-sello"></span>
+    <span class="bb-nota-leer-titulo" id="bb-leer-titulo"></span>
+    <div  class="bb-nota-leer-cuerpo" id="bb-leer-cuerpo"></div>
+    <div class="bb-nota-leer-acciones">
+      <button class="bb-btn-chalk-sm" onclick="bbEditarDesdeVista()">✏️ editar</button>
+      <button class="bb-btn-chalk-sm" onclick="bbCerrarLeer()">cerrar</button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL BIENVENIDA — -->
 <div id="modal-setup-local" style="display:none;">
@@ -983,6 +1017,9 @@
     🔄 Cambiar usuario
   </div>
 </div>
+
+<div class="bb-nota-leer-overlay" id="bb-nota-leer-overlay"></div>
+
    <script src="js/utils.js"></script>
    <script src="js/data.js"></script>
    <script src="js/modales.js"></script>
