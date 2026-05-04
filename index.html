@@ -865,50 +865,74 @@
 </div>
 
 
-<!-- MODAL: PIZARRÓN -->
-<div class="piz-overlay" id="modal-pizarron">
-  <div class="piz-modal">
-    <div class="piz-header">
-      <div class="piz-titulo-wrap">
-        <span id="piz-titulo-dia" style="font-family:'Lora',serif;font-style:italic;font-size:.92rem;color:var(--accent);">📌 Pizarrón</span>
-      </div>
-      <div class="piz-toolbar">
-        <!-- Modo -->
-        <div class="piz-tool-group">
-          <button class="piz-btn" id="piz-btn-postit" onclick="pizSetModo('postit')" title="Post-its">📌</button>
-          <button class="piz-btn" id="piz-btn-tiza" onclick="pizSetModo('tiza')" title="Dibujar">✏️</button>
-          <button class="piz-btn" id="piz-btn-borrador" onclick="pizSetModo('borrador')" title="Borrador">🧹</button>
-        </div>
-        <!-- Colores -->
-        <div class="piz-tool-group" id="piz-colores" style="opacity:.35;">
-          <button class="piz-color-btn" style="background:#fff;" onclick="pizSetColor('#fff',this)" title="Blanco"></button>
-          <button class="piz-color-btn active" style="background:#fff;" onclick="pizSetColor('#fff',this)" title="Blanco"></button>
-          <button class="piz-color-btn" style="background:#fde68a;" onclick="pizSetColor('#fde68a',this)" title="Amarillo"></button>
-          <button class="piz-color-btn" style="background:#fca5a5;" onclick="pizSetColor('#fca5a5',this)" title="Rojo"></button>
-          <button class="piz-color-btn" style="background:#86efac;" onclick="pizSetColor('#86efac',this)" title="Verde"></button>
-          <button class="piz-color-btn" style="background:#93c5fd;" onclick="pizSetColor('#93c5fd',this)" title="Azul"></button>
-          <button class="piz-color-btn" style="background:#c4b5fd;" onclick="pizSetColor('#c4b5fd',this)" title="Violeta"></button>
-        </div>
-        <!-- Tamaño -->
-        <div class="piz-tool-group" id="piz-sizes" style="opacity:.35;">
-          <button class="piz-size-btn active" onclick="pizSetSize(3,this)">S</button>
-          <button class="piz-size-btn" onclick="pizSetSize(6,this)">M</button>
-          <button class="piz-size-btn" onclick="pizSetSize(12,this)">L</button>
-        </div>
-        <button class="piz-btn piz-btn-danger" onclick="pizLimpiarCanvas()" title="Borrar dibujo">🗑</button>
-        <button class="piz-btn piz-btn-close" onclick="cerrarPizarron()" title="Cerrar">✕</button>
+<!-- MODAL PIZARRÓN -->
+<div class="bb-overlay" id="modal-pizarron">
+  <div class="bb-modal">
+
+    <!-- HEADER -->
+    <div class="bb-header">
+      <span class="bb-titulo">📌 Pizarrón</span>
+      <div class="bb-header-actions">
+        <button class="bb-btn-icon" onclick="bbCerrar()" title="Cerrar">✕</button>
       </div>
     </div>
-    <!-- Body: canvas + post-its superpuestos -->
-    <div class="piz-body" id="piz-body">
-      <canvas id="piz-canvas"></canvas>
-      <div class="piz-postits" id="piz-postits"></div>
+
+    <!-- BODY: dos columnas -->
+    <div class="bb-body">
+
+      <!-- ── COLUMNA IZQUIERDA: Block de notas ── -->
+      <aside class="bb-notas-panel">
+        <div class="bb-notas-header">
+          <span class="bb-notas-titulo">Notas</span>
+          <button class="bb-nueva-nota-btn" onclick="bbNuevaNota()" title="Nueva nota">＋ Nueva</button>
+        </div>
+
+        <!-- Lista de notas (tarjetas) -->
+        <div class="bb-notas-lista" id="bb-notas-lista"></div>
+
+        <!-- Editor inline de la nota activa -->
+        <div class="bb-nota-editor bb-hidden" id="bb-nota-editor">
+          <input  type="text" id="bb-editor-titulo" class="bb-nota-editor-titulo"
+                  placeholder="Título de la nota"
+                  oninput="bbGuardarEditorActivo()">
+          <textarea id="bb-editor-cuerpo" class="bb-nota-editor-cuerpo"
+                    placeholder="Escribí tu nota acá..."
+                    oninput="bbGuardarEditorActivo()"></textarea>
+        </div>
+      </aside>
+
+      <!-- ── COLUMNA DERECHA: Tablero libre (post-its + sellitos) ── -->
+      <main class="bb-tablero" id="bb-tablero">
+
+        <!-- Toolbar flotante arriba del tablero -->
+        <div class="bb-tablero-toolbar">
+          <!-- Post-its por color -->
+          <div class="bb-tool-group">
+            <span class="bb-tool-label">Post-it</span>
+            <button class="bb-postit-color" style="--c:#fde68a;" onclick="bbAgregarPostit('#fde68a')" title="Amarillo"></button>
+            <button class="bb-postit-color" style="--c:#fca5a5;" onclick="bbAgregarPostit('#fca5a5')" title="Rosa"></button>
+            <button class="bb-postit-color" style="--c:#86efac;" onclick="bbAgregarPostit('#86efac')" title="Verde"></button>
+            <button class="bb-postit-color" style="--c:#93c5fd;" onclick="bbAgregarPostit('#93c5fd')" title="Azul"></button>
+            <button class="bb-postit-color" style="--c:#c4b5fd;" onclick="bbAgregarPostit('#c4b5fd')" title="Violeta"></button>
+          </div>
+
+          <!-- Sellitos -->
+          <div class="bb-tool-group">
+            <span class="bb-tool-label">Sellitos</span>
+            <div class="bb-stamps-row" id="bb-stamps-row">
+              <!-- generados por JS -->
+            </div>
+          </div>
+
+          <button class="bb-btn-limpiar" onclick="bbLimpiarTablero()" title="Limpiar tablero">🗑 Limpiar</button>
+        </div>
+
+        <!-- Área donde se sueltan post-its y sellitos -->
+        <div class="bb-tablero-area" id="bb-tablero-area"></div>
+
+      </main>
     </div>
-    <!-- Input de nueva nota -->
-    <div class="piz-nota-input-wrap" id="piz-nota-input-wrap">
-      <input type="text" id="piz-nota-input" class="piz-nota-input" placeholder="Escribí una nota... y presioná Enter">
-      <button onclick="pizAgregarNota()" class="piz-nota-add">＋</button>
-    </div>
+
   </div>
 </div>
 
