@@ -216,6 +216,13 @@ function seleccionarAutocompletado(clienteId){
 }
 // ── FILTRO ── filtrar pedidos (cuba clientes, pendientes, retirados,etc)
 function setFiltro(f, el){
+  if (filtro === f && f !== 'todos') {
+    filtro = 'todos';
+    document.querySelectorAll('.filtros button:not([id^="filtro-dia"])').forEach(b => b.classList.remove('active'));
+    document.querySelector('.filtros button[onclick*="todos"]').classList.add('active');
+    renderPedidos();
+    return;
+  }
   filtro = f;
   document.querySelectorAll('.filtros button:not([id^="filtro-dia"])').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
@@ -223,6 +230,16 @@ function setFiltro(f, el){
 }
 
 function setFiltroDia(tipo, el){
+  // Si ya está activo, deseleccionar
+  if (filtroDia === tipo) {
+    filtroDia = null;
+    el.classList.remove('active');
+    document.getElementById('filtro-dia-select').style.display = 'none';
+    filtroDiaKey = null;
+    renderPedidos();
+    return;
+  }
+
   filtroDia = tipo;
   document.querySelectorAll('#filtro-dia-hoy,#filtro-dia-manana,#filtro-dia-otro')
     .forEach(b => b.classList.remove('active'));

@@ -53,26 +53,23 @@ function toggleUsuarioMenu(btnId){
   const menu = document.getElementById('usuario-menu');
   const btn = document.getElementById(btnId);
   const rect = btn.getBoundingClientRect();
-  
-  menu.style.width = rect.width + 'px';
-  menu.style.right = (window.innerWidth - rect.right) + 'px';
 
-  // Si viene del sidebar → expande arriba
-  // Si viene del header → expande abajo
   if (btnId === 'btn-usuario') {
-    menu.style.top = (rect.top - 140) + 'px'; // ajustá el 110 según altura del menú
-    menu.style.bottom = 'auto';
+    // Sidebar → aparece a la derecha, centrado verticalmente con el botón
+    menu.style.left = (rect.right + 8) + 'px';
+    menu.style.right = 'auto';
+    menu.style.top = (rect.top - 60) + 'px';
+    menu.style.width = '200px'; // ancho fijo, no hereda el del botón colapsado
   } else {
+    // Header → aparece abajo alineado a la derecha
+    menu.style.left = 'auto';
+    menu.style.right = (window.innerWidth - rect.right) + 'px';
     menu.style.top = (rect.bottom + 8) + 'px';
-    menu.style.bottom = 'auto';
+    menu.style.width = rect.width + 'px';
   }
 
   menu.classList.toggle('hidden');
-  if (menu.classList.contains('hidden')) {
-    menu.style.display = 'none';
-  } else {
-    menu.style.display = 'block';
-  }
+  menu.style.display = menu.classList.contains('hidden') ? 'none' : 'block';
 }
 // cerrar al clickear afuera
 document.addEventListener('click', e => {

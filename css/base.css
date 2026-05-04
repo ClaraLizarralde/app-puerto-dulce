@@ -2538,6 +2538,21 @@ body.layout-vertical .tabs .tab .ti {
     white-space:nowrap;opacity:0;pointer-events:none;
   }
   body.layout-vertical .tabs.collapsed .tab:hover::after{opacity:1;}
+
+  body.layout-vertical .tabs.collapsed .btn-usuario {
+  padding: 8px;
+  justify-content: center;
+}
+
+body.layout-vertical .tabs.collapsed .btn-usuario .usuario-nombre {
+  display: none;
+}
+
+body.layout-vertical .tabs.collapsed .tabs-collapse-btn {
+  width: 40px;
+  margin: 0 auto;
+  border-radius: 50%;
+}
 body.layout-vertical .app-main {
   flex: 1 1 auto;
   min-width: 0;

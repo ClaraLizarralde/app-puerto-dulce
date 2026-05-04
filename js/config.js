@@ -247,6 +247,10 @@ function toggleSidebarCollapse(){
   const next = !tabs.classList.contains('collapsed');
   localStorage.setItem('pd_sidebar_collapsed', next ? '1' : '0');
   applySidebarCollapseState();
+  
+  // Cerrar menú usuario
+  const menu = document.getElementById('usuario-menu');
+  if (menu) menu.style.display = 'none';
 }
 (function(){
   applySidebarCollapseState();
