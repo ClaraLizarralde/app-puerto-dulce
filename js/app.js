@@ -86,5 +86,5 @@ actualizarUIUsuario();
 
 function abrirModalCambioUsuario() {
   document.getElementById('usuario-menu').style.display = 'none';
-  abrirModalBienvenida();
+  abrirModalBienvenida(true); // ← solo agregás el true
 }

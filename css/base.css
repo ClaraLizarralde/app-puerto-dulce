@@ -3357,7 +3357,10 @@ body.layout-vertical .tabs.collapsed .tabs-collapse-btn .icon-sm {
   position: fixed !important;
   inset: 0 !important;
   z-index: 2000 !important;
-  display: none; /* estado por defecto */
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
 }
 
 #modal-pizarron.bb-visible {
@@ -3842,4 +3845,24 @@ body.bb-pizarron-open {
 
 body.bb-pizarron-open .app-body {
   overflow: visible !important;
+}
+
+.piz-cerrar-x {
+  position: absolute;
+  top: 16px; 
+  right: 20px;
+  background: rgba(255,255,255,.08);
+  border: 1.5px solid rgba(240,230,208,.3);
+  color: rgba(240,230,208,.7);
+  font-size: 1rem; cursor: pointer;
+  font-family: 'Shadows Into Light', cursive;
+  padding: 4px 10px; border-radius: 4px;
+  transition: all .15s;
+  z-index: 20;
+  letter-spacing: 1px;
+}
+.piz-cerrar-x:hover { 
+  background: rgba(255,255,255,.15);
+  border-color: rgba(240,230,208,.7);
+  color: var(--chalk-white); 
 }

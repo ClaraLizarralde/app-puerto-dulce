@@ -38,15 +38,25 @@ function bbInit() {
 /* ── Teclado ──────────────────────────────────── */
 function bbKeydown(e) {
   if (e.key === 'Escape') {
+    // Modal bienvenida
+    const modalBienvenida = document.getElementById('modal-setup-local');
+    if (modalBienvenida?.style.display !== 'none' && modalBienvenida?._desdeCambioUsuario) {
+      cerrarModalBienvenida();
+      return;
+    }
+    // Modal leer nota
     if (document.getElementById('bb-nota-leer-overlay')?.classList.contains('bb-visible')) {
       bbCerrarLeer(); return;
     }
+    // Modal editor nota
     if (document.getElementById('bb-nota-overlay')?.classList.contains('bb-visible')) {
       bbCerrarEditorNota(); return;
     }
+    // Grid sellos
     if (document.getElementById('bb-sellos-flotante')?.classList.contains('bb-visible')) {
       bbCerrarGridSellos(); return;
     }
+    // Pizarrón
     if (document.getElementById('modal-pizarron')?.classList.contains('bb-visible')) {
       bbCerrar(); return;
     }

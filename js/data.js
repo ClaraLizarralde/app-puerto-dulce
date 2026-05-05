@@ -340,6 +340,11 @@ function pizPantallaPin(localId, userId) {
   if (!usuario) return;
   const sec = document.getElementById('piz-login-section');
   if (!sec) return;
+
+  const modal = document.getElementById('modal-setup-local');
+  const desdeCambio = modal?._desdeCambioUsuario || false;
+  const esDesktop = window.innerWidth >= 901;
+
   sec.innerHTML = `
     <div class="piz-pantalla piz-pin-wrap">
       <p class="piz-label">ingresá tu PIN · ${usuario.nombre.replace(/^\S+\s*/,'')}</p>
@@ -350,19 +355,62 @@ function pizPantallaPin(localId, userId) {
         <span class="piz-pin-dot" id="piz-dot-3"></span>
       </div>
       <p class="piz-pin-error" id="piz-pin-error"></p>
-      <div class="piz-teclado">
-        ${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k => `
-          <button class="piz-tecla${k===''?' invisible':''}" 
-            ${k!==''?`onclick="pizTecla('${k}','${localId}','${usuario.id}')"`:''}>
-            ${k}
-          </button>
-        `).join('')}
-      </div>
+      
+      ${esDesktop ? `
+        <p class="piz-label" style="font-size:.7rem;margin-top:4px;">usá el teclado numérico</p>
+      ` : `
+        <div class="piz-teclado">
+          ${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k => `
+            <button class="piz-tecla${k===''?' invisible':''}" 
+              ${k!==''?`onclick="pizTecla('${k}','${localId}','${usuario.id}')"`:''}>
+              ${k}
+            </button>
+          `).join('')}
+        </div>
+      `}
+      
       <button class="piz-back-btn" onclick="pizPantallaUsuarios('${localId}')">← volver</button>
+      ${desdeCambio ? `
+        <button class="piz-back-btn" onclick="cerrarModalBienvenida()" style="margin-top:4px;opacity:.5;">✕ cancelar</button>
+      ` : ''}
     </div>
   `;
+
   window._pinActual = '';
+
+  // Teclado físico en desktop
+  if (esDesktop) {
+    // Limpiar listener anterior si existe
+    if (window._pizKeyListener) {
+      document.removeEventListener('keydown', window._pizKeyListener);
+    }
+    window._pizKeyListener = function(e) {
+      // Solo actuar si el modal está abierto
+      if (document.getElementById('modal-setup-local')?.style.display === 'none') return;
+      
+      if (e.key >= '0' && e.key <= '9') {
+        pizTecla(e.key, localId, usuario.id);
+      } else if (e.key === 'Backspace') {
+        pizTecla('⌫', localId, usuario.id);
+      } else if (e.key === 'Escape') {
+        if (desdeCambio) cerrarModalBienvenida();
+        else pizPantallaUsuarios(localId);
+      }
+    };
+    document.addEventListener('keydown', window._pizKeyListener);
+  }
 }
+
+// Función para cerrar el modal desde cambio usuario
+window.cerrarModalBienvenida = function() {
+  const modal = document.getElementById('modal-setup-local');
+  if (modal) modal.style.display = 'none';
+  document.querySelector('.piz-cerrar-x')?.remove(); // ← agregá esta línea
+  if (window._pizKeyListener) {
+    document.removeEventListener('keydown', window._pizKeyListener);
+    window._pizKeyListener = null;
+  }
+};
 window.pizPantallaPin = pizPantallaPin;
 
 window.pizTecla = function(tecla, localId, userId) {
@@ -414,9 +462,11 @@ window.pizTecla = function(tecla, localId, userId) {
     // Toma notas reales del pizarrón, o usa placeholders
     let notas = [];
     try {
-      notas = (datos.pizarron && datos.pizarron.notas && datos.pizarron.notas.length)
-        ? datos.pizarron.notas.slice(0, 3)
-        : [];
+const bbRaw = localStorage.getItem('spa_blackboard_v3');
+const bbData = bbRaw ? JSON.parse(bbRaw) : null;
+notas = (bbData && bbData.notas && bbData.notas.length)
+  ? bbData.notas.slice(0, 3).map(n => ({ texto: n.titulo || n.cuerpo || '' }))
+  : [];
     } catch(e) {}
 
     if (!notas.length) {
@@ -435,39 +485,66 @@ window.pizTecla = function(tecla, localId, userId) {
     `).join('');
   }
 
-  function pizPantallaLocales() {
-    const postits = document.getElementById('piz-postits-area');
-if (postits) postits.style.display = 'flex';
-const lineas = document.querySelectorAll('.piz-line');
-lineas.forEach(l => l.style.display = 'block');
-    const sec = document.getElementById('piz-login-section');
-    if (!sec) return;
-    sec.innerHTML = `
-      <div class="piz-pantalla">
-        <p class="piz-label">seleccioná tu local</p>
-        <div class="piz-locales">
-          ${LOCALES_PIZ.map(l => `
-            <button class="piz-local-btn${l.disabled ? ' disabled' : ''}"
-              onclick="${l.disabled ? 'pizMensajeConstruccion()' : `pizPantallaUsuarios('${l.id}')`}">
-              ${l.nombre}
-              <span class="piz-local-tag">${l.tag}</span>
-            </button>
-          `).join('')}
-        </div>
-      </div>
-    `;
+function pizPantallaLocales() {
+  const postits = document.getElementById('piz-postits-area');
+  if (postits) postits.style.display = 'flex';
+  const lineas = document.querySelectorAll('.piz-line');
+  lineas.forEach(l => l.style.display = 'block');
+  const sec = document.getElementById('piz-login-section');
+  if (!sec) return;
+  const modal = document.getElementById('modal-setup-local');
+  const desdeCambio = modal?._desdeCambioUsuario || false;
+
+  // Botón X en el pizarron
+  const pizarron = document.querySelector('.pizarron');
+  pizarron?.querySelector('.piz-cerrar-x')?.remove();
+  if (desdeCambio && pizarron) {
+    const btnX = document.createElement('button');
+    btnX.className = 'piz-cerrar-x';
+    btnX.textContent = '✕';
+    btnX.onclick = cerrarModalBienvenida;
+    pizarron.appendChild(btnX);
   }
+
+  sec.innerHTML = `
+    <div class="piz-pantalla">
+      <p class="piz-label">seleccioná tu local</p>
+      <div class="piz-locales">
+        ${LOCALES_PIZ.map(l => `
+          <button class="piz-local-btn${l.disabled ? ' disabled' : ''}"
+            onclick="${l.disabled ? 'pizMensajeConstruccion()' : `pizPantallaUsuarios('${l.id}')`}">
+            ${l.nombre}
+            <span class="piz-local-tag">${l.tag}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
 
 window.pizPantallaUsuarios = function(localId) {
   const postits = document.getElementById('piz-postits-area');
-if (postits) postits.style.display = 'flex';
-const lineas = document.querySelectorAll('.piz-line');
-lineas.forEach(l => l.style.display = 'block');
-
+  if (postits) postits.style.display = 'flex';
+  const lineas = document.querySelectorAll('.piz-line');
+  lineas.forEach(l => l.style.display = 'block');
   const local = LOCALES_PIZ.find(l => l.id === localId);
   const users = USUARIOS_PIZ[localId] || [];
   const sec = document.getElementById('piz-login-section');
   if (!sec) return;
+  const modal = document.getElementById('modal-setup-local');
+  const desdeCambio = modal?._desdeCambioUsuario || false;
+
+  // Botón X en el pizarron
+  const pizarron = document.querySelector('.pizarron');
+  pizarron?.querySelector('.piz-cerrar-x')?.remove();
+  if (desdeCambio && pizarron) {
+    const btnX = document.createElement('button');
+    btnX.className = 'piz-cerrar-x';
+    btnX.textContent = '✕';
+    btnX.onclick = cerrarModalBienvenida;
+    pizarron.appendChild(btnX);
+  }
+
   sec.innerHTML = `
     <div class="piz-pantalla">
       <p class="piz-label">quién sos · ${local.nombre}</p>
@@ -483,7 +560,6 @@ lineas.forEach(l => l.style.display = 'block');
     </div>
   `;
 };
-
   window.pizPantallaLocales = pizPantallaLocales;
 
   window.pizEntrar = function(localId, userId, nombre, rol) {
@@ -503,13 +579,14 @@ lineas.forEach(l => l.style.display = 'block');
   };
 
   // Abre el modal
-  window.abrirModalBienvenida = function() {
-    const modal = document.getElementById('modal-setup-local');
-    if (!modal) return;
-    modal.style.display = 'flex';
-    renderPizPostits();
-    pizPantallaLocales();
-  };
+window.abrirModalBienvenida = function(desdeCambioUsuario = false) {
+  const modal = document.getElementById('modal-setup-local');
+  if (!modal) return;
+  modal._desdeCambioUsuario = desdeCambioUsuario;
+  modal.style.display = 'flex';
+  renderPizPostits();
+  pizPantallaLocales();
+};
 
   // Exponer para que el flow de inicio lo llame
   // Si ya tenés lógica de "mostrar setup al iniciar", reemplazala por:
