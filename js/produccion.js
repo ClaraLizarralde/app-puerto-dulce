@@ -7,19 +7,22 @@ if(!window._hechoSet)window._hechoSet={hoy:new Set(),manana:new Set()};
 // Subpestaña activa de Producción
 let _prodTabActiva='hoy';
 
-function showProdTab(id, el){
-  document.querySelectorAll('.prod-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.prod-panel').forEach(p=>p.classList.remove('active'));
-  if(el)el.classList.add('active');
-  const panel=document.getElementById('prodpanel-'+id);
-  if(panel)panel.classList.add('active');
-  _prodTabActiva=id;
-  // Renderizar el panel correcto si aún no tiene contenido
-  if(id==='hoy')renderProduccionHoy();
-  else if(id==='manana')renderProduccionManana();
-  else if(id==='semana')renderProduccionSemanal();
-}
+function showProdTab(id, el) {
+  document.querySelectorAll('.prod-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.prod-panel').forEach(p => p.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const panel = document.getElementById('prodpanel-' + id);
+  if (panel) panel.classList.add('active');
+  _prodTabActiva = id;
+  if (id === 'hoy') renderProduccionHoy();
+  else if (id === 'manana') renderProduccionManana();
+  else if (id === 'semana') renderProduccionSemanal();
 
+  document.querySelectorAll('#sidebar-subtabs-produccion .sidebar-subtab')
+    .forEach(b => b.classList.remove('active'));
+  const ssBtn = document.getElementById('ss-prodtab-' + id);
+  if (ssBtn) ssBtn.classList.add('active');
+}
 function getItemKey(pedidoId,rId,idx){return `${pedidoId}_${rId}_${idx}`;}
 
 function getItemEstado(pedidoId,rId,idx){

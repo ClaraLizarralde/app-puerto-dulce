@@ -181,15 +181,20 @@ function renderCatalogo(){
 function showCfgTab(id, el) {
   document.querySelectorAll('.cfg-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.cfg-panel').forEach(p => p.classList.remove('active'));
-  if(el) el.classList.add('active');
+  if (el) el.classList.add('active');
   const panel = document.getElementById('cfgpanel-' + id);
-  if(panel) panel.classList.add('active');
-  // Renderizar contenido según panel
-  if(id === 'clientes') renderFrecuentes();
-  if(id === 'catalogo') renderCatalogo();
-  if(id === 'archivos') renderArchivadosGlobal();
-  if(id === 'local') renderCfgLocal();
+  if (panel) panel.classList.add('active');
+  if (id === 'clientes') renderFrecuentes();
+  if (id === 'catalogo') renderCatalogo();
+  if (id === 'archivos') renderArchivadosGlobal();
+  if (id === 'local') renderCfgLocal();
+
+  document.querySelectorAll('#sidebar-subtabs-config .sidebar-subtab')
+    .forEach(b => b.classList.remove('active'));
+  const ssBtn = document.getElementById('ss-cfgtab-' + id);
+  if (ssBtn) ssBtn.classList.add('active');
 }
+
 
 // ── TEMAS ──
 function setTema(tema) {
@@ -232,25 +237,55 @@ document.addEventListener('DOMContentLoaded', function() {
   const l = localStorage.getItem('pd_layout') || 'horizontal';
   setLayout(l);
 });
-function applySidebarCollapseState(){
-  const collapsed = localStorage.getItem('pd_sidebar_collapsed') === '1';
-  const tabs = document.getElementById('main-tabs');
-  const btn = document.getElementById('tabs-collapse-btn');
-  if(!tabs || !btn) return;
-  tabs.classList.toggle('collapsed', collapsed);
-  document.body.classList.toggle('sidebar-collapsed', collapsed); // ← agregar esta línea
-  btn.textContent = collapsed ? '⇥' : '⇤';
-}
 function toggleSidebarCollapse(){
   const tabs = document.getElementById('main-tabs');
   if(!tabs) return;
-  const next = !tabs.classList.contains('collapsed');
-  localStorage.setItem('pd_sidebar_collapsed', next ? '1' : '0');
+
+  const isTabletLandscape = window.matchMedia(
+    '(min-width: 768px) and (max-width: 1024px) and (orientation: landscape)'
+  ).matches;
+
+  if(isTabletLandscape){
+    // Tablet: expandido/colapsado (colapsado por defecto)
+    const next = tabs.classList.contains('expanded');
+    localStorage.setItem('pd_sidebar_expanded', next ? '0' : '1');
+  } else {
+    // Desktop: expandido/colapsado (expandido por defecto)
+    const next = !tabs.classList.contains('collapsed');
+    localStorage.setItem('pd_sidebar_collapsed', next ? '1' : '0');
+  }
+
   applySidebarCollapseState();
-  
+
   // Cerrar menú usuario
   const menu = document.getElementById('usuario-menu');
-  if (menu) menu.style.display = 'none';
+  if(menu) menu.style.display = 'none';
+}
+
+function applySidebarCollapseState(){
+  const tabs = document.getElementById('main-tabs');
+  const btn  = document.getElementById('tabs-collapse-btn');
+  if(!tabs || !btn) return;
+
+  const isTabletLandscape = window.matchMedia(
+    '(min-width: 768px) and (max-width: 1024px) and (orientation: landscape)'
+  ).matches;
+
+  if(isTabletLandscape){
+    // Tablet: por defecto colapsado, se puede expandir
+    const expanded = localStorage.getItem('pd_sidebar_expanded') === '1';
+    tabs.classList.toggle('expanded',  expanded);
+    tabs.classList.remove('collapsed');
+  } else {
+    // Desktop: por defecto expandido, se puede colapsar
+    const collapsed = localStorage.getItem('pd_sidebar_collapsed') === '1';
+    tabs.classList.toggle('collapsed', collapsed);
+    tabs.classList.remove('expanded');
+  }
+
+  document.body.classList.toggle('sidebar-collapsed',
+    tabs.classList.contains('collapsed')
+  );
 }
 (function(){
   applySidebarCollapseState();

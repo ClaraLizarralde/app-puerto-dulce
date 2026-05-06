@@ -49,23 +49,23 @@ if (menuRol) menuRol.textContent = usuarioActivo.rol === 'admin' ? 'Administrado
   if (menu) menu.classList.add('hidden');
 }
 
-function toggleUsuarioMenu(btnId){
+function toggleUsuarioMenu(btnId) {
   const menu = document.getElementById('usuario-menu');
-  const btn = document.getElementById(btnId);
+  const btn  = document.getElementById(btnId);
   const rect = btn.getBoundingClientRect();
 
   if (btnId === 'btn-usuario') {
-    // Sidebar → aparece a la derecha, centrado verticalmente con el botón
-    menu.style.left = (rect.right + 8) + 'px';
-    menu.style.right = 'auto';
-    menu.style.top = (rect.top - 60) + 'px';
-    menu.style.width = '200px'; // ancho fijo, no hereda el del botón colapsado
+    menu.style.setProperty('left',   (rect.right + 8) + 'px',                   'important');
+    menu.style.setProperty('right',  'auto',                                     'important');
+    menu.style.setProperty('top',    'auto',                                     'important');
+    menu.style.setProperty('bottom', (window.innerHeight - rect.bottom) + 'px', 'important');
+    menu.style.setProperty('width',  '200px',                                   'important');
   } else {
-    // Header → aparece abajo alineado a la derecha
-    menu.style.left = 'auto';
-    menu.style.right = (window.innerWidth - rect.right) + 'px';
-    menu.style.top = (rect.bottom + 8) + 'px';
-    menu.style.width = rect.width + 'px';
+    menu.style.setProperty('left',   'auto',                                     'important');
+    menu.style.setProperty('right',  (window.innerWidth - rect.right) + 'px',   'important');
+    menu.style.setProperty('top',    (rect.bottom + 8) + 'px',                  'important');
+    menu.style.setProperty('bottom', 'auto',                                     'important');
+    menu.style.setProperty('width',  '200px',                                   'important');
   }
 
   menu.classList.toggle('hidden');

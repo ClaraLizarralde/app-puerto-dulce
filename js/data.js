@@ -607,3 +607,18 @@ window.abrirModalBienvenida = function(desdeCambioUsuario = false) {
 }
 window.pizMensajeConstruccion = pizMensajeConstruccion;
 })();
+
+function selectMobileSubtab(parent, id, el) {
+  // Ocultar selector screen
+  const screen = document.getElementById('subtab-screen-' + parent);
+  if (screen) screen.classList.remove('active');
+
+  // Llamar la función correspondiente
+  if (parent === 'produccion') {
+    showProdTab(id, document.getElementById('prodtab-' + id));
+  } else if (parent === 'cuba') {
+    showCubaTab(id, document.getElementById('cubatab-' + id));
+  } else if (parent === 'config') {
+    showCfgTab(id, document.getElementById('cfgtab-' + id));
+  }
+}

@@ -9,12 +9,15 @@ function showCubaTab(id, el){
   if(el) el.classList.add('active');
   const panel = document.getElementById('cubapanel-'+id);
   if(panel) panel.classList.add('active');
-  // render relevant panel
   if(id==='pedidos') renderCubaResumen();
   else if(id==='pedir') renderEncargos();
-  else if(id==='ventas'){ renderVentas(); }
-  else if(id==='exportar'){ renderCubaExportSelector(); }
-  // exportar panel is static
+  else if(id==='ventas') renderVentas();
+  else if(id==='exportar') renderCubaExportSelector();
+
+  document.querySelectorAll('#sidebar-subtabs-cuba .sidebar-subtab')
+    .forEach(b => b.classList.remove('active'));
+  const ssBtn = document.getElementById('ss-cubatab-' + id);
+  if (ssBtn) ssBtn.classList.add('active');
 }
 
 

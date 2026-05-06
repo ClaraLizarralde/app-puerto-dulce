@@ -12,18 +12,43 @@ function renderEstadoLocal(){
   });
 }
 // ── TABS ──
-function showTab(id,el){
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
+function showTab(id, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
   el.classList.add('active');
-  if(id==='produccion'){
-    // Activar la subpestaña activa de producción
-    const elTab=document.getElementById('prodtab-'+_prodTabActiva);
-    showProdTab(_prodTabActiva, elTab||document.getElementById('prodtab-hoy'));
+
+  if (id === 'produccion') {
+    const elTab = document.getElementById('prodtab-' + _prodTabActiva);
+    showProdTab(_prodTabActiva, elTab || document.getElementById('prodtab-hoy'));
   }
-  if(id==='cuba')renderCuba();
-  if(id==='config'){ const activePanel=document.querySelector('.cfg-panel.active'); const activePanelId=activePanel?activePanel.id.replace('cfgpanel-',''):'catalogo'; showCfgTab(activePanelId, document.getElementById('cfgtab-'+activePanelId)); }
+  if (id === 'cuba') renderCuba();
+  if (id === 'config') {
+    const activePanel = document.querySelector('.cfg-panel.active');
+    const activePanelId = activePanel ? activePanel.id.replace('cfgpanel-', '') : 'catalogo';
+    showCfgTab(activePanelId, document.getElementById('cfgtab-' + activePanelId));
+  }
+
+  // Mobile: mostrar selector screen si existe
+  const isMobile = window.innerWidth < 768 || 
+    (window.innerWidth <= 1024 && window.screen.orientation?.type?.includes('portrait'));
+
+  if (isMobile) {
+    const screen = document.getElementById('subtab-screen-' + id);
+    if (screen) {
+      document.getElementById('tab-' + id)
+        .querySelectorAll('.prod-panel, .cfg-panel')
+        .forEach(p => p.classList.remove('active'));
+
+      screen.classList.add('active');
+      return;
+    }
+  }
+
+  // Sidebar subtabs: mostrar el grupo del tab activo, ocultar el resto
+  document.querySelectorAll('.sidebar-subtabs').forEach(el => el.classList.remove('visible'));
+  const subtabGroup = document.getElementById('sidebar-subtabs-' + id);
+  if (subtabGroup) subtabGroup.classList.add('visible');
 }
 
 function renderAll(){
@@ -134,6 +159,7 @@ function renderArchivadosGlobalContent(){
   }).join('');
 }
 
+//ESTA FUNCION NO ESTA EN USO, PERO LA DEJO PORQUE PUEDE SERVIR PARA FUTURAS FUNCIONALIDADES
 function renderDiasNav(){
   const nav=document.getElementById('dias-nav');
   if(!nav) return;
