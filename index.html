@@ -57,7 +57,7 @@
     <span class="tabs-side-logo">🍰</span>
     <span class="tabs-side-brand">Puerto dulce<span class="tabs-side-sub">sistema de pedidos</span></span>
   </div>
-  <div class="tabs-list">
+<div class="tabs-list">
     <div class="tab active" data-title="Pedidos" onclick="showTab('pedidos',this)"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
   <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
 </svg>Pedidos</div>
@@ -80,6 +80,10 @@
       </button>
     </div>
 
+    <!-- FAB  solo mobile -->
+    <div class="tab tab-mobile-fab" onclick="abrirModalNP()">
+      <div class="tab-fab-circle">＋</div>
+    </div>
     <div class="tab" data-title="Cuba" onclick="showTab('cuba',this)"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
 </svg>Cuba</div>
@@ -101,19 +105,28 @@
         <span>Exportar</span>
       </button>
     </div>
+  <!-- Tab Más - solo mobile -->
+<div class="tab tab-mobile-only" data-title="Más" onclick="toggleMobMas(this)">
+  <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+  </svg>
+  Más
+</div>
+    
 
-    <div class="tab" data-title="Pizarrón" onclick="abrirPizarron()"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <!-- Solo desktop/tablet landscape -->
+    <div class="tab tab-desktop-only" data-title="Pizarrón" onclick="abrirPizarron()"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
   <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
 </svg>Pizarrón</div>
 
-    <div class="tab" data-title="Etiquetas" onclick="showTab('etiquetas',this);renderEtiquetas()"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <div class="tab tab-desktop-only" data-title="Etiquetas" onclick="showTab('etiquetas',this);renderEtiquetas()"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
   <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
   <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
 </svg>Etiquetas</div>
 
     <div class="tabs-divider"></div>
 
-    <div class="tab" data-title="Config" onclick="showTab('config',this)"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <div class="tab tab-desktop-only" data-title="Config" onclick="showTab('config',this)"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
   <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" />
   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
 </svg>Configuración</div>
@@ -141,7 +154,13 @@
     </div>
 
   </div><!-- /tabs-list -->
-
+  <div class="tabs-divider"></div>
+  <button class="btn-nuevo-pedido-sidebar" onclick="abrirModalNP()">
+    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+    <span class="btn-np-label">Nuevo pedido</span>
+  </button>
   <div class="tabs-divider"></div>
   <button class="btn-usuario" id="btn-usuario" onclick="toggleUsuarioMenu('btn-usuario')">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-sm">
@@ -196,52 +215,82 @@
 
 <div class="tab-contents">
 
-  <!-- PEDIDOS -->
-  <div class="tab-content active" id="tab-pedidos">
-    <div class="pedidos-header-toolbar">
-      <div class="search-wrap autocomplete-wrap">
-        <span class="s-ico">
-          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-          </svg>
-        </span>
-        <input type="text" id="buscador" placeholder="Buscar cliente..." oninput="onBuscadorInput()" autocomplete="off">
-        <button class="s-clear" id="btn-clear-buscador">✕</button>
-        <div class="autocomplete-lista" id="autocomplete-lista"></div>
-      </div>
-      <div class="filtros">
-        <button class="active" onclick="setFiltro('todos',this)">Todos</button>
-        <button onclick="setFiltro('pendientes',this)">Pendientes</button>
-        <button onclick="setFiltro('listos',this)">Listos</button>
-        <button onclick="setFiltro('noRetirados',this)">No retirados</button>
-        <button onclick="setFiltro('cuba',this)">Cuba</button>
-        <button onclick="setFiltro('clientes',this)">Clientes</button>
-        <div class="filtros-sep"></div>
-        <button id="filtro-dia-hoy" onclick="setFiltroDia('hoy',this)">Hoy</button>
-        <button id="filtro-dia-manana" onclick="setFiltroDia('manana',this)">Mañana</button>
-        <button id="filtro-dia-otro" onclick="setFiltroDia('otro',this)">Otro día ▾</button>
-        <select id="filtro-dia-select" onchange="setFiltroDiaKey(this.value)" style="display:none"></select>
-      </div>
+<!-- PEDIDOS -->
+<div class="tab-content active" id="tab-pedidos">
+
+  <!-- TOP BAR DE PEDIDOS -->
+  <div class="po-topbar">
+    <div class="po-search-wrap autocomplete-wrap">
+      <span class="po-search-ico">
+        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+        </svg>
+      </span>
+      <input type="text" id="buscador" placeholder="Buscar cliente, producto, teléfono..." oninput="onBuscadorInput()" autocomplete="off">
+      <button class="po-search-clear" id="btn-clear-buscador" onclick="document.getElementById('buscador').value='';onBuscadorInput()">✕</button>
+      <div class="autocomplete-lista" id="autocomplete-lista"></div>
     </div>
-    <div class="toolbar">
-      <button onclick="mostrarCSVModal()">↓ Exportar CSV</button>
-      <button class="btn-arch" onclick="archivarRetirados()">📥 Archivar retirados</button>
-    </div>
-    <div class="planilla" id="planilla-wrap"></div>
-    <div class="vacio" id="vacio-pedidos" style="display:none">No hay pedidos para este día.</div>
-    <div class="archivados-section" id="archivados-section" style="display:none">
-      <div class="archivados-header" onclick="toggleArchivadosLista()">
-        <span class="archivados-titulo">📥 Pedidos archivados</span>
-        <span class="archivados-count" id="archivados-count">0</span>
-      </div>
-      <div class="archivados-lista" id="archivados-lista"></div>
-    </div>
-    <div class="footer-contador" id="footer-contador">
-      <div class="fc-item"><div class="fc-num" id="fc-pedidos">0</div><div class="fc-lbl">Pedidos</div></div>
-      <div class="fc-item"><div class="fc-num" id="fc-tortas">0</div><div class="fc-lbl">Tortas</div></div>
-      <div class="fc-item"><div class="fc-num" id="fc-productos">0</div><div class="fc-lbl">Otros prods.</div></div>
-    </div>
+    <div class="po-topbar-actions">
+  <button class="po-btn-sm" onclick="mostrarCSVModal()">↓ CSV</button>
+  <button class="po-btn-sm po-btn-arch" id="btn-ver-archivados" onclick="toggleVistaArchivados()">
+    📥 Archivados <span class="po-arch-cnt" id="po-arch-cnt">0</span>
+  </button>
+  <button class="po-btn-sm po-btn-accent" onclick="abrirModalNP()">+ Nuevo pedido</button>
+</div>
   </div>
+
+  <!-- TABS DE DÍAS -->
+  <div class="po-day-tabs" id="po-day-tabs"></div>
+
+  <!-- FILTROS -->
+  <div class="po-filter-row">
+    <span class="po-filter-label">Filtro</span>
+    <button class="po-chip active" onclick="setFiltro('todos',this)">Todos</button>
+    <button class="po-chip" onclick="setFiltro('pendientes',this)">Pendientes</button>
+    <button class="po-chip" onclick="setFiltro('listos',this)">Listos</button>
+    <button class="po-chip" onclick="setFiltro('noRetirados',this)">Sin retirar</button>
+    <button class="po-chip" onclick="setFiltro('cuba',this)">Cuba</button>
+    <button class="po-chip" onclick="setFiltro('clientes',this)">Clientes</button>
+    <button class="po-chip" onclick="setFiltro('sinTacc',this)">Sin TACC</button>
+  </div>
+
+  <!-- TABLA -->
+  <div class="po-table-wrap">
+    <table class="po-table" id="pedidos-table">
+      <thead>
+        <tr>
+          <th style="width:32px"></th>
+          <th style="width:28px"></th>
+          <th>#</th>
+          <th>HORA</th>
+          <th>CLIENTE</th>
+          <th>PRODUCTOS</th>
+          <th>TOTAL</th>
+          <th>ESTADO</th>
+          <th style="text-align:right">ACCIONES</th>
+        </tr>
+      </thead>
+      <tbody id="pedidos-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- ARCHIVADOS (se mantiene oculto, funciona igual) -->
+  <div class="archivados-section" id="archivados-section" style="display:none">
+    <div class="archivados-header" onclick="toggleArchivadosLista()">
+      <span class="archivados-titulo">📥 Pedidos archivados</span>
+      <span class="archivados-count" id="archivados-count">0</span>
+    </div>
+    <div class="archivados-lista" id="archivados-lista"></div>
+  </div>
+
+  <!-- FOOTER STATS -->
+  <div class="po-footer-stats">
+    <div class="po-stat"><div class="po-stat-num" id="fc-pedidos">0</div><div class="po-stat-lbl">Pedidos</div></div>
+    <div class="po-stat"><div class="po-stat-num" id="fc-tortas">0</div><div class="po-stat-lbl">Tortas</div></div>
+    <div class="po-stat"><div class="po-stat-num" id="fc-productos">0</div><div class="po-stat-lbl">Otros prods.</div></div>
+  </div>
+
+</div>
 
   <!-- PRODUCCIÓN -->
   <div class="tab-content" id="tab-produccion">
@@ -595,11 +644,25 @@
 </div>
 </div>
 
-<!--fab nuevo pedido-->
-<button class="fab" id="fab-nuevo-pedido" onclick="abrirModalNP()">
-  <span class="fab-icon">＋</span>
-  <span class="fab-label">Nuevo pedido</span>
-</button>
+
+
+<!-- Menu hamburguesa mobile -->
+<div class="ham-overlay" id="ham-overlay" onclick="cerrarMenuHamburguesa()"></div>
+<div class="ham-sheet" id="ham-sheet">
+  <div class="ham-handle"></div>
+  <button class="ham-item" onclick="abrirPizarron();cerrarMenuHamburguesa()">
+    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" /></svg>
+    Pizarrón
+  </button>
+  <button class="ham-item" onclick="showTab('etiquetas',document.querySelector('[data-title=Etiquetas]'));renderEtiquetas();cerrarMenuHamburguesa()">
+    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" /></svg>
+    Etiquetas
+  </button>
+  <button class="ham-item" onclick="showTab('config',document.querySelector('[data-title=Config]'));cerrarMenuHamburguesa()">
+    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+    Configuración
+  </button>
+</div>
 
 </div><!-- /app-body -->
 
@@ -1010,6 +1073,128 @@
 
 <div class="bb-nota-leer-overlay" id="bb-nota-leer-overlay"></div>
 
+<!-- ══════════════════════════════
+     MOBILE FLOATING SUBTAB PANEL
+     ══════════════════════════════ -->
+ 
+<!-- Backdrop -->
+<div class="mob-panel-backdrop" id="mob-panel-backdrop" onclick="cerrarMobPanel()"></div>
+ 
+<!-- Panel Producción -->
+<div class="mob-panel" id="mob-panel-produccion">
+  <div class="mob-panel-handle"></div>
+  <div class="mob-panel-label">Producción</div>
+  <div class="mob-panel-grid mob-panel-grid-3">
+    <button class="mob-panel-item" onclick="mobPanelPick('produccion','hoy')">
+      <div class="mob-panel-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+        </svg>
+      </div>
+      <span>Hoy</span>
+    </button>
+    <button class="mob-panel-item" onclick="mobPanelPick('produccion','manana')">
+      <div class="mob-panel-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+        </svg>
+      </div>
+      <span>Mañana</span>
+    </button>
+    <button class="mob-panel-item" onclick="mobPanelPick('produccion','semana')">
+      <div class="mob-panel-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+        </svg>
+      </div>
+      <span>Semana</span>
+    </button>
+  </div>
+</div>
+ 
+<!-- Panel Cuba -->
+<div class="mob-panel" id="mob-panel-cuba">
+  <div class="mob-panel-handle"></div>
+  <div class="mob-panel-label">Cuba</div>
+  <div class="mob-panel-grid mob-panel-grid-4">
+    <button class="mob-panel-item" onclick="mobPanelPick('cuba','pedidos')">
+      <div class="mob-panel-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122" />
+        </svg>
+      </div>
+      <span>Pedidos</span>
+    </button>
+    <button class="mob-panel-item" onclick="mobPanelPick('cuba','pedir')">
+      <div class="mob-panel-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9.75h4.875a2.625 2.625 0 0 1 0 5.25H12M8.25 9.75 10.5 7.5M8.25 9.75 10.5 12m9-7.243V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185Z" />
+        </svg>
+      </div>
+      <span>Pedir</span>
+    </button>
+    <button class="mob-panel-item" onclick="mobPanelPick('cuba','ventas')">
+      <div class="mob-panel-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+        </svg>
+      </div>
+      <span>Ventas</span>
+    </button>
+    <button class="mob-panel-item" onclick="mobPanelPick('cuba','exportar')">
+      <div class="mob-panel-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0l-3-3m3 3l3-3M3 18h18" />
+        </svg>
+      </div>
+      <span>Exportar</span>
+    </button>
+  </div>
+</div>
+ 
+<!-- Panel Más -->
+<div class="mob-panel" id="mob-panel-mas">
+  <div class="mob-panel-handle"></div>
+  <div class="mob-panel-label">Más opciones</div>
+  <div class="mob-panel-grid mob-panel-grid-4">
+<button class="mob-panel-item" onclick="mobPanelPick('mas','usuario')">
+  <div class="mob-panel-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+    </svg>
+  </div>
+  <span id="mob-panel-usuario-nombre">Usuario</span>
+</button>
+    <button class="mob-panel-item" onclick="mobPanelPick('mas','pizarron')">
+      <div class="mob-panel-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+        </svg>
+      </div>
+      <span>Pizarrón</span>
+    </button>
+    <button class="mob-panel-item" onclick="mobPanelPick('mas','etiquetas')">
+      <div class="mob-panel-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+        </svg>
+      </div>
+      <span>Etiquetas</span>
+    </button>
+    <button class="mob-panel-item" onclick="mobPanelPick('mas','config')">
+      <div class="mob-panel-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        </svg>
+      </div>
+      <span>Configuración</span>
+    </button>
+  </div>
+</div>
+
+
    <script src="js/utils.js"></script>
    <script src="js/data.js"></script>
    <script src="js/modales.js"></script>
@@ -1023,6 +1208,7 @@
    <script src="js/themes.js"></script>
    <script src="js/html-events.js"></script>
    <script src="js/app.js"></script>
+   <script src="js/demo-data.js"></script>
 
    
 </body>
