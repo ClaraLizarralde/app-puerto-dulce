@@ -982,6 +982,8 @@ function showTab(id, el) {
   document.querySelectorAll('.sidebar-subtabs').forEach(el => el.classList.remove('visible'));
   const subtabGroup = document.getElementById('sidebar-subtabs-' + id);
   if (subtabGroup) subtabGroup.classList.add('visible');
+
+  
 }
 
 // ── Botón "Más" en el bottom bar ──

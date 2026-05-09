@@ -1,122 +1,198 @@
+/* ── DEFAULT: badges con bordó ── */
+:root .po-estado-badge.pendiente,
+:root .po-estado-badge.prod {
+  background: #f5eaec !important;
+  border-color: #7a3a4a !important;
+  color: #7a3a4a !important;
+}
+
+:root .po-day-sep-label {
+  color: #7a3a4a !important;
+}
+
+:root .po-td-hora {
+  color: #7a3a4a !important;
+}
+
 /* ══════════════════════════════════════
-   TEMA: default (terracota original)
+   TEMA: default — Salvia & Borgoña
+   Gris neutro · Verde salvia · Borgoña
    ══════════════════════════════════════ */
 :root {
-  --bg:#faf7f4;
-  --paper:#ffffff;
-  --ink:#1e1410;
-  --ink-mid:#6b4f3a;
-  --ink-light:#a8856e;
-  --border:#e8d8cc;
-  --shadow:rgba(100,50,20,0.08);
+  --bg:#eeede8;
+  --paper:#fafaf8;
+  --ink:#1a1f1a;
+  --ink-mid:#4a5a4a;
+  --ink-light:#8a9a8a;
+  --border:#e0ddd8;
+  --shadow:rgba(26,31,26,0.08);
 
-  --accent:#c95d3f;
-  --accent-soft:#fdf0eb;
-  --accent2:#e8956a;
+  --accent:#5a8a6a;
+  --accent-soft:#eaf2ec;
+  --accent2:#6b1f2f;
 
-  --green:#4a8c5c;
-  --green-soft:#eaf4ed;
-  --green-mid:#6aab7e;
+  --green:#5a8a6a;
+  --green-soft:#eaf2ec;
+  --green-mid:#4a7a5a;
 
-  --amber:#b87a2a;
-  --amber-soft:#fdf3e3;
+  --amber:#9a7a30;
+  --amber-soft:#f5f0e0;
 
-  --blue:#4a7fa5;
-  --blue-soft:#e8f2f9;
+  --blue:#6b1f2f;
+  --blue-soft:#f5e8ec;
 
-  --cuba-bg:#fdf6e3;
-  --cuba-border:#d4a843;
-  --cuba-ink:#7a5a10;
-  --cuba-soft:#fef9ed;
+  --cuba-bg:#fdf8ee;
+  --cuba-border:#9a7a30;
+  --cuba-ink:#5a4010;
+  --cuba-soft:#fffbf0;
 
-  --tacc-s:#4a8c5c;
-  --tacc-s-soft:#eaf4ed;
-  --tacc-c:#b05a2a;
-  --tacc-c-soft:#fdecd8;
+  --tacc-s:#5a8a6a;
+  --tacc-s-soft:#eaf2ec;
+  --tacc-c:#9a5a4a;
+  --tacc-c-soft:#f5ecea;
 
-  --red:#c0392b;
-  --red-soft:#fdecea;
+  --red:#9a4a4a;
+  --red-soft:#f5ecea;
 
   --radius:12px;
   --radius-sm:8px;
 
-  --header-grad:linear-gradient(135deg,#c95d3f,#b84a30);
+  --header-grad:linear-gradient(135deg,#4a7a5a,#3a6a4a);
 
-  /* Colores por día */
-  --dia-lunes:#2563eb;
-  --dia-lunes-text:#fff;
-  --dia-martes:#7c3aed;
+  --dia-lunes:#6b1f2f;
+  --dia-lunes-text:#fdf8f0;
+  --dia-martes:#9a5a4a;
   --dia-martes-text:#fff;
-  --dia-miercoles:#ca8a04;
-  --dia-miercoles-text:#1e1410;
-  --dia-jueves:#dc2626;
+  --dia-miercoles:#9a7a30;
+  --dia-miercoles-text:#fff;
+  --dia-jueves:#5a8a6a;
   --dia-jueves-text:#fff;
-  --dia-viernes:#16a34a;
+  --dia-viernes:#4a7a5a;
   --dia-viernes-text:#fff;
-  --dia-sabado:#ea580c;
-  --dia-sabado-text:#fff;
-  --dia-domingo:#4b5563;
+  --dia-sabado:#6b1f2f;
+  --dia-sabado-text:#fdf8f0;
+  --dia-domingo:#8a9a8a;
   --dia-domingo-text:#fff;
+
+  --dia-lunes-soft: color-mix(in srgb, var(--dia-lunes) 20%, transparent);
+  --dia-martes-soft: color-mix(in srgb, var(--dia-martes) 20%, transparent);
+  --dia-miercoles-soft: color-mix(in srgb, var(--dia-miercoles) 20%, transparent);
+  --dia-jueves-soft: color-mix(in srgb, var(--dia-jueves) 20%, transparent);
+  --dia-viernes-soft: color-mix(in srgb, var(--dia-viernes) 20%, transparent);
+  --dia-sabado-soft: color-mix(in srgb, var(--dia-sabado) 20%, transparent);
+  --dia-domingo-soft: color-mix(in srgb, var(--dia-domingo) 20%, transparent);
 }
 
 /* ══════════════════════════════════════
-   TEMA: girly — Verde Bosque · Rose Gold · Dorado
-   Timber Green / Hooker's Green / Charm / Rose Gold
+   TEMA: girly — Botanical Rose
+   Crema · Rosa Terracota · Verde Bosque
    ══════════════════════════════════════ */
 [data-theme="girly"] {
-  --bg:#18332E;
-  --paper:#213d37;
-  --ink:#f5ece8;
-  --ink-mid:#D07B87;
-  --ink-light:#A9BA9D;
-  --border:#2e4e47;
-  --shadow:rgba(0,0,0,0.4);
+  --bg:#F5F0E8;
+  --paper:#FDFAF6;
+  --ink:#2D4A2D;
+  --ink-mid:#5A7A5A;
+  --ink-light:#8AAA7A;
+  --border:#E0D8C8;
+  --shadow:rgba(45,74,45,0.08);
 
-  --accent:#D07B87;
-  --accent-soft:#1e2e2a;
-  --accent2:#B76E78;
+  --accent:#C97A6A;
+  --accent-soft:#F9EDEA;
+  --accent2:#A85A4A;
 
-  --green:#49796B;
-  --green-soft:#162620;
-  --green-mid:#A9BA9D;
+  --green:#2D4A2D;
+  --green-soft:#EAF0E8;
+  --green-mid:#5A7A5A;
 
-  --amber:#c9a040;
-  --amber-soft:#1e1a08;
+  --amber:#B8860A;
+  --amber-soft:#FDF6E0;
 
-  --blue:#8aabcc;
-  --blue-soft:#0e1e28;
+  --blue:#8AAA7A;
+  --blue-soft:#EEF3EB;
 
-  --cuba-bg:#1a1e10;
-  --cuba-border:#c9a040;
-  --cuba-ink:#e8d080;
-  --cuba-soft:#202010;
+  --cuba-bg:#FDF8EE;
+  --cuba-border:#B8860A;
+  --cuba-ink:#6A5010;
+  --cuba-soft:#FFFBF0;
 
-  --tacc-s:#49796B;
-  --tacc-s-soft:#162620;
-  --tacc-c:#A56269;
-  --tacc-c-soft:#2a1418;
+  --tacc-s:#2D4A2D;
+  --tacc-s-soft:#EAF0E8;
+  --tacc-c:#C97A6A;
+  --tacc-c-soft:#F9EDEA;
 
-  --red:#A56269;
-  --red-soft:#2a1018;
+  --red:#C97A6A;
+  --red-soft:#F9EDEA;
 
-  --header-grad:linear-gradient(135deg,#0e2018,#18332E,#1e3a32);
+  --header-grad:linear-gradient(135deg,#C97A6A,#A85A4A);
 
-  --dia-lunes:#49796B;
-  --dia-lunes-text:#f5ece8;
-  --dia-martes:#D07B87;
+  --dia-lunes:#8AAA7A;
+  --dia-lunes-text:#fff;
+  --dia-martes:#C97A6A;
   --dia-martes-text:#fff;
-  --dia-miercoles:#c9a040;
-  --dia-miercoles-text:#18332E;
-  --dia-jueves:#B76E78;
-  --dia-jueves-text:#fff;
-  --dia-viernes:#A9BA9D;
-  --dia-viernes-text:#18332E;
-  --dia-sabado:#A56269;
+  --dia-miercoles:#B8860A;
+  --dia-miercoles-text:#fff;
+  --dia-jueves:#2D4A2D;
+  --dia-jueves-text:#FDFAF6;
+  --dia-viernes:#5A7A5A;
+  --dia-viernes-text:#FDFAF6;
+  --dia-sabado:#A85A4A;
   --dia-sabado-text:#fff;
-  --dia-domingo:#2e4e47;
-  --dia-domingo-text:#A9BA9D;
+  --dia-domingo:#E0D8C8;
+  --dia-domingo-text:#2D4A2D;
+  --dia-lunes-soft: color-mix(in srgb, var(--dia-lunes) 20%, transparent);
+--dia-martes-soft: color-mix(in srgb, var(--dia-martes) 20%, transparent);
+--dia-miercoles-soft: color-mix(in srgb, var(--dia-miercoles) 20%, transparent);
+--dia-jueves-soft: color-mix(in srgb, var(--dia-jueves) 20%, transparent);
+--dia-viernes-soft: color-mix(in srgb, var(--dia-viernes) 20%, transparent);
+--dia-sabado-soft: color-mix(in srgb, var(--dia-sabado) 20%, transparent);
+--dia-domingo-soft: color-mix(in srgb, var(--dia-domingo) 20%, transparent);
+}
+/* ── GIRLY: fuente serif botánica ── */
+[data-theme="girly"] body {
+  font-family: 'Lora', serif;
 }
 
+/* ── GIRLY: sidebar crema con tinte cálido ── */
+[data-theme="girly"] .tabs {
+  background: #fdf6f0;
+  border-right-color: #e0d0c0;
+}
+
+/* ── GIRLY: tab activa ── */
+[data-theme="girly"] .tab.active {
+  border-left-color: #C97A6A;
+  background: #F9EDEA;
+  color: #C97A6A;
+}
+
+/* ── GIRLY: btn nuevo pedido ── */
+[data-theme="girly"] .btn-nuevo-pedido-sidebar {
+  border-color: #C97A6A;
+  background: #F9EDEA;
+  color: #C97A6A;
+}
+[data-theme="girly"] .btn-nuevo-pedido-sidebar:hover {
+  background: #C97A6A;
+  color: #FDFAF6;
+}
+
+/* ── GIRLY: header logo en cursiva serif ── */
+[data-theme="girly"] .header-logo {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-weight: 600;
+}
+
+/* ── GIRLY: banner día borde suave ── */
+[data-theme="girly"] .dia-principal-banner {
+  border-bottom-color: #d4b8a8;
+}
+
+/* ── GIRLY: pattern floral sutil en fondo ── */
+[data-theme="girly"] body {
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><text y='28' font-size='16' opacity='0.07'>🌸</text><text x='55' y='65' font-size='14' opacity='0.06'>🌿</text><text x='10' y='95' font-size='13' opacity='0.06'>🌺</text><text x='80' y='110' font-size='12' opacity='0.05'>🌱</text></svg>");
+  background-repeat: repeat;
+}
 /* ══════════════════════════════════════
    TEMA: neon — Retro Futuristic Dark
    Negro azulado · Cyan · Magenta · Violeta
@@ -173,72 +249,89 @@
   --dia-sabado-text:#fff;
   --dia-domingo:#c040ff;
   --dia-domingo-text:#fff;
+
+  --dia-lunes-soft: color-mix(in srgb, var(--dia-lunes) 20%, transparent);
+--dia-martes-soft: color-mix(in srgb, var(--dia-martes) 20%, transparent);
+--dia-miercoles-soft: color-mix(in srgb, var(--dia-miercoles) 20%, transparent);
+--dia-jueves-soft: color-mix(in srgb, var(--dia-jueves) 20%, transparent);
+--dia-viernes-soft: color-mix(in srgb, var(--dia-viernes) 20%, transparent);
+--dia-sabado-soft: color-mix(in srgb, var(--dia-sabado) 20%, transparent);
+--dia-domingo-soft: color-mix(in srgb, var(--dia-domingo) 20%, transparent);
 }
 
 /* ══════════════════════════════════════
-   TEMA: pro — Slate & Sage
+   TEMA: dark — Dark Neutro
+   Gris carbón · Blanco roto · Azul pizarra
    ══════════════════════════════════════ */
-[data-theme="pro"] {
-  --bg:#f4f5f7;
-  --paper:#ffffff;
-  --ink:#1a2030;
-  --ink-mid:#4a5568;
-  --ink-light:#8896a8;
-  --border:#d8dde8;
-  --shadow:rgba(26,32,48,0.08);
+[data-theme="dark"] {
+  --bg:#1a1c20;
+  --paper:#22252b;
+  --ink:#e8eaf0;
+  --ink-mid:#8892a8;
+  --ink-light:#4a5268;
+  --border:#2e3240;
+  --shadow:rgba(0,0,0,0.25);
 
-  --accent:#3d7aaf;
-  --accent-soft:#eaf2f9;
-  --accent2:#5a9acc;
+  --accent:#5a8fd0;
+  --accent-soft:#1a2535;
+  --accent2:#4a7ab8;
 
-  --green:#2e8c68;
-  --green-soft:#e8f5f0;
-  --green-mid:#4aab88;
+  --green:#4aab7a;
+  --green-soft:#0f1f18;
+  --green-mid:#38905f;
 
-  --amber:#d4840a;
-  --amber-soft:#fdf3e3;
+  --amber:#d4a030;
+  --amber-soft:#1a1408;
 
-  --blue:#3d7aaf;
-  --blue-soft:#eaf2f9;
+  --blue:#5a8fd0;
+  --blue-soft:#1a2535;
 
-  --cuba-bg:#fdf8ee;
-  --cuba-border:#c8a030;
-  --cuba-ink:#6a5010;
-  --cuba-soft:#fefbf0;
+  --cuba-bg:#181a10;
+  --cuba-border:#d4a030;
+  --cuba-ink:#d4c080;
+  --cuba-soft:#1a1c14;
 
-  --tacc-s:#2e8c68;
-  --tacc-s-soft:#e8f5f0;
-  --tacc-c:#b86020;
-  --tacc-c-soft:#fdecd8;
+  --tacc-s:#4aab7a;
+  --tacc-s-soft:#0f1f18;
+  --tacc-c:#d07050;
+  --tacc-c-soft:#1a0e08;
 
-  --red:#c0392b;
-  --red-soft:#fdecea;
+  --red:#d05050;
+  --red-soft:#1a0808;
 
-  --header-grad:linear-gradient(135deg,#1a2e48,#2e4a6a);
+  --header-grad:linear-gradient(135deg,#1a1c20,#22252b);
 
-  --dia-lunes:#3d7aaf;
+  --dia-lunes:#5a8fd0;
   --dia-lunes-text:#fff;
-  --dia-martes:#5a4a8a;
+  --dia-martes:#8a6ad0;
   --dia-martes-text:#fff;
-  --dia-miercoles:#c8a030;
-  --dia-miercoles-text:#fff;
-  --dia-jueves:#b83030;
+  --dia-miercoles:#d4a030;
+  --dia-miercoles-text:#1a1c20;
+  --dia-jueves:#d05050;
   --dia-jueves-text:#fff;
-  --dia-viernes:#2e8c68;
+  --dia-viernes:#4aab7a;
   --dia-viernes-text:#fff;
-  --dia-sabado:#b86020;
+  --dia-sabado:#d07050;
   --dia-sabado-text:#fff;
-  --dia-domingo:#5a6878;
-  --dia-domingo-text:#fff;
+  --dia-domingo:#4a5268;
+  --dia-domingo-text:#e8eaf0;
+
+  --dia-lunes-soft: color-mix(in srgb, var(--dia-lunes) 20%, transparent);
+--dia-martes-soft: color-mix(in srgb, var(--dia-martes) 20%, transparent);
+--dia-miercoles-soft: color-mix(in srgb, var(--dia-miercoles) 20%, transparent);
+--dia-jueves-soft: color-mix(in srgb, var(--dia-jueves) 20%, transparent);
+--dia-viernes-soft: color-mix(in srgb, var(--dia-viernes) 20%, transparent);
+--dia-sabado-soft: color-mix(in srgb, var(--dia-sabado) 20%, transparent);
+--dia-domingo-soft: color-mix(in srgb, var(--dia-domingo) 20%, transparent);
 }
 
 
 /* ══════════════════════════════════════
-   TEMA: dark — Noche Violeta
+   TEMA: violet — Noche Violeta
    #0E0C12 fondo · #C084FC violeta
    #F472B6 rosa · #EDD9FF texto
    ══════════════════════════════════════ */
-[data-theme="dark"] {
+[data-theme="violet"] {
   --bg:#0E0C12;
   --paper:#13101C;
   --ink:#EDD9FF;
@@ -293,120 +386,317 @@
   --dia-sabado-text:#fff;
   --dia-domingo:#6A5A80;
   --dia-domingo-text:#EDD9FF;
+  --dia-lunes-soft: color-mix(in srgb, var(--dia-lunes) 20%, transparent);
+--dia-martes-soft: color-mix(in srgb, var(--dia-martes) 20%, transparent);
+--dia-miercoles-soft: color-mix(in srgb, var(--dia-miercoles) 20%, transparent);
+--dia-jueves-soft: color-mix(in srgb, var(--dia-jueves) 20%, transparent);
+--dia-viernes-soft: color-mix(in srgb, var(--dia-viernes) 20%, transparent);
+--dia-sabado-soft: color-mix(in srgb, var(--dia-sabado) 20%, transparent);
+--dia-domingo-soft: color-mix(in srgb, var(--dia-domingo) 20%, transparent);
 }
 
-/* ── DARK: fuente única del tema ── */
-[data-theme="dark"] body {
+[data-theme="violet"] body {
   font-family: 'Inter', 'Outfit', sans-serif;
 }
 
-/* ── DARK: header — sin cursiva en el logo ── */
-[data-theme="dark"] .header {
+[data-theme="violet"] .header {
   box-shadow: 0 2px 20px var(--shadow);
 }
-[data-theme="dark"] .header-logo {
+
+[data-theme="violet"] .header-logo {
   font-style: normal;
+
+
 }
 
-/* ══════════════════════════════════════
-   TEMA: pooh — Winnie the Pooh
-   #FAD749 fondo · #EF7F01 highlights
-   #F52532 botones/alertas · #110000 texto
-   ══════════════════════════════════════ */
-[data-theme="pooh"] {
-  --bg:#FAD749;
-  --paper:#ffffff;
-  --ink:#110000;
-  --ink-mid:#7A4500;
-  --ink-light:#B07020;
-  --border:#EF7F01;
-  --shadow:rgba(239,127,1,0.15);
 
-  --accent:#EF7F01;
-  --accent-soft:#FFF3CC;
-  --accent2:#FAD749;
-
-  --green:#5A8A1A;
-  --green-soft:#EEF5DC;
-  --green-mid:#8AB84A;
-
-  --amber:#EF7F01;
-  --amber-soft:#FFF3CC;
-
-  --blue:#5A8FAA;
-  --blue-soft:#E0EEF5;
-
-  --cuba-bg:#FFF8DC;
-  --cuba-border:#EF7F01;
-  --cuba-ink:#7A4500;
-  --cuba-soft:#FFFBEE;
-
-  --tacc-s:#5A8A1A;
-  --tacc-s-soft:#EEF5DC;
-  --tacc-c:#EF7F01;
-  --tacc-c-soft:#FFF3CC;
-
-  --red:#F52532;
-  --red-soft:#FDECEA;
-
-  --radius:14px;
-  --radius-sm:10px;
-
-  --header-grad:linear-gradient(135deg,#EF7F01,#d96e00);
-
-  --dia-lunes:#EF7F01;
-  --dia-lunes-text:#110000;
-  --dia-martes:#F52532;
-  --dia-martes-text:#fff;
-  --dia-miercoles:#FAD749;
-  --dia-miercoles-text:#110000;
-  --dia-jueves:#d96e00;
-  --dia-jueves-text:#fff;
-  --dia-viernes:#8AB84A;
-  --dia-viernes-text:#110000;
-  --dia-sabado:#F52532;
-  --dia-sabado-text:#fff;
-  --dia-domingo:#EF7F01;
-  --dia-domingo-text:#110000;
-}
-
-/* ── POOH: fuente y fondo con pattern ── */
-[data-theme="pooh"] body {
-  font-family: 'Nunito', 'Outfit', sans-serif;
-  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><text y='32' font-size='22' opacity='0.08'>🐝</text><text x='65' y='75' font-size='20' opacity='0.08'>🍯</text><text x='10' y='110' font-size='18' opacity='0.07'>🐻</text><text x='90' y='125' font-size='15' opacity='0.07'>🌸</text><text x='50' y='135' font-size='13' opacity='0.06'>🐝</text></svg>");
-  background-repeat: repeat;
-}
-
-/* ── POOH: logo con emoji y sin cursiva ── */
-[data-theme="pooh"] .header {
-  box-shadow: 0 2px 14px var(--shadow);
-}
-[data-theme="pooh"] .header-logo {
-  font-style: normal;
-  font-weight: 800;
-}
-[data-theme="pooh"] .header-logo::before {
-  content: "🍯 ";
-}
-
-/* ── POOH: cuba banner emoji ── */
-[data-theme="pooh"] .cuba-banner h3::before {
-  content: "🍯 ";
-}
-
-/* ── POOH: fab con emoji ── */
-[data-theme="pooh"] .fab::before {
-  content: "🐝 ";
-}
-
-/* ── POOH: navs con fondo semitransparente sobre el amarillo del --bg ── */
-[data-theme="pooh"] .dias-nav {
-  background: rgba(250,215,73,0.4);
-}
-[data-theme="pooh"] .tabs {
-  background: rgba(250,215,73,0.5);
-}
-[data-theme="pooh"] .prod-tabs,
-[data-theme="pooh"] .cfg-tabs {
   background: rgba(250,215,73,0.3);
+/* ══════════════════════════════════════
+   TEMA: retro — Y2K Cartoon
+   Celeste · Naranja · Amarillo · Verde · Outline negro
+   ══════════════════════════════════════ */
+[data-theme="retro"] {
+  --bg:#7dd4f0;
+  --paper:#ffffff;
+  --ink:#1a1010;
+  --ink-mid:#3a2010;
+  --ink-light:#7a6050;
+  --border:#1a1010;
+  --shadow:rgba(26,16,16,0.25);
+
+  --accent:#f07820;
+  --accent-soft:#fef0e0;
+  --accent2:#f0d020;
+
+  --green:#48b030;
+  --green-soft:#e0f8d8;
+  --green-mid:#38901f;
+
+  --amber:#f0d020;
+  --amber-soft:#fefce0;
+
+  --blue:#4090d0;
+  --blue-soft:#d8f0fc;
+
+  --cuba-bg:#fefce0;
+  --cuba-border:#f0d020;
+  --cuba-ink:#3a2010;
+  --cuba-soft:#fffff0;
+
+  --tacc-s:#48b030;
+  --tacc-s-soft:#e0f8d8;
+  --tacc-c:#e03020;
+  --tacc-c-soft:#fde8e0;
+
+  --red:#e03020;
+  --red-soft:#fde8e0;
+
+  --radius:12px;
+  --radius-sm:8px;
+
+  --header-grad:linear-gradient(135deg,#8040c0,#6020a0);
+
+  --dia-lunes:#4090d0;
+  --dia-lunes-text:#fff;
+  --dia-martes:#e03020;
+  --dia-martes-text:#fff;
+  --dia-miercoles:#f0d020;
+  --dia-miercoles-text:#1a1010;
+  --dia-jueves:#8040c0;
+  --dia-jueves-text:#fff;
+  --dia-viernes:#48b030;
+  --dia-viernes-text:#fff;
+  --dia-sabado:#f07820;
+  --dia-sabado-text:#fff;
+  --dia-domingo:#7dd4f0;
+  --dia-domingo-text:#1a1010;
+  --dia-lunes-soft: color-mix(in srgb, var(--dia-lunes) 20%, transparent);
+--dia-martes-soft: color-mix(in srgb, var(--dia-martes) 20%, transparent);
+--dia-miercoles-soft: color-mix(in srgb, var(--dia-miercoles) 20%, transparent);
+--dia-jueves-soft: color-mix(in srgb, var(--dia-jueves) 20%, transparent);
+--dia-viernes-soft: color-mix(in srgb, var(--dia-viernes) 20%, transparent);
+--dia-sabado-soft: color-mix(in srgb, var(--dia-sabado) 20%, transparent);
+--dia-domingo-soft: color-mix(in srgb, var(--dia-domingo) 20%, transparent);
+}
+
+/* ── RETRO: fuente redondeada cartoon ── */
+[data-theme="retro"] body {
+  font-family: 'Nunito', 'Outfit', sans-serif;
+  font-weight: 700;
+}
+
+/* ── RETRO: header violeta con outline ── */
+[data-theme="retro"] .header {
+  border-bottom: 3px solid #1a1010;
+  box-shadow: 0 3px 0px #1a1010;
+}
+
+[data-theme="retro"] .header-logo {
+  font-style: normal;
+  font-weight: 900;
+}
+
+/* ── RETRO: sidebar celeste con outline ── */
+[data-theme="retro"] .tabs {
+  background:  #f0d020;
+  border-right: 3px solid #1a1010;
+}
+
+/* ── RETRO: tabs con outline cartoon ── */
+[data-theme="retro"] .tab:hover {
+  background: #fef0e0;
+  border-color: #1a1010;
+  box-shadow: 2px 2px 0px #1a1010;
+}
+
+[data-theme="retro"] .tab.active {
+  border-left-color: #f07820;
+  background: #fef0e0;
+  color: #f07820;
+  box-shadow: 2px 2px 0px #1a1010;
+}
+
+/* ── RETRO: btn nuevo pedido cartoon ── */
+[data-theme="retro"] .btn-nuevo-pedido-sidebar {
+  border: 2.5px solid #1a1010;
+  background: #8040c0;
+  color: #1a1010;
+  box-shadow: 3px 3px 0px #1a1010;
+  font-weight: 900;
+}
+[data-theme="retro"] .btn-nuevo-pedido-sidebar:hover {
+  background: #f07820;
+  color: #fff;
+  box-shadow: 1px}
+
+  [data-theme="retro"] .po-btn-sm.po-btn-accent {
+  background: #8040c0;
+  border: 2.5px solid #1a1010;
+  color: #fff;
+  box-shadow: 3px 3px 0px #1a1010;
+  font-weight: 900;
+}
+[data-theme="retro"] .po-btn-sm.po-btn-accent:hover {
+  background: #6020a0;
+  box-shadow: 1px 1px 0px #1a1010;
+  transform: translate(2px, 2px);
+}
+
+/* ── RETRO: filas alternadas cartoon ── */
+[data-theme="retro"] .po-tr:nth-of-type(5n+1) { background: #7dd4f0 !important; }
+[data-theme="retro"] .po-tr:nth-of-type(5n+2) { background: #f07820 !important; }
+[data-theme="retro"] .po-tr:nth-of-type(5n+3) { background: #48b030 !important; }
+[data-theme="retro"] .po-tr:nth-of-type(5n+4) { background: #f0d020 !important; }
+[data-theme="retro"] .po-tr:nth-of-type(5n+5) { background: #8040c0 !important; }
+
+[data-theme="retro"] .prod-cat-sep {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border: 2px solid #1a1010 !important;
+  font-weight: 900 !important;
+}
+
+[data-theme="retro"] .prod-card-header {
+  background: #f0d020 !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0px #1a1010 !important;
+}
+
+[data-theme="retro"] .cuba-item:nth-of-type(5n+1) { background: #7dd4f0 !important; }
+[data-theme="retro"] .cuba-item:nth-of-type(5n+2) { background: #f07820 !important; }
+[data-theme="retro"] .cuba-item:nth-of-type(5n+3) { background: #48b030 !important; }
+[data-theme="retro"] .cuba-item:nth-of-type(5n+4) { background: #f0d020 !important; }
+[data-theme="retro"] .cuba-item:nth-of-type(5n+5) { background: #8040c0 !important; }
+
+[data-theme="retro"] .cat-item-row:nth-of-type(5n+1) { background: #7dd4f0 !important; }
+[data-theme="retro"] .cat-item-row:nth-of-type(5n+2) { background: #f07820 !important; }
+[data-theme="retro"] .cat-item-row:nth-of-type(5n+3) { background: #48b030 !important; }
+[data-theme="retro"] .cat-item-row:nth-of-type(5n+4) { background: #f0d020 !important; }
+[data-theme="retro"] .cat-item-row:nth-of-type(5n+5) { background: #8040c0 !important; }
+
+[data-theme="retro"] .po-tr {
+  border-bottom: 2px solid #1a1010 !important;
+}
+
+[data-theme="retro"] .po-tr:hover {
+  filter: brightness(0.95);
+}
+[data-theme="retro"] .po-topbar {
+  background: #f0d020;
+  border-bottom: 3px solid #1a1010;
+}
+
+[data-theme="retro"] .po-day-tabs {
+  background: #8040c0;
+  border-bottom: 3px solid #1a1010;
+}
+
+[data-theme="retro"] .po-day-tab {
+  color: #fff;
+}
+
+[data-theme="retro"] .po-day-tab.active {
+  color: #f0d020;
+  border-bottom-color: #f0d020;
+}
+
+[data-theme="retro"] .po-filter-row {
+  background: #48b030;
+  border-bottom: 3px solid #1a1010;
+}
+
+[data-theme="retro"] .po-filter-label,
+[data-theme="retro"] .po-chip {
+  color: #fff;
+  border-color: rgba(255,255,255,0.5);
+}
+
+[data-theme="retro"] .po-chip.active {
+  background: #f0d020;
+  border-color: #1a1010;
+  color: #1a1010;
+}
+
+[data-theme="retro"] .po-td-hora {
+  color: #1a1010 !important;
+  font-weight: 900;
+}
+
+/* ── RETRO: botones estado con outline cartoon ── */
+[data-theme="retro"] .po-estado-badge {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0px #1a1010 !important;
+  font-weight: 900 !important;
+}
+
+/* ── RETRO: pills de productos con borde negro ── */
+[data-theme="retro"] .po-prod-pill {
+  background: #fff !important;
+  border: 2px solid #1a1010 !important;
+  color: #1a1010 !important;
+  font-weight: 700 !important;
+}
+
+/* ── RETRO: fila expandida pastel del color de la fila ── */
+[data-theme="retro"] .po-tr-expanded.open .po-expanded-cell {
+  background: #fff !important;
+  border: 2px solid #1a1010 !important;
+  border-top: none !important;
+}
+
+/* ── RETRO: botones dentro de fila expandida ── */
+[data-theme="retro"] .po-btn-exp,
+[data-theme="retro"] .po-exp-estado-opt {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0px #1a1010 !important;
+  font-weight: 700 !important;
+}
+
+/* ── RETRO: texto general en filas ── */
+[data-theme="retro"] .po-tr .po-cliente-nombre,
+[data-theme="retro"] .po-tr .po-cliente-tel,
+[data-theme="retro"] .po-tr .po-td-total {
+  color: #1a1010 !important;
+}
+
+[data-theme="retro"] .po-expanded-inner {
+  border-top: 2px solid #1a1010 !important;
+}
+
+[data-theme="retro"] .po-exp-estado-opt {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0px #1a1010 !important;
+  font-weight: 700 !important;
+  background: #fff !important;
+  color: #1a1010 !important;
+}
+
+[data-theme="retro"] .po-exp-estado-opt.active-pendiente { background: #f0d020 !important; color: #1a1010 !important; }
+[data-theme="retro"] .po-exp-estado-opt.active-prod { background: #7dd4f0 !important; color: #1a1010 !important; }
+[data-theme="retro"] .po-exp-estado-opt.active-listo { background: #48b030 !important; color: #fff !important; }
+[data-theme="retro"] .po-exp-estado-opt.active-entregado { background: #8040c0 !important; color: #fff !important; }
+
+[data-theme="retro"] .sem-header {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border: 2px solid #1a1010 !important;
+  font-weight: 900 !important;
+}
+
+[data-theme="retro"] .sem-row:nth-of-type(5n+1) { background: #7dd4f0 !important; }
+[data-theme="retro"] .sem-row:nth-of-type(5n+2) { background: #f07820 !important; }
+[data-theme="retro"] .sem-row:nth-of-type(5n+3) { background: #48b030 !important; }
+[data-theme="retro"] .sem-row:nth-of-type(5n+4) { background: #f0d020 !important; }
+[data-theme="retro"] .sem-row:nth-of-type(5n+5) { background: #8040c0 !important; }
+
+[data-theme="retro"] .dia-principal-banner {
+  background: #8040c0 !important;
+  border-bottom: 3px solid #1a1010 !important;
+  color: #fff !important;
+}
+
+[data-theme="retro"] .dia-principal-banner .dpb-dia,
+[data-theme="retro"] .dia-principal-banner .dpb-fecha,
+[data-theme="retro"] .dia-principal-banner .badge-hoy {
+  color: #fff !important;
 }

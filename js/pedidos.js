@@ -555,6 +555,8 @@ function renderPedidos() {
       row.className = rowClass;
       row.dataset.id = p.id;
 
+      
+
       const prodsHTML = (p.productos || []).map(r => {
         const nom = r.tipo === "catalogo" ? r.nombre : r.libre;
         const tam = r.tamano ? " · " + r.tamano : "";
@@ -604,12 +606,14 @@ function renderPedidos() {
     });
 
     wrap.appendChild(planilla);
+    
   });
 
   if (!hayAlgo) {
     vacio.style.display = "";
     wrap.style.display = "none";
   }
+ 
 }
 
 // Calcula el total monetario de un pedido
@@ -1582,3 +1586,5 @@ function initPedidosBO() {
   renderDayTabs();
   renderPedidosTable();
 }
+
+

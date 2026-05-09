@@ -1004,11 +1004,10 @@
 }
 .tema-preview{width:48px;height:32px;border-radius:8px;overflow:hidden;position:relative;box-shadow:0 1px 4px rgba(0,0,0,0.15);}
 .tp-default{background:linear-gradient(135deg,#c95d3f 50%, #faf7f4 50%);}
-.tp-girly{background:linear-gradient(135deg,#18332E 50%, #D07B87 50%);border:1px solid #c9a040;}
-.tp-neon{background:linear-gradient(135deg,#090b12 50%, #00e5b0 50%);border:1px solid #7060ff;}
-.tp-pro{background:linear-gradient(135deg,#1a2e48 50%, #f4f5f7 50%);}
-.tp-dark{background:linear-gradient(135deg, #0E0C12 50%, #C084FC 50%);border:1px solid #3D2A5A;}
-.tp-pooh{background:linear-gradient(135deg, #F52532 50%, #FAD749 50%);border:2px solid #EF7F01;}
+.tp-girly{background:linear-gradient(135deg,#C97A6A 50%,#2D4A2D 50%);border:1px solid #B8860A;}.tp-neon{background:linear-gradient(135deg,#090b12 50%, #00e5b0 50%);border:1px solid #7060ff;}
+.tp-dark{background:linear-gradient(135deg,#1a1c20 50%,#5a8fd0 50%);border:1px solid #2e3240;}
+.tp-violet{background:linear-gradient(135deg, #0E0C12 50%, #C084FC 50%);border:1px solid #3D2A5A;}
+.tp-retro{background:linear-gradient(135deg, #5a3a8a 50%, #7ab800 50%);border:2px solid #2d1a4a;}
 
 /* Selector de layout */
 .layout-sel{display:flex;gap:8px;margin-bottom:16px;}

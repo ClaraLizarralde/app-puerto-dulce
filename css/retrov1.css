@@ -1,0 +1,480 @@
+
+  background: rgba(250,215,73,0.3);
+/* ══════════════════════════════════════
+   TEMA: retro — Y2K Cartoon
+   Celeste · Naranja · Amarillo · Verde · Outline negro
+   ══════════════════════════════════════ */
+[data-theme="retro"] {
+  --bg:#7dd4f0;
+  --paper:#ffffff;
+  --ink:#1a1010;
+  --ink-mid:#3a2010;
+  --ink-light:#7a6050;
+  --border:#1a1010;
+  --shadow:rgba(26,16,16,0.25);
+
+  --accent:#f07820;
+  --accent-soft:#fef0e0;
+  --accent2:#f0d020;
+
+  --green:#48b030;
+  --green-soft:#e0f8d8;
+  --green-mid:#38901f;
+
+  --amber:#f0d020;
+  --amber-soft:#fefce0;
+
+  --blue:#4090d0;
+  --blue-soft:#d8f0fc;
+
+  --cuba-bg:#fefce0;
+  --cuba-border:#f0d020;
+  --cuba-ink:#3a2010;
+  --cuba-soft:#fffff0;
+
+  --tacc-s:#48b030;
+  --tacc-s-soft:#e0f8d8;
+  --tacc-c:#e03020;
+  --tacc-c-soft:#fde8e0;
+
+  --red:#e03020;
+  --red-soft:#fde8e0;
+
+  --radius:12px;
+  --radius-sm:8px;
+
+  --header-grad:linear-gradient(135deg,#8040c0,#6020a0);
+
+  --dia-lunes:#4090d0;
+  --dia-lunes-text:#fff;
+  --dia-martes:#e03020;
+  --dia-martes-text:#fff;
+  --dia-miercoles:#f0d020;
+  --dia-miercoles-text:#1a1010;
+  --dia-jueves:#8040c0;
+  --dia-jueves-text:#fff;
+  --dia-viernes:#48b030;
+  --dia-viernes-text:#fff;
+  --dia-sabado:#f07820;
+  --dia-sabado-text:#fff;
+  --dia-domingo:#7dd4f0;
+  --dia-domingo-text:#1a1010;
+}
+
+/* ── RETRO: fuente redondeada cartoon ── */
+[data-theme="retro"] body {
+  font-family: 'Nunito', 'Outfit', sans-serif;
+  font-weight: 700;
+}
+
+/* ── RETRO: header violeta con outline ── */
+[data-theme="retro"] .header {
+  border-bottom: 3px solid #1a1010;
+  box-shadow: 0 3px 0px #1a1010;
+}
+
+[data-theme="retro"] .header-logo {
+  font-style: normal;
+  font-weight: 900;
+}
+
+/* ── RETRO: sidebar celeste con outline ── */
+[data-theme="retro"] .tabs {
+  background:  #f0d020;
+  border-right: 3px solid #1a1010;
+}
+
+/* ── RETRO: tabs con outline cartoon ── */
+[data-theme="retro"] .tab:hover {
+  background: #fef0e0;
+  border-color: #1a1010;
+  box-shadow: 2px 2px 0px #1a1010;
+}
+
+[data-theme="retro"] .tab.active {
+  border-left-color: #f07820;
+  background: #fef0e0;
+  color: #f07820;
+  box-shadow: 2px 2px 0px #1a1010;
+}
+
+/* ── RETRO: btn nuevo pedido cartoon ── */
+[data-theme="retro"] .btn-nuevo-pedido-sidebar {
+  border: 2.5px solid #1a1010;
+  background: #8040c0;
+  color: #1a1010;
+  box-shadow: 3px 3px 0px #1a1010;
+  font-weight: 900;
+}
+[data-theme="retro"] .btn-nuevo-pedido-sidebar:hover {
+  background: #f07820;
+  color: #fff;
+  box-shadow: 1px}
+
+  [data-theme="retro"] .po-btn-sm.po-btn-accent {
+  background: #8040c0;
+  border: 2.5px solid #1a1010;
+  color: #fff;
+  box-shadow: 3px 3px 0px #1a1010;
+  font-weight: 900;
+}
+[data-theme="retro"] .po-btn-sm.po-btn-accent:hover {
+  background: #6020a0;
+  box-shadow: 1px 1px 0px #1a1010;
+  transform: translate(2px, 2px);
+}
+
+/* ── RETRO: filas alternadas cartoon ── */
+[data-theme="retro"] .po-tr:nth-of-type(5n+1) { background: #7dd4f0 !important; }
+[data-theme="retro"] .po-tr:nth-of-type(5n+2) { background: #f07820 !important; }
+[data-theme="retro"] .po-tr:nth-of-type(5n+3) { background: #48b030 !important; }
+[data-theme="retro"] .po-tr:nth-of-type(5n+4) { background: #f0d020 !important; }
+[data-theme="retro"] .po-tr:nth-of-type(5n+5) { background: #8040c0 !important; }
+
+[data-theme="retro"] .prod-cat-sep {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border: 2px solid #1a1010 !important;
+  font-weight: 900 !important;
+}
+
+[data-theme="retro"] .prod-card-header {
+  background: #f0d020 !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0px #1a1010 !important;
+}
+
+[data-theme="retro"] .cuba-item:nth-of-type(5n+1) { background: #7dd4f0 !important; }
+[data-theme="retro"] .cuba-item:nth-of-type(5n+2) { background: #f07820 !important; }
+[data-theme="retro"] .cuba-item:nth-of-type(5n+3) { background: #48b030 !important; }
+[data-theme="retro"] .cuba-item:nth-of-type(5n+4) { background: #f0d020 !important; }
+[data-theme="retro"] .cuba-item:nth-of-type(5n+5) { background: #8040c0 !important; }
+
+[data-theme="retro"] .cat-item-row:nth-of-type(5n+1) { background: #7dd4f0 !important; }
+[data-theme="retro"] .cat-item-row:nth-of-type(5n+2) { background: #f07820 !important; }
+[data-theme="retro"] .cat-item-row:nth-of-type(5n+3) { background: #48b030 !important; }
+[data-theme="retro"] .cat-item-row:nth-of-type(5n+4) { background: #f0d020 !important; }
+[data-theme="retro"] .cat-item-row:nth-of-type(5n+5) { background: #8040c0 !important; }
+
+[data-theme="retro"] .po-tr {
+  border-bottom: 2px solid #1a1010 !important;
+}
+
+[data-theme="retro"] .po-tr:hover {
+  filter: brightness(0.95);
+}
+[data-theme="retro"] .po-topbar {
+  background: #f0d020;
+  border-bottom: 3px solid #1a1010;
+}
+
+[data-theme="retro"] .po-day-tabs {
+  background: #8040c0;
+  border-bottom: 3px solid #1a1010;
+}
+
+[data-theme="retro"] .po-day-tab {
+  color: #fff;
+}
+
+[data-theme="retro"] .po-day-tab.active {
+  color: #f0d020;
+  border-bottom-color: #f0d020;
+}
+
+[data-theme="retro"] .po-filter-row {
+  background: #48b030;
+  border-bottom: 3px solid #1a1010;
+}
+
+[data-theme="retro"] .po-filter-label,
+[data-theme="retro"] .po-chip {
+  color: #fff;
+  border-color: rgba(255,255,255,0.5);
+}
+
+[data-theme="retro"] .po-chip.active {
+  background: #f0d020;
+  border-color: #1a1010;
+  color: #1a1010;
+}
+
+[data-theme="retro"] .po-td-hora {
+  color: #1a1010 !important;
+  font-weight: 900;
+}
+
+/* ── RETRO: botones estado con outline cartoon ── */
+[data-theme="retro"] .po-estado-badge {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0px #1a1010 !important;
+  font-weight: 900 !important;
+}
+
+/* ── RETRO: pills de productos con borde negro ── */
+[data-theme="retro"] .po-prod-pill {
+  background: #fff !important;
+  border: 2px solid #1a1010 !important;
+  color: #1a1010 !important;
+  font-weight: 700 !important;
+}
+
+/* ── RETRO: fila expandida pastel del color de la fila ── */
+[data-theme="retro"] .po-tr-expanded.open .po-expanded-cell {
+  background: #fff !important;
+  border: 2px solid #1a1010 !important;
+  border-top: none !important;
+}
+
+/* ── RETRO: botones dentro de fila expandida ── */
+[data-theme="retro"] .po-btn-exp,
+[data-theme="retro"] .po-exp-estado-opt {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0px #1a1010 !important;
+  font-weight: 700 !important;
+}
+
+/* ── RETRO: texto general en filas ── */
+[data-theme="retro"] .po-tr .po-cliente-nombre,
+[data-theme="retro"] .po-tr .po-cliente-tel,
+[data-theme="retro"] .po-tr .po-td-total {
+  color: #1a1010 !important;
+}
+
+[data-theme="retro"] .po-expanded-inner {
+  border-top: 2px solid #1a1010 !important;
+}
+
+[data-theme="retro"] .po-exp-estado-opt {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0px #1a1010 !important;
+  font-weight: 700 !important;
+  background: #fff !important;
+  color: #1a1010 !important;
+}
+
+[data-theme="retro"] .po-exp-estado-opt.active-pendiente { background: #f0d020 !important; color: #1a1010 !important; }
+[data-theme="retro"] .po-exp-estado-opt.active-prod { background: #7dd4f0 !important; color: #1a1010 !important; }
+[data-theme="retro"] .po-exp-estado-opt.active-listo { background: #48b030 !important; color: #fff !important; }
+[data-theme="retro"] .po-exp-estado-opt.active-entregado { background: #8040c0 !important; color: #fff !important; }
+
+[data-theme="retro"] .sem-header {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border: 2px solid #1a1010 !important;
+  font-weight: 900 !important;
+}
+
+[data-theme="retro"] .sem-row:nth-of-type(5n+1) { background: #7dd4f0 !important; }
+[data-theme="retro"] .sem-row:nth-of-type(5n+2) { background: #f07820 !important; }
+[data-theme="retro"] .sem-row:nth-of-type(5n+3) { background: #48b030 !important; }
+[data-theme="retro"] .sem-row:nth-of-type(5n+4) { background: #f0d020 !important; }
+[data-theme="retro"] .sem-row:nth-of-type(5n+5) { background: #8040c0 !important; }
+
+[data-theme="retro"] .dia-principal-banner {
+  background: #8040c0 !important;
+  border-bottom: 3px solid #1a1010 !important;
+  color: #fff !important;
+}
+
+[data-theme="retro"] .dia-principal-banner .dpb-dia,
+[data-theme="retro"] .dia-principal-banner .dpb-fecha,
+[data-theme="retro"] .dia-principal-banner .badge-hoy {
+  color: #fff !important;
+}
+
+# Retro Cartoon Palette V2
+
+Basado en la ilustración que pasaste (rosa suave + mint + coral + violeta).
+
+```css
+/* ══════════════════════════════════════
+   TEMA: retro v2 — Cartoon Skate
+   Rosa · Mint · Coral · Violeta
+   ══════════════════════════════════════ */
+[data-theme="retro"] {
+  --bg:#E7C6C8;
+  --paper:#FFF8EF;
+
+  --ink:#171313;
+  --ink-mid:#513B56;
+  --ink-light:#8B6F8F;
+
+  --border:#171313;
+  --shadow:rgba(23,19,19,0.22);
+
+  /* principales */
+  --accent:#9A3CF6;
+  --accent-soft:#F3E8FF;
+  --accent2:#FF5A63;
+
+  /* secundarios */
+  --green:#5FD1BE;
+  --green-soft:#E9FFFA;
+  --green-mid:#42B5A3;
+
+  --amber:#F5B739;
+  --amber-soft:#FFF3D6;
+
+  --blue:#4588DD;
+  --blue-soft:#EAF3FF;
+
+  --red:#FF5A63;
+  --red-soft:#FFE4E6;
+
+  --cuba-bg:#FFF7E7;
+  --cuba-border:#F5B739;
+  --cuba-ink:#5B3A00;
+  --cuba-soft:#FFFDF5;
+
+  --tacc-s:#5FD1BE;
+  --tacc-s-soft:#E9FFFA;
+  --tacc-c:#FF5A63;
+  --tacc-c-soft:#FFE4E6;
+
+  --radius:16px;
+  --radius-sm:12px;
+
+  --header-grad:linear-gradient(135deg,#9A3CF6,#7A28D9);
+
+  /* días */
+  --dia-lunes:#4588DD;
+  --dia-lunes-text:#fff;
+
+  --dia-martes:#FF5A63;
+  --dia-martes-text:#fff;
+
+  --dia-miercoles:#F5B739;
+  --dia-miercoles-text:#171313;
+
+  --dia-jueves:#9A3CF6;
+  --dia-jueves-text:#fff;
+
+  --dia-viernes:#5FD1BE;
+  --dia-viernes-text:#171313;
+
+  --dia-sabado:#FF8A3D;
+  --dia-sabado-text:#fff;
+
+  --dia-domingo:#EFCFD1;
+  --dia-domingo-text:#171313;
+}
+
+/* ── RETRO: base ── */
+[data-theme="retro"] body {
+  font-family: 'Nunito', 'Outfit', sans-serif;
+  font-weight: 700;
+  background: var(--bg);
+}
+
+/* ── HEADER ── */
+[data-theme="retro"] .header {
+  border-bottom: 3px solid var(--border);
+  box-shadow: 0 4px 0 var(--border);
+}
+
+/* ── SIDEBAR ── */
+[data-theme="retro"] .tabs {
+  background: var(--amber);
+  border-right: 3px solid var(--border);
+}
+
+/* ── TABS ── */
+[data-theme="retro"] .tab {
+  border-radius: 14px;
+}
+
+[data-theme="retro"] .tab:hover {
+  background: var(--paper);
+  border-color: var(--border);
+  box-shadow: 3px 3px 0 var(--border);
+}
+
+[data-theme="retro"] .tab.active {
+  background: var(--paper);
+  color: var(--accent);
+  border-left-color: var(--accent2);
+  box-shadow: 3px 3px 0 var(--border);
+}
+
+/* ── BOTONES ── */
+[data-theme="retro"] .btn-nuevo-pedido-sidebar,
+[data-theme="retro"] .po-btn-sm.po-btn-accent {
+  border: 3px solid var(--border);
+  background: var(--accent);
+  color: white;
+  box-shadow: 4px 4px 0 var(--border);
+  font-weight: 900;
+  transition: all .12s ease;
+}
+
+[data-theme="retro"] .btn-nuevo-pedido-sidebar:hover,
+[data-theme="retro"] .po-btn-sm.po-btn-accent:hover {
+  background: var(--accent2);
+  transform: translate(2px,2px);
+  box-shadow: 2px 2px 0 var(--border);
+}
+
+/* ── FILAS ── */
+[data-theme="retro"] .po-tr:nth-of-type(5n+1) {
+  background:#7DD8F5 !important;
+}
+
+[data-theme="retro"] .po-tr:nth-of-type(5n+2) {
+  background:#5FD1BE !important;
+}
+
+[data-theme="retro"] .po-tr:nth-of-type(5n+3) {
+  background:#C58BFF !important;
+}
+
+[data-theme="retro"] .po-tr:nth-of-type(5n+4) {
+  background:#FF8A3D !important;
+}
+
+[data-theme="retro"] .po-tr:nth-of-type(5n+5) {
+  background:#FFD36B !important;
+}
+
+/* ── BADGES ── */
+[data-theme="retro"] .po-estado-badge {
+  border: 2px solid var(--border) !important;
+  box-shadow: 2px 2px 0 var(--border) !important;
+  background: var(--paper);
+  font-weight: 900 !important;
+}
+
+/* ── PILLS ── */
+[data-theme="retro"] .po-prod-pill {
+  background: var(--paper) !important;
+  border: 2px solid var(--border) !important;
+  color: var(--ink) !important;
+  font-weight: 800 !important;
+}
+
+/* ── TOPBAR ── */
+[data-theme="retro"] .po-topbar {
+  background: var(--amber);
+  border-bottom: 3px solid var(--border);
+}
+
+[data-theme="retro"] .po-day-tabs {
+  background: var(--accent);
+  border-bottom: 3px solid var(--border);
+}
+
+[data-theme="retro"] .po-filter-row {
+  background: var(--green);
+  border-bottom: 3px solid var(--border);
+}
+
+/* ── CARDS ── */
+[data-theme="retro"] .prod-card-header,
+[data-theme="retro"] .sem-header {
+  background: var(--accent) !important;
+  color: white !important;
+  border: 3px solid var(--border) !important;
+  box-shadow: 3px 3px 0 var(--border) !important;
+}
+```
+

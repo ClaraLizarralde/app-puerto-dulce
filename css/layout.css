@@ -29,26 +29,7 @@
   --bottombar-height:   60px;
   --fab-bottom:         84px;
 
---dia-lunes:          #E63946;
---dia-lunes-soft:     color-mix(in srgb, var(--dia-lunes) 20%, transparent);
 
---dia-martes:         #F4A261;
---dia-martes-soft:    color-mix(in srgb, var(--dia-martes) 20%, transparent);
-
---dia-miercoles:      #2A9D8F;
---dia-miercoles-soft: color-mix(in srgb, var(--dia-miercoles) 20%, transparent);
-
---dia-jueves:         #8338EC;
---dia-jueves-soft:    color-mix(in srgb, var(--dia-jueves) 20%, transparent);
-
---dia-viernes:        #FB5607;
---dia-viernes-soft:   color-mix(in srgb, var(--dia-viernes) 20%, transparent);
-
---dia-sabado:         #3A86FF;
---dia-sabado-soft:    color-mix(in srgb, var(--dia-sabado) 20%, transparent);
-
---dia-domingo:        #FF006E;
---dia-domingo-soft:   color-mix(in srgb, var(--dia-domingo) 20%, transparent);
 }
 
 /* ══════════════════════════════════════
