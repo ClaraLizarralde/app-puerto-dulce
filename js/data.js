@@ -944,8 +944,8 @@ function mobPanelPick(parent, id) {
   }
 }
 
-// ── showTab reemplazado ──
-// REEMPLAZÁ tu función showTab() existente con esta:
+// ── showTab  ──
+
 
 function showTab(id, el) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));

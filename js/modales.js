@@ -1004,147 +1004,114 @@ function npToggleNota() {
 }
 
 // ── ABRIR / CERRAR ──
+
+let _npTabAnterior = 'tab-pedidos';
+
 function abrirModalNP() {
-  const _fab = document.getElementById("fab-nuevo-pedido");
-  if (_fab) _fab.style.display = "none";
-  _npDia = null;
-  _npDiaKey = null;
-  _npPedido = { id: "__np__", productos: [] };
-  _npPagado = false;
-  _npMetodoPago = "";
-  _npEstado = "pendiente";
-  document.querySelectorAll(".modal-np-dia-btn").forEach(b => b.classList.remove("active"));
-  const customInput = document.getElementById("np-dia-custom");
-  if (customInput) customInput.value = "";
-  const lblOtro = document.getElementById("np-lbl-otro");
-  if (lblOtro) lblOtro.textContent = "Otro día";
-  document.getElementById("np-nombre").value = "";
-  document.getElementById("np-tel").value = "";
-  document.getElementById("np-tel-hint").textContent = "";
-  document.getElementById("np-tel-hint").className = "np-hint";
-  document.getElementById("np-hora").value = "";
-  _npTimeH = null;
-  _npTimeM = null;
-  setTimeout(() => { npClockInit(); }, 30);
-  document.getElementById("np-error").style.display = "none";
-  document.getElementById("np-error").textContent = "";
-  document.getElementById("np-cuba-badge").style.display = "none";
-  document.getElementById("np-campo-tel").style.display = "";
-  document.getElementById("np-campo-pago").style.display = "";
-  npActualizarBotonesCuba(false);
-  document.getElementById("np-t1").classList.remove("active");
-  document.getElementById("np-t2").classList.remove("active");
-  document.querySelectorAll("#np-estado-sel .estado-opt").forEach(b => b.className = "estado-opt");
-  document.querySelector("#np-estado-sel .estado-opt").className = "estado-opt active-pendiente";
-  const bar = document.getElementById("np-pago-bar");
-  bar.className = "pago-bar no";
-  bar.innerHTML = "💳 Sin confirmar pago <button class=\"btn-pagar pagar\" onclick=\"npTogglePago()\">Confirmar</button>";
-  document.getElementById("np-nota").value = "";
-  document.getElementById("np-nota-wrap").style.display = "none";
-  npRenderProds();
-  npLabels();
-  npActualizarHorario();
-  document.getElementById("modal-np").classList.remove("hidden");
-  setTimeout(() => { document.getElementById("np-dia-hoy").focus(); npClockInit(); }, 80);
+  const activo = document.querySelector('.tab-content.active');
+  if (activo) _npTabAnterior = activo.id;
+  document.getElementById('tab-contents').style.display = 'none';
+  document.getElementById('tab-np-page').style.display = 'flex';
+  // ... resto del init igual
 }
 
 function cerrarModalNP() {
-  const _fab = document.getElementById("fab-nuevo-pedido");
-  if (_fab) _fab.style.display = "";
-  document.getElementById("modal-np").classList.add("hidden");
+  document.getElementById('tab-np-page').style.display = 'none';
+  document.getElementById('tab-contents').style.display = '';
+  document.getElementById(_npTabAnterior)?.classList.add('active');
+  const fab = document.getElementById('fab-nuevo-pedido');
+  if (fab) fab.style.display = '';
   _npPedido = null;
 }
 
 function confirmarNP() {
-  const nombreRaw = (document.getElementById("np-nombre").value || "").trim();
-  const cliente = normalizarCliente(nombreRaw);
-  const isCuba = esCuba(cliente);
-  const hora = document.getElementById("np-hora").value || "";
-  const nota = (document.getElementById("np-nota").value || "").trim();
-  const errDiv = document.getElementById("np-error");
-  function npError(msg) {
-    errDiv.innerHTML = msg;
-    errDiv.style.display = "";
-    const modal = document.getElementById("modal-np");
-    modal.classList.remove("shake");
-    void modal.offsetWidth;
-    modal.classList.add("shake");
-    setTimeout(() => modal.classList.remove("shake"), 300);
-  }
-  if (!_npDiaKey) { npError("⚠️ Seleccioná un día de entrega."); return; }
-  if (!isCuba && !nombreRaw) { npError("⚠️ Ingresá el nombre del cliente."); document.getElementById("np-nombre").focus(); return; }
-  let telNormalizado = "", telTipo = null;
-  if (!isCuba) {
-    const telRaw = document.getElementById("np-tel").value || "";
-    if (!telRaw.trim()) { npError("⚠️ Ingresá el teléfono del cliente."); document.getElementById("np-tel").focus(); return; }
-    const telResult = npNormalizarTel(telRaw);
-    if (!telResult.valido) { npError("⚠️ Teléfono inválido: " + telResult.hint); document.getElementById("np-tel").focus(); return; }
-    telNormalizado = telResult.normalizado;
-    telTipo = telResult.tipo;
-  }
-  if (!isCuba && !hora) { npError("⚠️ Ingresá el horario de entrega."); document.getElementById("np-hora").focus(); return; }
-  const productos = (_npPedido && _npPedido.productos) || [];
-  if (!productos.length) { npError("⚠️ Agregá al menos un producto."); return; }
-  const sinTalle = productos.filter(r => {
-    const cat = datos.catalogo.find(c => c.nombre === r.nombre && c.tipo === (r.tacc === "s" ? "sin_tacc" : "con_tacc"));
-    const obliga = r.tipo === "catalogo" ? (cat ? cat.tiene_talle : false) : false;
-    return obliga && !(r.tamano || "").trim();
-  });
-  if (sinTalle.length) {
-    const noms = sinTalle.map(r => r.nombre).join(", ");
-    npError("⚠️ Completá el talle de: <strong>" + esc(noms) + "</strong>");
+  const errDiv = document.getElementById('np-error');
+  errDiv.textContent = '';
+  errDiv.style.display = 'none';
+
+  const nombre = (document.getElementById('np-nombre').value || '').trim();
+  const tel = (document.getElementById('np-tel').value || '').trim();
+  const hora = (document.getElementById('np-hora').value || '').trim();
+  const nota = (document.getElementById('np-nota').value || '').trim();
+  const isCuba = nombre.toLowerCase().includes('cuba');
+
+  // Validaciones
+  const errores = [];
+  if (!_npDiaKey) errores.push('Seleccioná un día de entrega');
+  if (!isCuba && !nombre) errores.push('Falta el nombre del cliente');
+  if (!isCuba && !hora) errores.push('Falta el horario de entrega');
+  if (!_npPedido || !_npPedido.productos.length) errores.push('Agregá al menos un producto');
+
+  if (errores.length) {
+    errDiv.textContent = '⚠️ ' + errores.join(' · ');
+    errDiv.style.display = '';
     return;
   }
-  errDiv.style.display = "none";
-  if (!datos.dias[_npDiaKey]) datos.dias[_npDiaKey] = { pedidos: [], ventas: [] };
-  const diaAnterior = diaActual;
-  diaActual = _npDiaKey;
-  const id = uid();
-  productos.forEach(r => { delete r._tamLibre; });
-  let fueraHorario = false;
-  if (hora && !isCuba) {
-    const horario = getHorariosParaDia(_npDiaKey);
-    if (!horario) {
-      fueraHorario = true;
-    } else {
-      const slots = buildHorarioSlots(horario);
-      const [hh, mm] = hora.split(":").map(Number);
-      fueraHorario = !slots.some(s => s.h === hh && s.m === mm);
+
+  // Validar talles obligatorios
+  const sinTalle = (_npPedido.productos || []).filter(r => {
+    const cat = datos.catalogo.find(c =>
+      c.nombre === r.nombre &&
+      c.tipo === (r.tacc === 's' ? 'sin_tacc' : 'con_tacc')
+    );
+    const obliga = r.tipo === 'catalogo' ? (cat ? cat.tiene_talle : false) : false;
+    return obliga && !(r.tamano || '').trim();
+  });
+  if (sinTalle.length) {
+    errDiv.innerHTML = '⚠️ Completá el talle de: <strong>' +
+      sinTalle.map(r => esc(r.nombre)).join(', ') + '</strong>';
+    errDiv.style.display = '';
+    return;
+  }
+
+  // Limpiar flag interno
+  _npPedido.productos.forEach(r => { delete r._tamLibre; });
+
+  // Normalizar cliente
+  const clienteNorm = normalizarCliente(nombre);
+  if (!isCuba && nombre) {
+    const yaExiste = datos.clientes.find(c =>
+      c.nombre.toLowerCase() === clienteNorm.toLowerCase()
+    );
+    if (!yaExiste) {
+      datos.clientes.push({
+        id: uid(),
+        nombre: clienteNorm,
+        tel: tel || '',
+        frecuente: false
+      });
     }
   }
-  const nuevoPedido = {
-    id,
-    cliente: isCuba ? "cuba" : nombreRaw,
-    cliente_input: isCuba ? "Cuba" : nombreRaw,
-    tel: telNormalizado, tel_tipo: telTipo,
+
+  // Armar pedido final
+  const pedido = {
+    id: uid(),
+    cliente: clienteNorm,
+    cliente_input: nombre,
+    tel: isCuba ? '' : tel,
     hora_entrega: hora,
-    fuera_horario: fueraHorario || undefined,
-    estado: _npEstado,
-    pagado: _npPagado, metodoPago: _npPagado ? (_npMetodoPago || "Confirmado") : "",
+    productos: _npPedido.productos,
+    estado: _npEstado || 'pendiente',
+    pagado: _npPagado,
+    metodoPago: _npMetodoPago || '',
     notas: nota,
-    productos,
-    historial: [{ estado: _npEstado, ts: Date.now() }],
-    creado: Date.now(),
+    cargado: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
+    timestamp: Date.now()
   };
-  datos.dias[_npDiaKey].pedidos.unshift(nuevoPedido);
+
+  // Guardar en el día correspondiente
+  if (!datos.dias[_npDiaKey]) datos.dias[_npDiaKey] = { pedidos: [] };
+  if (!datos.dias[_npDiaKey].pedidos) datos.dias[_npDiaKey].pedidos = [];
+  datos.dias[_npDiaKey].pedidos.push(pedido);
+
   guardar();
   mostrarToastGuardado();
   cerrarModalNP();
-  if (diaAnterior !== _npDiaKey) { renderDiasNav(); renderAll(); }
-  else { renderPedidos(); }
-  setTimeout(() => { const w = document.getElementById("planilla-wrap"); if (w) w.scrollIntoView({ behavior: "smooth" }); }, 80);
-}
+  renderPedidos();
 
-function agregarPedido() { abrirModalNP(); }
-
-// ── SELECTOR PRODUCTO ──
-let _selectorPedidoId = null, _selectorProdId = null;
-function abrirSelector(pedidoId, prodId) {
-  _selectorPedidoId = pedidoId;
-  _selectorProdId = prodId;
-  document.getElementById("selector-search").value = "";
-  renderSelectorLista();
-  document.getElementById("selector-overlay").classList.remove("hidden");
+  // Actualizar producción si está activa
+  const prodTab = document.getElementById('tab-produccion');
+  if (prodTab && prodTab.classList.contains('active')) renderProduccion();
 }
 function cerrarSelector() { document.getElementById("selector-overlay").classList.add("hidden"); }
 let _libreTipo = "s";

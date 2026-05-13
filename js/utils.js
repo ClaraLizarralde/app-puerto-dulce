@@ -121,24 +121,24 @@ const DIA_DOTS = ["#4b5563", "#2563eb", "#7c3aed", "#ca8a04", "#dc2626", "#16a34
     _kbIdx = -1;
   }
 
-  // ── Eventos de teclado global ──
-  document.addEventListener("keydown", function (e) {
-    const selectorAbierto = !document.getElementById("selector-overlay").classList.contains("hidden");
-    const modalAbierto = !document.getElementById("modal-np").classList.contains("hidden");
+// ── Eventos de teclado global ──
+document.addEventListener("keydown", function (e) {
+  const selectorAbierto = !document.getElementById("selector-overlay").classList.contains("hidden");
+  const npAbierto = document.getElementById("tab-np-page").classList.contains("active");
 
-    // ── ESC: cerrar lo que esté abierto ──
-    if (e.key === "Escape") {
-      if (selectorAbierto) {
-        cerrarSelector();
-        e.preventDefault();
-        return;
-      }
-      if (modalAbierto) {
-        cerrarModalNP();
-        e.preventDefault();
-        return;
-      }
+  // ── ESC: cerrar lo que esté abierto ──
+  if (e.key === "Escape") {
+    if (selectorAbierto) {
+      cerrarSelector();
+      e.preventDefault();
+      return;
     }
+    if (npAbierto) {
+      cerrarModalNP();
+      e.preventDefault();
+      return;
+    }
+  }
 
     // ── Dentro del selector de productos ──
     if (selectorAbierto) {
@@ -187,7 +187,7 @@ const DIA_DOTS = ["#4b5563", "#2563eb", "#7c3aed", "#ca8a04", "#dc2626", "#16a34
     }
 
     // ── Dentro del modal nuevo pedido ──
-    if (modalAbierto) {
+    if (npAbierto) {
       const diaIds = ["np-dia-hoy", "np-dia-man", "np-dia-otro"];
       if ((e.key === "Enter" || e.key === " ") && diaIds.includes(document.activeElement.id)) {
         e.preventDefault();

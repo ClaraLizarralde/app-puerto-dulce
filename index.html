@@ -213,7 +213,7 @@
   </div>
 </div>
 
-<div class="tab-contents">
+<div class="tab-contents" id="tab-contents">
 
 <!-- PEDIDOS -->
 <div class="tab-content active" id="tab-pedidos">
@@ -440,6 +440,7 @@
   <!-- CONFIG -->
   <div class="tab-content" id="tab-config">
 
+
     <!-- SELECTOR MOBILE -->
     <div class="subtab-selector-screen" id="subtab-screen-config">
       <div class="subtab-selector-title">⚙️ Configuración</div>
@@ -603,9 +604,193 @@
       </div>
     </div>
 
-  </div>
+
 
 </div>
+<div class="tab-content" id="tab-np-page" style="padding:0; flex-direction:column;">
+
+  <!-- HEADER -->
+  <div class="modal-np-header">
+    <h3>✨ Nuevo pedido</h3>
+    <button class="np-btn-guardar-header" onclick="confirmarNP()" tabindex="9">Guardar pedido ✓</button>
+    <button class="modal-np-close" onclick="cerrarModalNP()">✕</button>
+  </div>
+
+  <div class="modal-np-body">
+
+    <!-- ════════════════════
+         COLUMNA IZQUIERDA
+         ════════════════════ -->
+    <div class="np-col-left">
+
+      <!-- Fila: Para (toggle Cliente / Cuba) -->
+      <div class="np-fila">
+        <div class="np-fila-label">Para</div>
+        <div class="np-fila-content">
+          <div class="np-toggle-wrap">
+            <button type="button" class="np-toggle-opt active-cliente" id="np-btn-cliente-ui" onclick="npUiModoCliente()">
+              👤 Cliente
+            </button>
+            <button type="button" class="np-toggle-opt" id="np-btn-cuba" onclick="npToggleCuba()" tabindex="7">
+              🏪 Cuba
+            </button>
+          </div>
+          <div class="modal-np-cuba-badge" id="np-cuba-badge" style="display:none;">🏪 Pedido de Cuba</div>
+        </div>
+      </div>
+
+      <!-- Fila: Nombre (oculta en Cuba) -->
+      <div class="np-fila" id="np-fila-nombre" style="">
+        <div class="np-fila-label">Nombre</div>
+        <div class="np-fila-content" style="position:relative;">
+          <input type="text" id="np-nombre" placeholder="Nombre del cliente..." autocomplete="off" tabindex="5" style="width:100%;">
+          <div id="np-autocomp" style="position:absolute;top:100%;left:0;right:0;background:var(--paper);border:1.5px solid var(--border);border-radius:var(--radius-sm);box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:300;display:none;max-height:150px;overflow-y:auto;"></div>
+        </div>
+      </div>
+
+      <!-- Fila: Teléfono (oculta en Cuba) -->
+      <div class="np-fila col" id="np-campo-tel" style="">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="np-fila-label">Teléfono</div>
+          <div class="np-fila-content">
+            <input type="tel" id="np-tel" placeholder="Teléfono o fijo..." oninput="npOnTelInput()" tabindex="6" style="width:100%;">
+          </div>
+        </div>
+        <div class="np-hint" id="np-tel-hint"></div>
+      </div>
+
+      <!-- Fila: Día -->
+      <div class="np-fila">
+        <div class="np-fila-label">Día</div>
+        <div class="np-fila-content">
+          <div class="np-dia-pill modal-np-dia-btn" id="np-dia-hoy" onclick="npSelDia('hoy',this)" tabindex="1">
+            Hoy
+            <span class="np-dia-sub" id="np-lbl-hoy"></span>
+          </div>
+          <div class="np-dia-pill modal-np-dia-btn" id="np-dia-man" onclick="npSelDia('manana',this)" tabindex="2">
+            Mañana
+            <span class="np-dia-sub" id="np-lbl-man"></span>
+          </div>
+          <div class="np-dia-pill modal-np-dia-btn" id="np-dia-otro" onclick="npAbrirCustomDia()" tabindex="3" style="position:relative;">
+            <span id="np-lbl-otro">Otro día</span>
+            <input type="date" id="np-dia-custom" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Fila: Horario -->
+      <div class="np-fila" id="np-campo-hora">
+        <div class="np-fila-label" id="np-hora-label">Horario</div>
+        <div class="np-fila-content" id="np-clock-wrap">
+          <div class="tp-pill-wrap">
+            <button type="button" class="time-picker-btn" id="np-tp-btn" onclick="npOpenTimePicker()" tabindex="4">
+              <div class="tp-clock-icon" id="np-tp-icon">
+                <div class="tp-hand-h" id="np-tp-hand-h" style="transform:rotate(-60deg)"></div>
+                <div class="tp-hand-m" id="np-tp-hand-m" style="transform:rotate(60deg)"></div>
+                <div class="tp-dot"></div>
+              </div>
+              <span class="tp-value" id="np-tp-value">Elegir horario</span>
+              <span class="tp-pill-arrow">▾</span>
+            </button>
+            <div class="tp-popover hidden" id="np-tp-selects">
+              <div class="tp-dropdown-list" id="np-tp-list"></div>
+            </div>
+          </div>
+          <input type="time" id="np-hora-mobile" style="display:none;margin-top:6px;font-family:'Outfit',sans-serif;font-size:.88rem;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--ink);outline:none;width:auto;">
+        </div>
+        <div id="np-turnos-wrap" style="display:none;">
+          <div class="modal-np-turno-opts">
+            <div class="modal-np-turno-btn t1" id="np-t1" onclick="npSelTurno(1)">🟠 Turno 1</div>
+            <div class="modal-np-turno-btn t2" id="np-t2" onclick="npSelTurno(2)">🔵 Turno 2</div>
+          </div>
+        </div>
+        <input type="hidden" id="np-hora">
+      </div>
+
+      <!-- Separador -->
+      <div class="np-sep"></div>
+
+      <!-- Estado + Pago + Nota como pills -->
+      <div class="np-opts-row">
+
+        <!-- Estado (dropdown funcional via JS existente) -->
+        <div class="np-opt-pill" id="np-opt-estado" onclick="npUiToggleEstado()">⏳ Pendiente</div>
+
+        <!-- Pago -->
+        <div class="np-opt-pill" id="np-opt-pago" onclick="npTogglePago()">💳 Confirmar pago</div>
+
+        <!-- Nota -->
+        <button type="button" class="np-opt-pill" id="np-nota-btn" onclick="npUiToggleNota()">📝 Nota</button>
+
+      </div>
+
+      <!-- Estado expandido (oculto por defecto) -->
+      <div id="np-estado-wrap" style="display:none; padding: 8px 0 4px;">
+        <div class="estado-sel" id="np-estado-sel">
+          <div class="estado-opt active-pendiente" onclick="npSelEstado('pendiente',this)">Pendiente</div>
+          <div class="estado-opt" onclick="npSelEstado('prod',this)">En producción</div>
+          <div class="estado-opt" onclick="npSelEstado('listo',this)">Listo</div>
+          <div class="estado-opt" onclick="npSelEstado('entregado',this)">Retirado</div>
+        </div>
+      </div>
+
+      <!-- Pago bar (oculta, se muestra al abrir) -->
+      <div id="np-campo-pago" style="display:none; padding: 4px 0 8px;">
+        <div class="pago-bar no" id="np-pago-bar">
+          💳 Sin confirmar pago
+          <button class="btn-pagar pagar" onclick="npTogglePago()">Confirmar</button>
+        </div>
+      </div>
+
+      <!-- Nota expandida (oculta por defecto) -->
+      <div id="np-nota-wrap" style="display:none; padding: 4px 0 8px;">
+        <textarea class="notas-input" id="np-nota" placeholder="Sin dulce de leche, avisame cuando esté..."></textarea>
+      </div>
+
+    </div><!-- /np-col-left -->
+
+
+    <!-- ════════════════════
+         COLUMNA DERECHA
+         ════════════════════ -->
+<div class="np-col-right">
+
+  <div class="np-sec-label">🎂 Productos</div>
+
+  <div id="np-prods-wrap"></div>
+
+  <!-- BUSCADOR INLINE -->
+  <div class="np-search-prod-wrap" id="np-search-prod-wrap">
+    <div class="np-search-prod-input-row">
+      <input
+        type="text"
+        id="np-search-prod-input"
+        class="np-search-prod-input"
+        placeholder="Buscar producto... (ej: rog, choco...)"
+        autocomplete="off"
+        oninput="npSearchProd(this.value)"
+        onfocus="npSearchProd(this.value)"
+      >
+      <button class="np-search-prod-clear" id="np-search-prod-clear" onclick="npSearchProdClear()" style="display:none;">✕</button>
+    </div>
+    <div class="np-search-prod-results" id="np-search-prod-results" style="display:none;"></div>
+  </div>
+
+  <div id="np-total-wrap" class="np-total-wrap" style="display:none;"></div>
+
+</div>
+    <div class="modal-np-error" id="np-error"></div>
+
+  </div><!-- /modal-np-body -->
+
+  <!-- FOOTER -->
+  <div class="modal-np-footer">
+    <button class="btn-cancelar" onclick="cerrarModalNP()" tabindex="10">Cancelar</button>
+    <button class="btn-confirmar" onclick="confirmarNP()" tabindex="9">Guardar pedido</button>
+  </div>
+
+</div><!-- /#tab-np-page -->
+
 </div>
 </div>
 
@@ -658,127 +843,7 @@
 </div>
 
 <!-- MODAL PAGO -->
-<!-- MODAL NUEVO PEDIDO -->
-<div class="modal-overlay hidden" id="modal-np">
-  <div class="modal-np">
-    <div class="modal-np-header">
-      <h3>✨ Nuevo pedido</h3>
-      <button class="modal-np-close" onclick="cerrarModalNP()">✕</button>
-    </div>
-    <div class="modal-np-body">
 
-      <!-- DÍA -->
-      <div class="modal-np-campo">
-        <label>Día de entrega</label>
-        <div class="modal-np-dia-opts">
-          <div class="modal-np-dia-btn" id="np-dia-hoy" onclick="npSelDia('hoy',this)" tabindex="1">Hoy<br><span style="font-size:.6rem;opacity:.7" id="np-lbl-hoy"></span></div>
-          <div class="modal-np-dia-btn" id="np-dia-man" onclick="npSelDia('manana',this)" tabindex="2">Mañana<br><span style="font-size:.6rem;opacity:.7" id="np-lbl-man"></span></div>
-          <div class="modal-np-dia-btn" id="np-dia-otro" onclick="npAbrirCustomDia()" tabindex="3">
-            <span id="np-lbl-otro">Otro día</span>
-            <input type="date" id="np-dia-custom" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none;">
-          </div>
-        </div>
-      </div>
-
-      <!-- HORARIO — ahora arriba del cliente -->
-      <div class="modal-np-campo" id="np-campo-hora">
-        <label id="np-hora-label">Horario de entrega</label>
-        <div id="np-clock-wrap">
-          <div class="tp-pill-wrap">
-            <button type="button" class="time-picker-btn" id="np-tp-btn" onclick="npOpenTimePicker()" tabindex="4">
-              <div class="tp-clock-icon" id="np-tp-icon">
-                <div class="tp-hand-h" id="np-tp-hand-h" style="transform:rotate(-60deg)"></div>
-                <div class="tp-hand-m" id="np-tp-hand-m" style="transform:rotate(60deg)"></div>
-                <div class="tp-dot"></div>
-              </div>
-              <span class="tp-value" id="np-tp-value">Elegir horario</span>
-              <span class="tp-pill-arrow">▾</span>
-            </button>
-            <!-- Desktop: dropdown custom -->
-            <div class="tp-popover hidden" id="np-tp-selects">
-              <div class="tp-dropdown-list" id="np-tp-list"></div>
-            </div>
-          </div>
-          <!-- Mobile: native input -->
-          <input type="time" id="np-hora-mobile" style="display:none;margin-top:6px;font-family:'Outfit',sans-serif;font-size:.88rem;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--ink);outline:none;width:auto;">
-        </div>
-        <!-- Turnos (Cuba en día especial) -->
-        <div id="np-turnos-wrap" style="display:none;">
-          <div class="modal-np-turno-opts">
-            <div class="modal-np-turno-btn t1" id="np-t1" onclick="npSelTurno(1)">🟠 Turno 1</div>
-            <div class="modal-np-turno-btn t2" id="np-t2" onclick="npSelTurno(2)">🔵 Turno 2</div>
-          </div>
-        </div>
-        <!-- Input hidden para compatibilidad con lógica existente -->
-        <input type="hidden" id="np-hora">
-      </div>
-
-      <!-- CLIENTE -->
-      <div class="modal-np-campo">
-        <label>Cliente</label>
-        <div style="display:flex;gap:8px;align-items:flex-start;">
-          <div style="flex:1.2;position:relative;">
-            <input type="text" id="np-nombre" placeholder="Nombre..." autocomplete="off" tabindex="5"
-               style="width:100%;">
-            <div id="np-autocomp" style="position:absolute;top:100%;left:0;right:0;background:var(--paper);border:1.5px solid var(--border);border-radius:var(--radius-sm);box-shadow:0 6px 20px var(--shadow);z-index:300;display:none;max-height:150px;overflow-y:auto;"></div>
-          </div>
-          <div id="np-campo-tel" style="flex:1;">
-            <input type="tel" id="np-tel" placeholder="Teléfono o fijo..." oninput="npOnTelInput()" tabindex="6" style="width:100%;">
-          </div>
-          <button type="button" id="np-btn-cuba" onclick="npToggleCuba()"
-            style="flex-shrink:0;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:600;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--paper);color:var(--ink-mid);cursor:pointer;white-space:nowrap;transition:all .15s;"
-            tabindex="7">🏪 Cuba</button>
-        </div>
-        <div class="np-hint" id="np-tel-hint"></div>
-        <div class="modal-np-cuba-badge" id="np-cuba-badge" style="display:none;">🏪 Pedido de Cuba</div>
-      </div>
-
-      <!-- PRODUCTOS -->
-      <div class="modal-np-campo">
-        <label>Productos</label>
-        <div id="np-prods-wrap"></div>
-        <button class="btn-add-prod" onclick="npAgregarProducto()" tabindex="7" style="margin-top:4px;">＋ Agregar producto</button>
-        <div id="np-total-wrap" class="np-total-wrap" style="display:none"></div>
-      </div>
-
-      <div style="height:1px;background:var(--border);margin:2px 0 12px;"></div>
-
-      <!-- ESTADO -->
-      <div class="modal-np-campo">
-        <label>Estado</label>
-        <div class="estado-sel" id="np-estado-sel">
-          <div class="estado-opt active-pendiente" onclick="npSelEstado('pendiente',this)">Pendiente</div>
-          <div class="estado-opt" onclick="npSelEstado('prod',this)">En producción</div>
-          <div class="estado-opt" onclick="npSelEstado('listo',this)">Listo</div>
-          <div class="estado-opt" onclick="npSelEstado('entregado',this)">Retirado</div>
-        </div>
-      </div>
-
-      <!-- PAGO -->
-      <div class="modal-np-campo" id="np-campo-pago">
-        <div class="pago-bar no" id="np-pago-bar">
-          💳 Sin confirmar pago
-          <button class="btn-pagar pagar" onclick="npTogglePago()">Confirmar</button>
-        </div>
-      </div>
-
-      <!-- NOTA GENERAL -->
-      <div class="modal-np-campo">
-        <button class="nota-general-toggle" id="np-nota-btn" onclick="npToggleNota()" tabindex="8">📝 Agregar nota general</button>
-        <div id="np-nota-wrap" style="display:none;margin-top:6px;">
-          <textarea class="notas-input" id="np-nota" placeholder="Sin dulce de leche, avisame cuando esté..."></textarea>
-        </div>
-      </div>
-
-      <div class="modal-np-error" id="np-error"></div>
-    </div>
-
-    <div class="modal-np-footer">
-      <button class="btn-cancelar" onclick="cerrarModalNP()" tabindex="10">Cancelar</button>
-      <button class="btn-confirmar" onclick="confirmarNP()" tabindex="9">Guardar pedido</button>
-    </div>
-  </div>
-</div>
 
 <!-- MODAL EDICIÓN PEDIDO -->
 <div class="modal-overlay hidden" id="modal-edicion">
