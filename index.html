@@ -236,16 +236,16 @@
       <div class="autocomplete-lista" id="autocomplete-lista"></div>
     </div>
     <div class="po-topbar-actions">
-  <button class="po-btn-sm" onclick="mostrarCSVModal()">↓ CSV</button>
-  <button class="po-btn-sm po-btn-arch" id="btn-ver-archivados" onclick="toggleVistaArchivados()">
-    📥 Archivados <span class="po-arch-cnt" id="po-arch-cnt">0</span>
-  </button>
-  <button class="po-btn-sm po-btn-accent" onclick="abrirModalNP()">+ Nuevo pedido</button>
-</div>
+      <button class="po-btn-todos active" id="btn-todos-global" onclick="setTabTodos()">
+        TODOS LOS PEDIDOS <span class="po-tab-count" id="po-todos-count">0</span>
+      </button>
+      <button class="po-btn-sm" onclick="mostrarCSVModal()">↓ CSV</button>
+      <button class="po-btn-sm po-btn-arch" id="btn-ver-archivados" onclick="toggleVistaArchivados()">
+        📥 Archivados <span class="po-arch-cnt" id="po-arch-cnt">0</span>
+      </button>
+      <button class="po-btn-sm po-btn-accent" onclick="abrirModalNP()">+ Nuevo pedido</button>
+    </div>
   </div>
-
-  <!-- TABS DE DÍAS -->
-  <div class="po-day-tabs" id="po-day-tabs"></div>
 
   <!-- FILTROS -->
   <div class="po-filter-row">
@@ -257,7 +257,22 @@
     <button class="po-chip" onclick="setFiltro('cuba',this)">Cuba</button>
     <button class="po-chip" onclick="setFiltro('clientes',this)">Clientes</button>
     <button class="po-chip" onclick="setFiltro('sinTacc',this)">Sin TACC</button>
+    <div class="po-sort-wrap">
+      <span class="po-filter-label">Ordenar</span>
+      <select id="po-sort-select" class="po-sort-select" onchange="setOrden(this.value)">
+        <option value="creacion_desc">↓ Carga</option>
+        <option value="hora_entrega">Horario ↑</option>
+        <option value="hora_entrega_desc">Horario ↓</option>
+        <option value="entrega_asc">Entrega ↑</option>
+        <option value="total_desc">Mayor total</option>
+        <option value="apellido">Apellido</option>
+        <option value="estado">Estado</option>
+      </select>
+    </div>
   </div>
+
+  <!-- TABS DE DÍAS -->
+  <div class="po-day-tabs" id="po-day-tabs"></div>
 
   <!-- TABLA -->
   <div class="po-table-wrap">
@@ -279,7 +294,7 @@
     </table>
   </div>
 
-  <!-- ARCHIVADOS (se mantiene oculto, funciona igual) -->
+  <!-- ARCHIVADOS -->
   <div class="archivados-section" id="archivados-section" style="display:none">
     <div class="archivados-header" onclick="toggleArchivadosLista()">
       <span class="archivados-titulo">📥 Pedidos archivados</span>

@@ -363,15 +363,17 @@ function seleccionarAutocompletado(clienteId) {
 function setFiltro(f, el) {
   if (filtro === f && f !== "todos") {
     filtro = "todos";
-    document.querySelectorAll(".filtros button:not([id^='filtro-dia'])").forEach(b => b.classList.remove("active"));
-    document.querySelector('.filtros button[onclick*="todos"]').classList.add("active");
-    renderPedidos();
+    document.querySelectorAll(".po-filter-row .po-chip").forEach(b => b.classList.remove("active"));
+    document.querySelector('.po-filter-row .po-chip[onclick*="todos"]')?.classList.add("active");
+    renderDayTabs();
+    renderPedidosTable();
     return;
   }
   filtro = f;
-  document.querySelectorAll(".filtros button:not([id^='filtro-dia'])").forEach(b => b.classList.remove("active"));
-  el.classList.add("active");
-  renderPedidos();
+  document.querySelectorAll(".po-filter-row .po-chip").forEach(b => b.classList.remove("active"));
+  if (el) el.classList.add("active");
+  renderDayTabs(); // ← actualiza contadores en tabs
+  renderPedidosTable();
 }
 
 function setFiltroDia(tipo, el) {
@@ -443,7 +445,9 @@ function getPedidosFiltradosDeDia(diaKey) {
   if (filtro === "cuba") ps = ps.filter(p => esCuba(p.cliente));
   if (filtro === "sinTacc") ps = ps.filter(p => (p.productos || []).some(r => r.tacc === "s"));
   if (filtro === "clientes") ps = ps.filter(p => !esCuba(p.cliente));
-  return ps.sort((a, b) => (a.hora_entrega || "99:99").localeCompare(b.hora_entrega || "99:99"));
+  // Vista día específico: más nuevo arriba (por timestamp de carga)
+  // Vista "Todos": también por timestamp descendente dentro de cada día
+ return sortPedidos(ps);
 }
 
 function getPedidosFiltrados() {
@@ -597,7 +601,7 @@ function renderPedidos() {
           ? `<div onclick="setEstado('${p.id}','entregado')" style="font-size:.58rem;font-weight:600;padding:3px 8px;border-radius:10px;border:1px solid var(--ink-light);color:var(--ink-light);background:transparent;cursor:pointer;flex-shrink:0;white-space:nowrap;">Retirado</div>`
           : `<div onclick="setEstado('${p.id}','listo')" style="font-size:.58rem;font-weight:600;padding:3px 8px;border-radius:10px;border:1px solid var(--green);color:var(--green);background:var(--green-soft);cursor:pointer;flex-shrink:0;white-space:nowrap;">↩ Deshacer</div>`
         }
-        <div onclick="abrirModalVista('${p.id}')" title="Ver pedido" style="font-size:1.1rem;color:var(--accent);margin-left:2px;font-weight:700;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--accent-soft);flex-shrink:0;cursor:pointer;">＋</div>
+        <div onclick="abrirModalNP_edicion('${p.id}')" title="Ver pedido" style="font-size:1.1rem;color:var(--accent);margin-left:2px;font-weight:700;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--accent-soft);flex-shrink:0;cursor:pointer;">＋</div>
       </div>
       <div class="row-prods">${prodsHTML}</div>
       ${p.creado ? `<div class="pedido-ts">cargado ${(() => { const d = new Date(p.creado); const h = String(d.getHours()).padStart(2, "0"); const m = String(d.getMinutes()).padStart(2, "0"); const dd = String(d.getDate()).padStart(2, "0"); const mm = String(d.getMonth() + 1).padStart(2, "0"); return dd + "/" + mm + " " + h + ":" + m; })()}</div>` : ""}
@@ -655,7 +659,7 @@ function buildPanel(p) {
         <input type="text" id="inp-cliente-${p.id}" value="${esc(p.cliente_input || p.cliente || "")}" placeholder="Nombre..." oninput="onClienteInput('${p.id}',this.value)" autocomplete="off">
         <div class="autocomplete-lista" id="ac-${p.id}"></div>
       </div>
-      <div class="campo"><label>Teléfono</label><input type="tel" value="${esc(p.tel || "")}" placeholder="11 1234-5678" onchange="updatePedido('${p.id}','tel',this.value)"></div>
+      <div class="campo"><label>Teléfono</label><input type="tel" id="inp-tel-${p.id}" value="${esc(p.tel || "")}" placeholder="11 1234-5678" onchange="updatePedido('${p.id}','tel',this.value)"></div>
     </div>
     <div class="campo" style="max-width:140px"><label>Hora de entrega</label><input type="time" value="${esc(p.hora_entrega || "")}" onchange="updatePedido('${p.id}','hora_entrega',this.value)"></div>
     `}
@@ -792,12 +796,16 @@ function setEstado(id, estado) {
     const diaKey = _poGetDiaDePedido(id);
     const [y, m, d] = diaKey.split("-").map(Number);
     const nomDia = _PO_DIAS_FULL[new Date(y, m - 1, d).getDay()];
-    datos.archivados.push({
-      ...p,
-      _fecha: diaKey,
-      _nomDia: nomDia,
-      _archivadoTs: Date.now()
-    });
+    // Fix: evitar duplicados si el pedido ya estaba archivado
+    const yaArchivado = datos.archivados.some(a => a.id === id);
+    if (!yaArchivado) {
+      datos.archivados.push({
+        ...p,
+        _fecha: diaKey,
+        _nomDia: nomDia,
+        _archivadoTs: Date.now()
+      });
+    }
     if (datos.dias[diaKey]) {
       datos.dias[diaKey].pedidos = datos.dias[diaKey].pedidos.filter(x => x.id !== id);
     }
@@ -940,7 +948,7 @@ function renderArchivadosGlobal() {
 
 // ── PENDIENTES DE DÍAS ANTERIORES ──
 function chequearPendientesAyer() {
-  const hoy = _poFechaKey(new Date());
+  const hoy = fechaKey(new Date());
   const diasPasados = Object.keys(datos.dias).filter(k => k < hoy);
 
   const pendientes = diasPasados.reduce((s, k) => {
@@ -1258,6 +1266,38 @@ let _poTabDia = null;
 let _poExpandedId = null;
 let _vistaArchivados = false;
 
+let _poOrden = "creacion_desc";
+
+function setOrden(v) {
+  _poOrden = v;
+  renderPedidosTable();
+}
+
+function sortPedidos(ps) {
+  const ORDER_ESTADO = { pendiente: 0, prod: 1, listo: 2, entregado: 3 };
+  return [...ps].sort((a, b) => {
+    switch (_poOrden) {
+      case "hora_entrega":
+        return (a.hora_entrega || "99:99").localeCompare(b.hora_entrega || "99:99");
+      case "hora_entrega_desc":
+        return (b.hora_entrega || "00:00").localeCompare(a.hora_entrega || "00:00");
+      case "entrega_asc":
+        return (a.hora_entrega || "99:99").localeCompare(b.hora_entrega || "99:99");
+      case "total_desc":
+        return calcularTotalPedido(b) - calcularTotalPedido(a);
+      case "apellido": {
+        const na = (a.cliente_input || a.cliente || "").split(" ").pop();
+        const nb = (b.cliente_input || b.cliente || "").split(" ").pop();
+        return na.localeCompare(nb, "es");
+      }
+      case "estado":
+        return (ORDER_ESTADO[a.estado] ?? 99) - (ORDER_ESTADO[b.estado] ?? 99);
+      case "creacion_desc":
+      default:
+        return (b.creado || 0) - (a.creado || 0);
+    }
+  });
+}
 function toggleVistaArchivados() {
   _vistaArchivados = !_vistaArchivados;
   const btn = document.getElementById("btn-ver-archivados");
@@ -1346,27 +1386,16 @@ function renderDayTabs() {
 
   bar.innerHTML = "";
 
-  const btnPrev = document.createElement("button");
-  btnPrev.className = "po-day-arrow left";
-  btnPrev.innerHTML = "‹";
-  btnPrev.onclick = () => {
-    const tabs = scroll.querySelectorAll(".po-day-tab");
-    const active = scroll.querySelector(".po-day-tab.active");
-    if (!active) return;
-    const idx = [...tabs].indexOf(active);
-    if (idx > 0) tabs[idx - 1].click();
-  };
-  bar.appendChild(btnPrev);
+  // Actualizar el botón TODOS en topbar
+  const totalTodos = keys.reduce((s, k) => s + (datos.dias[k]?.pedidos?.length || 0), 0);
+  const btnTodosEl = document.getElementById("btn-todos-global");
+  const todosCount = document.getElementById("po-todos-count");
+  if (todosCount) todosCount.textContent = totalTodos;
+  if (btnTodosEl) btnTodosEl.classList.toggle("active", _poTabDia === null);
 
+  // Scroll container (sin flechas, sin btnTodos)
   const scroll = document.createElement("div");
   scroll.className = "po-day-tabs-scroll";
-
-  const totalTodos = keys.reduce((s, k) => s + (datos.dias[k]?.pedidos?.length || 0), 0);
-  const btnTodos = document.createElement("button");
-  btnTodos.className = "po-day-tab" + (_poTabDia === null ? " active" : "");
-  btnTodos.innerHTML = `TODOS <span class="po-tab-count">${totalTodos}</span>`;
-  btnTodos.onclick = () => { _poTabDia = null; renderDayTabs(); renderPedidosTable(); };
-  scroll.appendChild(btnTodos);
 
   keys.forEach(k => {
     const cnt = datos.dias[k]?.pedidos?.length || 0;
@@ -1391,26 +1420,22 @@ function renderDayTabs() {
 
   bar.appendChild(scroll);
 
-  const btnNext = document.createElement("button");
-  btnNext.className = "po-day-arrow right";
-  btnNext.innerHTML = "›";
-  btnNext.onclick = () => {
-    const tabs = scroll.querySelectorAll(".po-day-tab");
-    const active = scroll.querySelector(".po-day-tab.active");
-    if (!active) return;
-    const idx = [...tabs].indexOf(active);
-    if (idx < tabs.length - 1) tabs[idx + 1].click();
-  };
-  bar.appendChild(btnNext);
-
   setTimeout(() => {
     const active = scroll.querySelector(".po-day-tab.active");
     if (active) active.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
   }, 50);
 }
 
+// Nueva función para el botón TODOS de la topbar
+function setTabTodos() {
+  _poTabDia = null;
+  renderDayTabs();
+  renderPedidosTable();
+}
+
 // ── RENDER TABLE ──
 function renderPedidosTable() {
+  asignarIds();
   renderStats();
 
   const tbody = document.getElementById("pedidos-tbody");
@@ -1420,6 +1445,7 @@ function renderPedidosTable() {
   if (_vistaArchivados) { renderTablaArchivados(tbody); return; }
 
   const hoy = _poFechaKey(new Date());
+  // Vista "Todos": días en orden ascendente (próximos primero); dentro de cada día, pedidos más nuevos arriba
   const diasAMostrar = _poTabDia !== null
     ? [_poTabDia]
     : Object.keys(datos.dias).filter(k => k >= hoy || k === diaActual).sort();
@@ -1438,15 +1464,6 @@ function renderPedidosTable() {
     const ps = getPedidosFiltradosDeDia(diaKey);
     const cntDia = datos.dias[diaKey]?.pedidos?.length || 0;
 
-    if (mostrarSep) {
-      html += `<tr class="po-tr-day-sep"><td colspan="9">
-        <div class="po-day-sep-inner">
-          <span class="po-day-sep-label">${_poDaySepLabel(diaKey)}</span>
-          <span class="po-day-sep-line"></span>
-          <span class="po-day-sep-count">${cntDia} pedido${cntDia !== 1 ? "s" : ""}</span>
-        </div>
-      </tr></tr>`;
-    }
 
     if (!ps.length) {
       if (!hayFiltro) {
@@ -1490,11 +1507,12 @@ function renderPedidosTable() {
           <td class="po-td-hora">
             ${esc(p.hora_entrega || "--:--")}${p.fuera_horario ? ' <span title="Fuera de horario" style="font-size:.6rem">🌙</span>' : ""}
           </td>
-          <td>
-            <div class="po-cliente-nombre${isCuba ? " cuba" : ""}">${isCuba ? "🏪 " : ""}${esc(nombre)}${notaIcon}</div>
-            ${p.tel ? `<div class="po-cliente-tel">${esc(p.tel)}</div>` : ""}
-            ${pagadoBadge}
-          </td>
+      <td>
+  ${mostrarSep ? `<div class="po-td-dia-tag">${_poDayTabLabel(diaKey)}</div>` : ""}
+  <div class="po-cliente-nombre${isCuba ? " cuba" : ""}">${isCuba ? "🏪 " : ""}${esc(nombre)}${notaIcon}</div>
+  ${p.tel ? `<div class="po-cliente-tel">${esc(p.tel)}</div>` : ""}
+  ${pagadoBadge}
+</td>
           <td><div class="po-prod-pills">${pills}</div></td>
           <td class="po-td-total${total === 0 ? " zero" : ""}">${totalStr}</td>
           <td><span class="po-estado-badge ${estado}">${estadoLabels[estado] || estado}</span></td>
@@ -1538,7 +1556,7 @@ function renderPedidosTable() {
                 <div class="po-exp-products">${expProds}</div>
                 ${p.notas ? `<div class="po-exp-nota">📝 ${esc(p.notas)}</div>` : ""}
                 <div class="po-exp-actions">
-                  <button class="po-btn-exp primary" onclick="abrirModalVista('${p.id}')">✏️ Editar</button>
+                  <button class="po-btn-exp primary" onclick="abrirModalNP_edicion('${p.id}')">✏️ Editar</button>
                   <button class="po-btn-exp danger"  onclick="confirmarEliminar('${p.id}')">🗑 Eliminar</button>
                 </div>
               </div>
@@ -1573,7 +1591,7 @@ function poToggleExpand(id) {
 }
 
 // ── OVERRIDE renderPedidos ──
-const _renderPedidosOriginal = typeof renderPedidos === "function" ? renderPedidos : null;
+// Reemplaza la función original con la versión de la tabla nueva (back-office)
 renderPedidos = function () {
   renderDayTabs();
   renderPedidosTable();
@@ -1585,5 +1603,3 @@ function initPedidosBO() {
   renderDayTabs();
   renderPedidosTable();
 }
-
-

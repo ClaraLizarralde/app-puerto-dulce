@@ -35,7 +35,7 @@ function _demoProd(nombre, tacc, tamano, cantidad, nota_prod) {
   };
 }
 
-function _demoPedido(cliente, tel, hora, productos, estado, pagado, metodo, nota, offsetDias) {
+function _demoPedido(cliente, tel, hora, productos, estado, pagado, metodo, nota, offsetDias, creado) {
   return {
     id: _demoUid(),
     _demo: true,                          // marca para poder borrarlos
@@ -49,7 +49,7 @@ function _demoPedido(cliente, tel, hora, productos, estado, pagado, metodo, nota
     notas: nota || '',
     productos,
     historial: [{ estado: estado || 'pendiente', ts: Date.now() }],
-    creado: Date.now() - Math.floor(Math.random() * 3600000),
+    creado: creado !== undefined ? creado : Date.now(),
     fuera_horario: false,
   };
 }
@@ -83,31 +83,40 @@ function cargarDemo() {
     if (!datos.dias[k]) datos.dias[k] = { pedidos: [], ventas: [] };
   });
 
+  // Genera timestamps escalonados para N pedidos de un dia.
+  // El indice 0 es el mas antiguo, el ultimo es el mas reciente (mayor ts).
+  // Separacion de 10 minutos entre pedidos.
+  function _ts(offsetDias, indexEnDia, totalEnDia) {
+    var base = Date.now() - offsetDias * 86400000;
+    var step = 10 * 60 * 1000; // 10 minutos
+    return base - (totalEnDia - 1 - indexEnDia) * step;
+  }
+
   // ── HOY ──────────────────────────────────────────────
   datos.dias[hoy].pedidos.push(
     _demoPedido('Valentina García', '+5491155443322', _demoHora(11,0),
       [_demoProd('Rogel','s','Mediano',1), _demoProd('Brownie','s','',3)],
-      'listo', true, 'Transferencia', '', 0),
+      'listo', true, 'Transferencia', '', 0, _ts(0,0,5)),
 
     _demoPedido('Marcos Ibáñez', '+5491144332211', _demoHora(12,30),
       [_demoProd('Chocotorta','c','Grande',1,'sin dulce de leche en la mitad'),
        _demoProd('American Cookies','c','',1)],
-      'prod', false, '', 'Llamar antes de retirar', 0),
+      'prod', false, '', 'Llamar antes de retirar', 0, _ts(0,1,5)),
 
     _demoPedido('Cuba', '', _demoHora(15,0),
       [_demoProd('Cheese Cake','c','Mediano',2),
        _demoProd('Mousse de Chocolate','c','Chico',3),
        _demoProd('Brownie','c','',6)],
-      'pendiente', false, '', '', 0),
+      'pendiente', false, '', '', 0, _ts(0,2,5)),
 
     _demoPedido('Lucía Fernández', '+5491166554433', _demoHora(17,0),
       [_demoProd('Lemon Pie','s','Grande',1),
        _demoProd('Alfajor Maicena','s','',4)],
-      'pendiente', false, '', '', 0),
+      'pendiente', false, '', '', 0, _ts(0,3,5)),
 
     _demoPedido('Agustín Morales', '+5491177665544', _demoHora(17,30),
       [_demoProd('Tiramisú','s','Mediano',1,'extra cacao arriba')],
-      'pendiente', true, 'Efectivo', '', 0),
+      'pendiente', true, 'Efectivo', '', 0, _ts(0,4,5)),
   );
 
   // ── MAÑANA ───────────────────────────────────────────
@@ -115,27 +124,27 @@ function cargarDemo() {
     _demoPedido('Sofía Ramírez', '+5491188776655', _demoHora(10,0),
       [_demoProd('Frutillas','s','Grande',1),
        _demoProd('Vela','s','',2)],
-      'pendiente', false, '', 'El cumple es a las 20h', 1),
+      'pendiente', false, '', 'El cumple es a las 20h', 1, _ts(1,0,5)),
 
     _demoPedido('Tomás Herrera', '+5491199887766', _demoHora(11,30),
       [_demoProd('Mousse de Limon','s','Chico',2),
        _demoProd('Carrot Cake','s','',2)],
-      'pendiente', false, '', '', 1),
+      'pendiente', false, '', '', 1, _ts(1,1,5)),
 
     _demoPedido('Cuba', '', _demoHora(15,0),
       [_demoProd('Sacher','c','Mediano',1),
        _demoProd('Chaja','c','Grande',1),
        _demoProd('Pepas','c','',4)],
-      'pendiente', false, '', '', 1),
+      'pendiente', false, '', '', 1, _ts(1,2,5)),
 
     _demoPedido('Camila Torres', '+5491100998877', _demoHora(16,0),
       [_demoProd('Bom Bom','s','Grande',1,'decorar con frutos rojos'),
        _demoProd('Cocadas','s','',2)],
-      'pendiente', true, 'Mercado Pago', '', 1),
+      'pendiente', true, 'Mercado Pago', '', 1, _ts(1,3,5)),
 
     _demoPedido('Rodrigo Castillo', '+5491111009988', _demoHora(18,0),
       [_demoProd('Chocotorta','s','Mediano',1)],
-      'pendiente', false, '', '', 1),
+      'pendiente', false, '', '', 1, _ts(1,4,5)),
   );
 
   // ── PASADO MAÑANA ─────────────────────────────────────
@@ -143,41 +152,41 @@ function cargarDemo() {
     _demoPedido('Florencia Acosta', '+5491122110099', _demoHora(10,30),
       [_demoProd('Rogel','s','Grande',1),
        _demoProd('Bengala','s','',4)],
-      'pendiente', false, '', '', 2),
+      'pendiente', false, '', '', 2, _ts(2,0,4)),
 
     _demoPedido('Nicolás Blanco', '+5491133221100', _demoHora(12,0),
       [_demoProd('Mousse de Chocolate','c','Grande',1),
        _demoProd('Oreo','c','',3)],
-      'pendiente', false, '', 'Sin glaseado en la mousse', 2),
+      'pendiente', false, '', 'Sin glaseado en la mousse', 2, _ts(2,1,4)),
 
     _demoPedido('Cuba', '', _demoHora(15,0),
       [_demoProd('Frutillas','c','Mediano',2),
        _demoProd('Mix de Chocolate','c','',3),
        _demoProd('Budin de Manzana','c','',2)],
-      'pendiente', false, '', '', 2),
+      'pendiente', false, '', '', 2, _ts(2,2,4)),
 
     _demoPedido('Emilia Vega', '+5491144332200', _demoHora(16,30),
       [_demoProd('Cheese Cake','s','Chico',1),
        _demoProd('Cuadrado Cheesecake','s','',2),
        _demoProd('Alfajor Chocolate','s','',3)],
-      'pendiente', true, 'Transferencia', '', 2),
+      'pendiente', true, 'Transferencia', '', 2, _ts(2,3,4)),
   );
 
   // ── DÍA +3 ───────────────────────────────────────────
   datos.dias[d3].pedidos.push(
     _demoPedido('Julieta Paz', '+5491155441100', _demoHora(11,0),
       [_demoProd('Tiramisú','s','Grande',1,'con extra de café')],
-      'pendiente', false, '', '', 3),
+      'pendiente', false, '', '', 3, _ts(3,0,3)),
 
     _demoPedido('Sebastián Ríos', '+5491166552211', _demoHora(14,0),
       [_demoProd('Lemon Pie','c','Mediano',1),
        _demoProd('Red Velvet','s','',2)],
-      'pendiente', false, '', '', 3),
+      'pendiente', false, '', '', 3, _ts(3,1,3)),
 
     _demoPedido('Cuba', '', _demoHora(15,0),
       [_demoProd('Bom Bom','c','Grande',2),
        _demoProd('American Cookies','c','',5)],
-      'pendiente', false, '', '', 3),
+      'pendiente', false, '', '', 3, _ts(3,2,3)),
   );
 
   // ── DÍA +4 ───────────────────────────────────────────
@@ -185,12 +194,12 @@ function cargarDemo() {
     _demoPedido('Martina López', '+5491177663300', _demoHora(10,0),
       [_demoProd('Maracuja','s','Mediano',1),
        _demoProd('Conitos','s','',1)],
-      'pendiente', false, '', 'Pago contra entrega', 4),
+      'pendiente', false, '', 'Pago contra entrega', 4, _ts(4,0,2)),
 
     _demoPedido('Diego Peralta', '+5491188774411', _demoHora(12,30),
       [_demoProd('Chocotorta','c','Grande',1),
        _demoProd('Pepas','c','',3)],
-      'pendiente', true, 'Efectivo', '', 4),
+      'pendiente', true, 'Efectivo', '', 4, _ts(4,1,2)),
   );
 
   guardar();

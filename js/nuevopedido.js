@@ -147,6 +147,8 @@ let _npPedido = null;
 let _npPagado = false;
 let _npMetodoPago = '';
 let _npEstado = 'pendiente';
+let _npEsEdicion        = false;
+let _npPedidoIdOriginal = null;
 let _npSeleccionandoAutocomp = false;
 let _npSearchClicking = false; // protege blur del buscador de productos
 
@@ -1441,12 +1443,14 @@ document.querySelectorAll('.np-pago-opt').forEach(b => b.classList.remove('activ
   if (activo) _npTabAnterior = activo.id;
 
   // Reset estado interno
-  _npDia        = null;
-  _npDiaKey     = null;
-  _npPedido     = { id: '__np__', productos: [] };
-  _npPagado     = false;
-  _npMetodoPago = '';
-  _npEstado     = 'pendiente';
+  _npDia              = null;
+  _npDiaKey           = null;
+  _npPedido           = { id: '__np__', productos: [] };
+  _npPagado           = false;
+  _npMetodoPago       = '';
+  _npEstado           = 'pendiente';
+  _npEsEdicion        = false;
+  _npPedidoIdOriginal = null;
 
   // Reset días
   document.querySelectorAll('.modal-np-dia-btn').forEach(b => b.classList.remove('active'));
@@ -1620,7 +1624,11 @@ function _npCerrarSinGuardar() {
   document.getElementById('tab-np-page').style.display    = 'none';
   document.getElementById('tab-contents').style.display   = '';
   document.getElementById(_npTabAnterior)?.classList.add('active');
-  _npPedido = null;
+  _npPedido           = null;
+  _npEsEdicion        = false;
+  _npPedidoIdOriginal = null;
+  const btnGuardar = document.getElementById('np-btn-guardar-header');
+  if (btnGuardar) btnGuardar.textContent = '💾 Guardar pedido';
 }
 
 function cerrarModalNP() {
@@ -1673,6 +1681,51 @@ function confirmarNP() {
     if (!yaExiste) datos.clientes.push({ id: uid(), nombre: clienteNorm, tel: tel || '', frecuente: false });
   }
 
+  // ── Modo EDICIÓN ──────────────────────────────────────────────
+  if (_npEsEdicion) {
+    const diaKeyOriginal = _poGetDiaDePedido(_npPedidoIdOriginal);
+    if (!diaKeyOriginal) {
+      errDiv.textContent = '⚠️ No se encontró el pedido original. Intentá de nuevo.';
+      errDiv.style.display = '';
+      return;
+    }
+    const pedidosDelDia = datos.dias[diaKeyOriginal].pedidos;
+    const idx = pedidosDelDia.findIndex(p => p.id === _npPedidoIdOriginal);
+    if (idx === -1) {
+      errDiv.textContent = '⚠️ No se encontró el pedido original. Intentá de nuevo.';
+      errDiv.style.display = '';
+      return;
+    }
+    const pedidoActualizado = Object.assign({}, pedidosDelDia[idx], {
+      cliente:       clienteNorm,
+      cliente_input: nombre,
+      tel:           isCuba ? '' : tel,
+      hora_entrega:  hora,
+      productos:     _npPedido.productos,
+      estado:        _npEstado || pedidosDelDia[idx].estado,
+      pagado:        _npPagado,
+      metodoPago:    _npMetodoPago || '',
+      notas:         nota,
+    });
+    if (diaKeyOriginal === _npDiaKey) {
+      datos.dias[diaKeyOriginal].pedidos[idx] = pedidoActualizado;
+    } else {
+      pedidosDelDia.splice(idx, 1);
+      if (!datos.dias[_npDiaKey])         datos.dias[_npDiaKey] = { pedidos: [] };
+      if (!datos.dias[_npDiaKey].pedidos) datos.dias[_npDiaKey].pedidos = [];
+      datos.dias[_npDiaKey].pedidos.push(pedidoActualizado);
+    }
+    guardar();
+    mostrarToastGuardado();
+    _npCerrarSinGuardar();
+    renderPedidos();
+    const prodTabEd = document.getElementById('tab-produccion');
+    if (prodTabEd && prodTabEd.classList.contains('active')) renderProduccion();
+    return;
+  }
+  // ── Fin modo EDICIÓN ─────────────────────────────────────────
+
+  // ── Modo CREACIÓN (igual que antes) ──────────────────────────
   const pedido = crearPedidoBase({
     cliente:       clienteNorm,
     cliente_input: nombre,
@@ -1696,6 +1749,162 @@ function confirmarNP() {
 
   const prodTab = document.getElementById('tab-produccion');
   if (prodTab && prodTab.classList.contains('active')) renderProduccion();
+}
+
+function abrirModalNP_edicion(pedidoId) {
+ 
+  // Buscar el pedido en todos los días
+  const diaKey = _poGetDiaDePedido(pedidoId);
+  if (!diaKey) {
+    console.warn('[NP edición] No se encontró el pedido:', pedidoId);
+    return;
+  }
+  const pedidoOriginal = (datos.dias[diaKey].pedidos || []).find(p => p.id === pedidoId);
+  if (!pedidoOriginal) {
+    console.warn('[NP edición] Pedido no encontrado en el día:', diaKey, pedidoId);
+    return;
+  }
+ 
+  // Abrir el modal limpio primero (reset completo vía abrirModalNP)
+  abrirModalNP();
+ 
+  // Marcar modo edición DESPUÉS del reset (el wrapper de arriba ya corrió)
+  _npEsEdicion        = true;
+  _npPedidoIdOriginal = pedidoId;
+ 
+  // ── Día ──────────────────────────────────────────────────────
+  _npDiaKey = diaKey;
+  _npDia    = 'otro'; // tratamos siempre como "otro" para simplificar
+ 
+  // Resaltar el botón de día correcto si coincide con hoy/mañana,
+  // o bien marcar el botón "Otro" con la fecha.
+  const hoyKey  = npDiaKeyDesde('hoy');
+  const manKey  = npDiaKeyDesde('manana');
+  document.querySelectorAll('.modal-np-dia-btn').forEach(b => b.classList.remove('active'));
+ 
+  if (diaKey === hoyKey) {
+    _npDia = 'hoy';
+    document.getElementById('np-dia-hoy')?.classList.add('active');
+  } else if (diaKey === manKey) {
+    _npDia = 'manana';
+    document.getElementById('np-dia-man')?.classList.add('active');
+  } else {
+    // Mostrar fecha en el botón "Otro día"
+    const [y, m, d] = diaKey.split('-').map(Number);
+    const f = new Date(y, m - 1, d);
+    const DIAS_CORTO = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const label = DIAS_CORTO[f.getDay()] + ' ' + d + '/' + m;
+    const lblOtro = document.getElementById('np-lbl-otro');
+    if (lblOtro) lblOtro.textContent = label;
+    document.getElementById('np-dia-otro')?.classList.add('active');
+  }
+ 
+  npActualizarHorario();
+ 
+  // ── Cliente / Cuba ────────────────────────────────────────────
+  const isCuba = (pedidoOriginal.cliente || '').toLowerCase().includes('cuba');
+ 
+  if (isCuba) {
+    // Activar modo Cuba en la UI
+    const nomInp = document.getElementById('np-nombre');
+    if (nomInp) nomInp.value = pedidoOriginal.cliente_input || pedidoOriginal.cliente || 'Cuba';
+    npActualizarBotonesCuba(true);
+    npActualizarHorario();
+    const autocomp = document.getElementById('np-autocomp');
+    if (autocomp) autocomp.style.display = 'none';
+    document.getElementById('np-btn-cliente-ui')?.classList.remove('active-cliente');
+    document.getElementById('np-btn-cuba')?.classList.add('active-cuba');
+  } else {
+    document.getElementById('np-nombre').value = pedidoOriginal.cliente_input || pedidoOriginal.cliente || '';
+    document.getElementById('np-tel').value    = pedidoOriginal.tel || '';
+    npOnTelInput(); // re-validar hint del teléfono
+  }
+ 
+  // ── Hora ──────────────────────────────────────────────────────
+  const hora = pedidoOriginal.hora_entrega || '';
+  document.getElementById('np-hora').value = hora;
+  if (hora && hora.includes(':')) {
+    const [h, m] = hora.split(':').map(Number);
+    _npTimeH = h;
+    _npTimeM = m;
+  } else {
+    _npTimeH = null;
+    _npTimeM = null;
+  }
+  npTimeSync();
+ 
+  // Si es Cuba con turnos, intentar marcar el turno correcto
+  if (isCuba && hora) {
+    const dd    = datos.dias[diaKey] || {};
+    const corte = dd.corteHora || '15:00';
+    if (hora === corte) {
+      document.getElementById('np-t1')?.classList.add('active');
+    } else if (hora === '18:00') {
+      document.getElementById('np-t2')?.classList.add('active');
+    }
+  }
+ 
+  // ── Productos ─────────────────────────────────────────────────
+  // Clonar los productos para no mutar el original hasta guardar
+  _npPedido = {
+    id:       '__np__',
+    productos: JSON.parse(JSON.stringify(pedidoOriginal.productos || [])),
+  };
+  npRenderProds();
+  npRenderTotal();
+ 
+  // ── Estado ────────────────────────────────────────────────────
+  _npEstado = pedidoOriginal.estado || 'pendiente';
+  const optEstado = document.getElementById('np-opt-estado');
+  if (optEstado) {
+    optEstado.textContent = NP_ESTADO_LABELS[_npEstado] || _npEstado;
+    if (_npEstado !== 'pendiente') optEstado.classList.add('active');
+  }
+  // Marcar el botón correcto dentro del selector de estado
+  document.querySelectorAll('#np-estado-sel .estado-opt').forEach(b => {
+    b.className = 'estado-opt';
+    if (b.dataset && b.dataset.estado === _npEstado) {
+      b.className = 'estado-opt active-' + _npEstado;
+    }
+  });
+ 
+  // ── Pago ─────────────────────────────────────────────────────
+  _npPagado     = !!pedidoOriginal.pagado;
+  _npMetodoPago = pedidoOriginal.metodoPago || '';
+  npUiActualizarPagoPill();
+ 
+  // Si hay método de pago, marcar el botón inline correspondiente
+  if (_npPagado && _npMetodoPago) {
+    const map = {
+      '💵 Efectivo':      'np-pago-efectivo',
+      '🏦 Transferencia': 'np-pago-transferencia',
+      '💳 Otro':          'np-pago-otro',
+    };
+    const btnId = map[_npMetodoPago];
+    if (btnId) document.getElementById(btnId)?.classList.add('active');
+  }
+ 
+  // ── Nota ─────────────────────────────────────────────────────
+  const nota = pedidoOriginal.notas || '';
+  const notaEl = document.getElementById('np-nota');
+  if (notaEl) notaEl.value = nota;
+  const optNota = document.getElementById('np-opt-nota');
+  if (optNota) {
+    if (nota) {
+      optNota.textContent = '📝 ' + nota.slice(0, 22) + (nota.length > 22 ? '…' : '');
+      optNota.classList.add('active');
+    } else {
+      optNota.textContent = '📝 Nota';
+      optNota.classList.remove('active');
+    }
+  }
+ 
+  // ── Título / botón guardar ────────────────────────────────────
+  // Cambiar el texto del botón para que diga "Guardar cambios"
+  const btnGuardar = document.getElementById('np-btn-guardar-header');
+  if (btnGuardar) btnGuardar.textContent = '💾 Guardar cambios';
+ 
+  npActualizarBtnGuardar();
 }
 
 // alias
