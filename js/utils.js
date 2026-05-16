@@ -69,10 +69,10 @@ function esCuba(n) {
 function getPrecioCat(cat, tamano) {
   if (!cat) return 0;
   if (cat.tiene_talle && tamano) {
-    const t = (tamano || "").toLowerCase();
-    if (t === "chico" && cat.precio_chico) return cat.precio_chico;
-    if (t === "mediano" && cat.precio_mediano) return cat.precio_mediano;
-    if (t === "grande" && cat.precio_grande) return cat.precio_grande;
+    const t = (tamano || '').toLowerCase();
+    if (t === 'chico'   && cat.precio_chico   != null) return cat.precio_chico;
+    if (t === 'mediano' && cat.precio_mediano  != null) return cat.precio_mediano;
+    if (t === 'grande'  && cat.precio_grande   != null) return cat.precio_grande;
   }
   return cat.precio || 0;
 }

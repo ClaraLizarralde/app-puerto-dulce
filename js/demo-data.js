@@ -63,6 +63,14 @@ function cargarDemo() {
     console.log('[DEMO] Ya hay pedidos reales, no se cargaron datos demo.');
     return;
   }
+  // No cargar si ya hay pedidos demo (evita duplicados si el script corre múltiples veces)
+  const hayDemo = Object.values(datos.dias || {}).some(dd =>
+    (dd.pedidos || []).some(p => p._demo)
+  );
+  if (hayDemo) {
+    console.log('[DEMO] Pedidos demo ya cargados, se omite re-carga.');
+    return;
+  }
 
   const hoy    = _demoFechaKey(0);
   const man    = _demoFechaKey(1);
@@ -1160,15 +1168,15 @@ function cargarCatalogoDemo() {
 }
 
 // ── AUTO-CARGA ────────────────────────────────────────
-// Se carga automáticamente si no hay ningún pedido real
-(function() {
-  const hayReales = Object.values(datos.dias || {}).some(dd =>
-    (dd.pedidos || []).some(p => !p._demo)
-  );
+// Se ejecuta una sola vez por sesión gracias al flag _demoAutoInited.
+// Esto evita duplicados si el script es evaluado múltiples veces
+// (hot reload, múltiples tags <script>, re-renders, etc.).
+if (!window._demoAutoInited) {
+  window._demoAutoInited = true;
   cargarCatalogoDemo();
   cargarClientesDemo();
-  if (!hayReales) cargarDemo();
-})();
+  cargarDemo();
+}
 
 // ── CLIENTES FRECUENTES DEMO ──────────────────────────
 function cargarClientesDemo() {

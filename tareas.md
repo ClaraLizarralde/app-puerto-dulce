@@ -1,14 +1,27 @@
-Puerto Dulce Backoffice — continuación
-App vanilla HTML/CSS/JS. "Nuevo pedido" es una página completa (#tab-np-page). Toda la lógica JS está en pedidos.js y no se toca.
-Lo que hay que rediseñar ahora — solo HTML y CSS de #tab-np-page:
-La sección izquierda (campos obligatorios) tiene que quedar así, compacta y en filas:
+Lista de tareas pendientes:
+Producto libre no funciona
 
-Fila 1 — Día: 3 pills en línea: Hoy [Lun 11] · Mañana [Mar 12] · Seleccionar día
-Fila 2 — Horario: label "Horario" + selector en la misma línea (el picker existente o un select)
-Fila 3 — Cliente toggle: 2 botones: 👤 Cliente | 🏪 Cuba — por defecto Cliente activo
-Fila 4 — Nombre + Teléfono: aparecen solo si está en modo Cliente, desaparecen si es Cuba
+Click en "Agregar como producto libre" no hace nada
+Sospecha: algo cierra los resultados antes de que el click llegue (blur del input o listener externo)
+Ya tiene mousedown + touchstart + onclick — revisar si hay un onblur en el input o un listener global que oculta results antes
 
-Sin gaps grandes entre filas. Estilo compacto tipo formulario rápido.
-IDs existentes que hay que mantener: np-dia-hoy, np-dia-man, np-dia-otro, np-campo-hora, np-nombre, np-tel, np-btn-cuba, np-campo-tel
-Variables CSS: --accent, --paper, --bg, --border, --ink, --ink-mid, --accent-soft, --radius-sm
-Arrancar con el HTML de la columna izquierda y su CSS. Sin tocar JS.
+Dropdown catálogo
+
+Los resultados tienen que flotar sobre el contenido (position absolute), no empujar el layout
+CSS ya sugerido: position:absolute; top:calc(100% + 4px); z-index:400 en .np-search-prod-results y position:relative en .np-search-prod-wrap
+
+Estilos cards de producto
+
+Tag ST/C y precio tienen que verse más chicos y en la misma línea (.pe-info-sub ya está en el JS, falta verificar que el CSS esté aplicado)
+.pe-talle-warn no tiene estilo definido
+
+Total
+
+Formato tiene que ser: Total (efectivo $X) a la izquierda, $63.000 grande verde a la derecha
+npRenderTotal() ya genera el HTML correcto, falta CSS para #np-total-wrap
+
+Contexto importante para el próximo chat
+
+Archivos: nuevopedido.js, nuevopedido.css, nuevopedido.html (el div #tab-np-page)
+El JS de patches está al final de nuevopedido.js
+Tema oscuro/claro se maneja por separado, no tocar colores

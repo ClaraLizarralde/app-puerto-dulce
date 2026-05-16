@@ -11,7 +11,6 @@ Sin frameworks ni dependencias externas
 /
 ├── index.html
 ├── css/
-│ ├── base1.css
 │ ├── layout.css
 │ ├── modulos.css
 │ ├── themes.css
@@ -29,7 +28,7 @@ Sin frameworks ni dependencias externas
 │ ├── cuba.js
 │ ├── etiquetas.js
 │ ├── html-events.js
-│ ├── modeles.js
+│ ├── nuevopedido.js
 │ └── themes.js
 └── assets/
 └── chalk/

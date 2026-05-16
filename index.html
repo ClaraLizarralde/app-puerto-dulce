@@ -10,6 +10,11 @@
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/ui.css">
 <link rel="stylesheet" href="css/modulos.css">
+<link rel="stylesheet" href="css/nuevopedido.css">
+<link rel="stylesheet" href="css/pedidos.css">
+<link rel="stylesheet" href="css/configuracion.css">
+
+
 <!-- SheetJS para exportar Excel -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <!-- Firebase (DESACTIVADO — descomentar cuando estés lista para conectar) -->
@@ -623,7 +628,7 @@
          ════════════════════ -->
     <div class="np-col-left">
 
-      <!-- Fila: Para (toggle Cliente / Cuba) -->
+      <!-- Para: toggle Cliente / Cuba -->
       <div class="np-fila">
         <div class="np-fila-label">Para</div>
         <div class="np-fila-content">
@@ -639,51 +644,93 @@
         </div>
       </div>
 
-      <!-- Fila: Nombre (oculta en Cuba) -->
-      <div class="np-fila" id="np-fila-nombre" style="">
+      <!-- Nombre (oculto en modo Cuba) -->
+      <!-- TAREA 1: botón ⭐ para desplegar clientes frecuentes -->
+      <div class="np-fila" id="np-fila-nombre">
         <div class="np-fila-label">Nombre</div>
         <div class="np-fila-content" style="position:relative;">
-          <input type="text" id="np-nombre" placeholder="Nombre del cliente..." autocomplete="off" tabindex="5" style="width:100%;">
-          <div id="np-autocomp" style="position:absolute;top:100%;left:0;right:0;background:var(--paper);border:1.5px solid var(--border);border-radius:var(--radius-sm);box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:300;display:none;max-height:150px;overflow-y:auto;"></div>
+          <input
+            type="text"
+            id="np-nombre"
+            class="np-input-field"
+            placeholder="Nombre del cliente..."
+            autocomplete="off"
+            tabindex="1"
+            oninput="npOnNombreInput()"
+            onblur="setTimeout(()=>{ if(!_npSeleccionandoAutocomp) npOcultarAutocomp(); }, 150)"
+            style="padding-right:30px;"
+          >
+          <!-- Botón frecuentes -->
+          <button type="button" id="np-btn-frecuentes" title="Clientes frecuentes"
+            onclick="npToggleFrecuentes()"
+            style="position:absolute;right:6px;top:50%;transform:translateY(-50%);
+                   background:none;border:none;cursor:pointer;font-size:.82rem;
+                   line-height:1;padding:4px;color:var(--ink-light);transition:color .15s;"
+            onmouseover="this.style.color='var(--accent)'"
+            onmouseout="this.style.color='var(--ink-light)'">⭐</button>
+          <!-- Autocompletado por escritura -->
+          <div id="np-autocomp"
+            style="position:absolute;top:100%;left:0;right:0;background:var(--paper);
+                   border:1.5px solid var(--border);border-radius:var(--radius-sm);
+                   box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:300;display:none;
+                   max-height:150px;overflow-y:auto;"></div>
+          <!-- Lista clientes frecuentes -->
+          <div id="np-frecuentes-list"
+            style="position:absolute;top:100%;left:0;right:0;background:var(--paper);
+                   border:1.5px solid var(--border);border-radius:var(--radius-sm);
+                   box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:301;display:none;
+                   max-height:180px;overflow-y:auto;"></div>
         </div>
       </div>
 
-      <!-- Fila: Teléfono (oculta en Cuba) -->
-      <div class="np-fila col" id="np-campo-tel" style="">
+      <!-- Teléfono (oculto en modo Cuba) -->
+      <div class="np-fila col" id="np-campo-tel">
         <div style="display:flex;align-items:center;gap:10px;">
           <div class="np-fila-label">Teléfono</div>
           <div class="np-fila-content">
-            <input type="tel" id="np-tel" placeholder="Teléfono o fijo..." oninput="npOnTelInput()" tabindex="6" style="width:100%;">
+            <input
+              type="tel"
+              id="np-tel"
+              class="np-input-field"
+              placeholder="Teléfono o fijo..."
+              oninput="npOnTelInput()"
+              tabindex="2"
+            >
           </div>
         </div>
         <div class="np-hint" id="np-tel-hint"></div>
       </div>
 
-      <!-- Fila: Día -->
+      <!-- Día -->
       <div class="np-fila">
         <div class="np-fila-label">Día</div>
-        <div class="np-fila-content">
-          <div class="np-dia-pill modal-np-dia-btn" id="np-dia-hoy" onclick="npSelDia('hoy',this)" tabindex="1">
+        <div class="np-fila-content np-fila-dia">
+          <div class="np-dia-pill modal-np-dia-btn" id="np-dia-hoy"
+               onclick="npSelDia('hoy',this)" tabindex="3">
             Hoy
             <span class="np-dia-sub" id="np-lbl-hoy"></span>
           </div>
-          <div class="np-dia-pill modal-np-dia-btn" id="np-dia-man" onclick="npSelDia('manana',this)" tabindex="2">
+          <div class="np-dia-pill modal-np-dia-btn" id="np-dia-man"
+               onclick="npSelDia('manana',this)" tabindex="4">
             Mañana
             <span class="np-dia-sub" id="np-lbl-man"></span>
           </div>
-          <div class="np-dia-pill modal-np-dia-btn" id="np-dia-otro" onclick="npAbrirCustomDia()" tabindex="3" style="position:relative;">
+          <div class="np-dia-pill modal-np-dia-btn" id="np-dia-otro"
+               onclick="npAbrirCalendario()" tabindex="5">
             <span id="np-lbl-otro">Otro día</span>
-            <input type="date" id="np-dia-custom" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none;">
           </div>
+          <!-- Calendario popover -->
+          <div id="np-cal-popover" style="display:none;"></div>
         </div>
       </div>
 
-      <!-- Fila: Horario -->
-      <div class="np-fila" id="np-campo-hora">
-        <div class="np-fila-label" id="np-hora-label">Horario</div>
+      <!-- Horario -->
+<div class="np-fila" id="np-campo-hora" style="overflow:visible; position:relative;">
+          <div class="np-fila-label" id="np-hora-label">Horario</div>
         <div class="np-fila-content" id="np-clock-wrap">
           <div class="tp-pill-wrap">
-            <button type="button" class="time-picker-btn" id="np-tp-btn" onclick="npOpenTimePicker()" tabindex="4">
+            <button type="button" class="time-picker-btn" id="np-tp-btn"
+                    onclick="npOpenTimePicker()" tabindex="6">
               <div class="tp-clock-icon" id="np-tp-icon">
                 <div class="tp-hand-h" id="np-tp-hand-h" style="transform:rotate(-60deg)"></div>
                 <div class="tp-hand-m" id="np-tp-hand-m" style="transform:rotate(60deg)"></div>
@@ -696,8 +743,9 @@
               <div class="tp-dropdown-list" id="np-tp-list"></div>
             </div>
           </div>
-          <input type="time" id="np-hora-mobile" style="display:none;margin-top:6px;font-family:'Outfit',sans-serif;font-size:.88rem;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--ink);outline:none;width:auto;">
+
         </div>
+        <!-- Turnos Cuba día especial -->
         <div id="np-turnos-wrap" style="display:none;">
           <div class="modal-np-turno-opts">
             <div class="modal-np-turno-btn t1" id="np-t1" onclick="npSelTurno(1)">🟠 Turno 1</div>
@@ -710,87 +758,131 @@
       <!-- Separador -->
       <div class="np-sep"></div>
 
-      <!-- Estado + Pago + Nota como pills -->
+      <!-- ── PILLS opcionales ── -->
       <div class="np-opts-row">
 
-        <!-- Estado (dropdown funcional via JS existente) -->
-        <div class="np-opt-pill" id="np-opt-estado" onclick="npUiToggleEstado()">⏳ Pendiente</div>
-
-        <!-- Pago -->
-        <div class="np-opt-pill" id="np-opt-pago" onclick="npTogglePago()">💳 Confirmar pago</div>
+        <!-- TAREA 3: Pago — ya no abre modal global -->
+        <div class="np-opt-pill" id="np-opt-pago" onclick="npInlineTogglePago()">
+          💳 Confirmar pago
+        </div>
 
         <!-- Nota -->
-        <button type="button" class="np-opt-pill" id="np-nota-btn" onclick="npUiToggleNota()">📝 Nota</button>
+        <div class="np-opt-pill" id="np-opt-nota" onclick="npUiToggleNota()">
+          📝 Nota
+        </div>
+
+        <!-- Estado -->
+        <div class="np-opt-pill" id="np-opt-estado" onclick="npUiToggleEstado()">
+          ⏳ Pendiente
+        </div>
 
       </div>
 
-      <!-- Estado expandido (oculto por defecto) -->
-      <div id="np-estado-wrap" style="display:none; padding: 8px 0 4px;">
+      <!-- TAREA 3: Panel pago inline (tres pills) -->
+<div id="np-pago-wrap" style="display:none; padding:4px 0 8px;">
+  <div style="display:flex;gap:6px;flex-wrap:wrap;">
+    <div class="np-opt-pill np-pago-opt" id="np-pago-efectivo"
+         onclick="npInlineSelPago('💵 Efectivo')">💵 Efectivo</div>
+    <div class="np-opt-pill np-pago-opt" id="np-pago-transferencia"
+         onclick="npInlineSelPago('🏦 Transferencia')">🏦 Transferencia</div>
+    <div class="np-opt-pill np-pago-opt" id="np-pago-otro"
+         onclick="npInlineSelPago('💳 Otro')">💳 Otro</div>
+  </div>
+
+      </div>
+
+      <!-- TAREA 4: Nota expandida con botón guardar -->
+      <div id="np-nota-wrap" style="display:none; padding:4px 0 8px;">
+        <textarea class="notas-input" id="np-nota"
+                  oninput="npUiNotaInput()"
+                  placeholder="Sin dulce de leche, avisame cuando esté..."></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+          <button type="button" onclick="npGuardarNota()"
+            style="font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:600;
+                   padding:5px 14px;border-radius:50px;
+                   border:1.5px solid var(--accent);
+                   background:transparent;color:var(--accent);
+                   cursor:pointer;transition:all .15s;"
+            onmouseover="this.style.background='var(--accent)';this.style.color='#fff'"
+            onmouseout="this.style.background='transparent';this.style.color='var(--accent)'">
+            ✓ Guardar nota
+          </button>
+        </div>
+      </div>
+
+      <!-- TAREA 5: Estado — 4 estados correctos -->
+      <div id="np-estado-wrap" style="display:none; padding:6px 0 4px;">
         <div class="estado-sel" id="np-estado-sel">
-          <div class="estado-opt active-pendiente" onclick="npSelEstado('pendiente',this)">Pendiente</div>
-          <div class="estado-opt" onclick="npSelEstado('prod',this)">En producción</div>
-          <div class="estado-opt" onclick="npSelEstado('listo',this)">Listo</div>
-          <div class="estado-opt" onclick="npSelEstado('entregado',this)">Retirado</div>
+          <div class="estado-opt active-pendiente"
+               onclick="npSelEstadoUi('pendiente',this)">⏳ Pendiente</div>
+          <div class="estado-opt"
+               onclick="npSelEstadoUi('listo',this)">✅ Listo</div>
+          <div class="estado-opt"
+               onclick="npSelEstadoUi('entregado',this)">📦 Retirado</div>
+          <div class="estado-opt"
+               onclick="npSelEstadoUi('suspendido',this)">🚫 Suspendido</div>
         </div>
-      </div>
-
-      <!-- Pago bar (oculta, se muestra al abrir) -->
-      <div id="np-campo-pago" style="display:none; padding: 4px 0 8px;">
-        <div class="pago-bar no" id="np-pago-bar">
-          💳 Sin confirmar pago
-          <button class="btn-pagar pagar" onclick="npTogglePago()">Confirmar</button>
-        </div>
-      </div>
-
-      <!-- Nota expandida (oculta por defecto) -->
-      <div id="np-nota-wrap" style="display:none; padding: 4px 0 8px;">
-        <textarea class="notas-input" id="np-nota" placeholder="Sin dulce de leche, avisame cuando esté..."></textarea>
       </div>
 
     </div><!-- /np-col-left -->
 
 
     <!-- ════════════════════
-         COLUMNA DERECHA
+         COLUMNA DERECHA — Productos
          ════════════════════ -->
 <div class="np-col-right">
 
-  <div class="np-sec-label">🎂 Productos</div>
+<!-- Buscador fijo arriba -->
+<div class="np-search-prod-wrap" id="np-search-prod-wrap">
+  <div class="np-search-prod-input-row">
+    <input
+      type="text"
+      id="np-search-prod-input"
+      class="np-search-prod-input"
+      placeholder="＋ Buscar producto... (ej: rogel, choco...)"
+      autocomplete="off"
+      oninput="npSearchProd(this.value)"
+      onfocus="npSearchFocus()"
+      onclick="npSearchClick()"
+      onkeydown="npSearchKeydown(event)"
+      onblur="npSearchBlur()"
+    >
+    <span class="np-search-arrow" id="np-search-arrow">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <button
+      class="np-search-prod-clear"
+      id="np-search-prod-clear"
+      onclick="npSearchProdClear()"
+      style="display:none;">✕</button>
+  </div>
+  <div class="np-search-prod-results" id="np-search-prod-results" style="display:none;"></div>
+</div>
 
-  <div id="np-prods-wrap"></div>
-
-  <!-- BUSCADOR INLINE -->
-  <div class="np-search-prod-wrap" id="np-search-prod-wrap">
-    <div class="np-search-prod-input-row">
-      <input
-        type="text"
-        id="np-search-prod-input"
-        class="np-search-prod-input"
-        placeholder="Buscar producto... (ej: rog, choco...)"
-        autocomplete="off"
-        oninput="npSearchProd(this.value)"
-        onfocus="npSearchProd(this.value)"
-      >
-      <button class="np-search-prod-clear" id="np-search-prod-clear" onclick="npSearchProdClear()" style="display:none;">✕</button>
-    </div>
-    <div class="np-search-prod-results" id="np-search-prod-results" style="display:none;"></div>
+  <!-- Productos scrollable -->
+  <div class="np-prods-scroll">
+    <div id="np-prods-wrap"></div>
   </div>
 
-  <div id="np-total-wrap" class="np-total-wrap" style="display:none;"></div>
+  <!-- Total footer -->
+  <div class="np-total-footer">
+    <div id="np-total-wrap" class="np-total-wrap" style="display:none;"></div>
+  </div>
 
-</div>
-    <div class="modal-np-error" id="np-error"></div>
+</div><!-- /np-col-right -->
+    <!-- Error global -->
+    <div class="modal-np-error" id="np-error" style="display:none;"></div>
 
   </div><!-- /modal-np-body -->
 
   <!-- FOOTER -->
   <div class="modal-np-footer">
     <button class="btn-cancelar" onclick="cerrarModalNP()" tabindex="10">Cancelar</button>
-    <button class="btn-confirmar" onclick="confirmarNP()" tabindex="9">Guardar pedido</button>
   </div>
 
 </div><!-- /#tab-np-page -->
-
 </div>
 </div>
 
@@ -920,7 +1012,7 @@
 <div class="selector-overlay hidden" id="selector-overlay">
   <div class="selector-panel">
     <h3>Elegir producto</h3>
-    <input type="text" class="selector-search" id="selector-search" placeholder="Buscar o escribir nombre libre...">
+    <input type="text" class="selector-search" id="selector-search" placeholder="▾ Buscar o elegir categoría...">
     <div class="selector-lista" id="selector-lista"></div>
     <div id="selector-libre-wrap" style="display:none;padding:10px 0 4px;">
       <div style="font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-light);margin-bottom:6px;">Tipo de producto libre:</div>
@@ -1225,20 +1317,23 @@
 </div>
 
 
-   <script src="js/utils.js"></script>
-   <script src="js/data.js"></script>
-   <script src="js/modales.js"></script>
-   <script src="js/pedidos.js"></script>
-   <script src="js/cuba.js"></script>
-   <script src="js/produccion.js"></script>
-   <script src="js/etiquetas.js"></script>
-   <script src="js/pizarron.js"></script>
-   <script src="js/export.js"></script>
-   <script src="js/config.js"></script>
-   <script src="js/themes.js"></script>
-   <script src="js/html-events.js"></script>
-   <script src="js/app.js"></script>
-   <script src="js/demo-data.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/auth.js"></script>       
+<script src="js/nuevopedido.js"></script>
+<script src="js/navigation.js"></script> 
+<script src="js/pedidos.js"></script>
+<script src="js/cuba.js"></script>
+<script src="js/produccion.js"></script>
+<script src="js/etiquetas.js"></script>
+<script src="js/pizarron.js"></script>
+<script src="js/export.js"></script>
+<script src="js/config.js"></script>
+<script src="js/themes.js"></script>
+<script src="js/html-events.js"></script>
+<script src="js/app.js"></script>
+<script src="js/demo-data.js"></script>
 
    
 </body>

@@ -618,13 +618,7 @@ function renderPedidos() {
 
 // Calcula el total monetario de un pedido
 function calcularTotalPedido(p) {
-  return (p.productos || []).reduce((s, r) => {
-    const cat = datos.catalogo.find(c => c.nombre === r.nombre && ((r.tacc === "s" && c.tipo === "sin_tacc") || (r.tacc === "c" && c.tipo === "con_tacc")));
-    const cant = Number(r.cantidad) || 1;
-    const base = r.tipo === "libre" ? (r.precio_libre || 0) : getPrecioCat(cat, r.tamano);
-    const extras = (r.extras || []).reduce((s2, ex) => s2 + (parseFloat(ex.precio) || 0), 0);
-    return s + (base * cant) + extras;
-  }, 0);
+  return totalDePedido(p);
 }
 
 // Construye panel de edición de pedido (vista expandida)
@@ -854,18 +848,8 @@ function guardarCerrar(id) {
 
 function confirmarEliminar(id) {
   abrirModalGen("¿Eliminar pedido?", "Esta acción no se puede deshacer.", () => {
-    let eliminado = false;
-    Object.values(datos.dias).forEach(dData => {
-      if (eliminado) return;
-      const ps = dData.pedidos || [];
-      const idx = ps.findIndex(x => x.id === id);
-      if (idx >= 0) {
-        ps.splice(idx, 1);
-        eliminado = true;
-      }
-    });
     _expandido = null;
-    guardar();
+    eliminarPedido(id);
     renderPedidos();
   }, "danger");
 }
@@ -933,7 +917,7 @@ function renderArchivadosContent(wrapperId, global) {
     return `<div class="arch-item">
       <div class="arch-item-top">
         ${global ? `<span class="arch-fecha">${a._nomDia || ""} ${(a._fecha || "").slice(8)}/${(a._fecha || "").slice(5, 7)}</span>` : ""}
-        <span class="arch-nombre">${esc(a.cliente || "Sin nombre")}</span>
+     <span class="arch-nombre">${esc(a.cliente_input || a.cliente || "Sin nombre")}</span>
         <span class="arch-hora">${a.hora_entrega || "--:--"}</span>
       </div>
       <div class="arch-prods">${esc(prods) || "(sin productos)"}</div>
@@ -1134,18 +1118,37 @@ function buildProdEdit(pedidoId, r, idx) {
     </div>`;
   }
 
-  let tamHTML = "";
+let tamHTML = "";
   if (tieneTalle) {
     const libreActivo = r._tamLibre || (!!(r.tamano) && !TAMANIOS.includes(r.tamano));
-    const tamBtns = TAMANIOS.map(t => `<button class="tam-btn${!libreActivo && r.tamano === t ? " active" : ""}" onclick="setTamano('${pedidoId}','${r.id}','${t}')">${t}</button>`).join("");
+    const tamBtns = TAMANIOS.map(t =>
+      `<button class="tam-btn${!libreActivo && r.tamano === t ? " active" : ""}"
+               onclick="setTamano('${pedidoId}','${r.id}','${t}')">${t}</button>`
+    ).join("");
+
+    // Input de precio: solo visible cuando talle es Libre o producto es libre
+    const mostrarPrecioLibre = libreActivo || r.tipo === 'libre';
+    const precioLibreHtml = mostrarPrecioLibre ? `
+      <div class="np-prod-precio-libre">
+        <label>Precio</label>
+        <input type="number" class="np-precio-libre-input"
+          placeholder="ej: 15000" min="0"
+          value="${r._precioLibre || ''}"
+          oninput="setProdCampo('${pedidoId}','${r.id}','_precioLibre',parseFloat(this.value)||0);_npActualizarTotal()">
+      </div>` : '';
+
     tamHTML = `
       <div class="campo"><label>Tamaño</label>
         <div class="tam-btns">
           ${tamBtns}
-          <button class="tam-btn tam-btn-libre${libreActivo ? " active" : ""}" onclick="setTamano('${pedidoId}','${r.id}','__libre__')">Libre</button>
+          <button class="tam-btn tam-btn-libre${libreActivo ? " active" : ""}"
+                  onclick="setTamano('${pedidoId}','${r.id}','__libre__')">Libre</button>
         </div>
-        <input type="text" class="tam-libre-input${libreActivo ? " visible" : ""}" value="${esc(libreActivo && r.tamano ? r.tamano : "")}" placeholder="ej: 2kg, bandeja..."
+        <input type="text" class="tam-libre-input${libreActivo ? " visible" : ""}"
+          value="${esc(libreActivo && r.tamano ? r.tamano : "")}"
+          placeholder="ej: 2kg, bandeja..."
           oninput="setTamanoLibre('${pedidoId}','${r.id}',this.value)">
+        ${precioLibreHtml}
       </div>
     `;
   }
@@ -1249,12 +1252,8 @@ function _poFormatTs(ts) {
 }
 
 function _poGetDiaDePedido(id) {
-  for (const [k, dd] of Object.entries(datos.dias)) {
-    if ((dd.pedidos || []).find(p => p.id === id)) return k;
-  }
-  return diaActual;
+  return getFechaDePedido(id);
 }
-
 let _poTabDia = null;
 let _poExpandedId = null;
 let _vistaArchivados = false;

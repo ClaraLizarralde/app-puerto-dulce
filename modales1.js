@@ -138,75 +138,78 @@
  * ================================================================
  */
 
+
 // ── MODAL NUEVO PEDIDO ──
 
-let _npDia = "hoy";
+let _npDia    = 'hoy';
 let _npDiaKey = null;
-let _npPedido = null; // objeto temporal — nunca en datos[] hasta confirmar
+let _npPedido = null;
 let _npPagado = false;
-let _npMetodoPago = "";
-let _npEstado = "pendiente";
+let _npMetodoPago = '';
+let _npEstado = 'pendiente';
 let _npSeleccionandoAutocomp = false;
 
-// ── NORMALIZACIÓN TELÉFONO ARGENTINO ──
+// Etiquetas para el pill de estado
+const NP_ESTADO_LABELS = {
+  pendiente: '⏳ Pendiente',
+  prod:      '🔧 En producción',
+  listo:     '✅ Listo',
+  entregado: '📦 Retirado',
+};
+
+
+// ══════════════════════════════════════════════════
+//  TELÉFONO
+// ══════════════════════════════════════════════════
+
 function npNormalizarTel(raw) {
-  if (!raw || !raw.trim()) return { valido: false, hint: "", tipo: null, normalizado: "" };
-  const digits = raw.replace(/\D/g, "");
-  if (!digits) return { valido: false, hint: "No tiene dígitos", tipo: null, normalizado: "" };
+  if (!raw || !raw.trim()) return { valido: false, hint: '', tipo: null, normalizado: '' };
+  const digits = raw.replace(/\D/g, '');
+  if (!digits) return { valido: false, hint: 'No tiene dígitos', tipo: null, normalizado: '' };
   let local = digits;
-  if (local.startsWith("549")) local = local.slice(3);
-  else if (local.startsWith("54")) local = local.slice(2);
-  else if (local.startsWith("0")) local = local.slice(1);
-  if (local.length < 6) return { valido: false, hint: "Faltan dígitos (mínimo 6)", tipo: null, normalizado: "" };
-  if (local.length > 11) return { valido: false, hint: "Formato no reconocido (demasiados dígitos)", tipo: null, normalizado: "" };
+  if (local.startsWith('549'))      local = local.slice(3);
+  else if (local.startsWith('54'))  local = local.slice(2);
+  else if (local.startsWith('0'))   local = local.slice(1);
+  if (local.length < 6)  return { valido: false, hint: 'Faltan dígitos (mínimo 6)', tipo: null, normalizado: '' };
+  if (local.length > 11) return { valido: false, hint: 'Formato no reconocido (demasiados dígitos)', tipo: null, normalizado: '' };
   let tipo, normalizado;
-  if (local.length <= 8) {
-    tipo = "linea";
-    normalizado = "+54" + local;
-  } else if (local.length === 9) {
-    tipo = "linea";
-    normalizado = "+54" + local;
-  } else if (local.length === 10) {
-    tipo = "linea_o_celular";
-    normalizado = "+54" + local;
-  } else if (local.length === 11) {
-    const area2 = local.slice(0, 2);
-    if (local.slice(2, 4) === "15") {
-      normalizado = "+549" + area2 + local.slice(4);
-    } else {
-      normalizado = "+549" + local;
-    }
-    tipo = "celular";
+  if (local.length <= 10) {
+    tipo = local.length === 10 ? 'linea_o_celular' : 'linea';
+    normalizado = '+54' + local;
   } else {
-    normalizado = "+54" + local;
-    tipo = "linea";
+    const area2 = local.slice(0, 2);
+    normalizado = local.slice(2, 4) === '15'
+      ? '+549' + area2 + local.slice(4)
+      : '+549' + local;
+    tipo = 'celular';
   }
   return { valido: true, hint: normalizado, tipo, normalizado };
 }
 
 function npOnTelInput() {
-  const raw = document.getElementById("np-tel").value;
-  const hint = document.getElementById("np-tel-hint");
-  if (!raw.trim()) {
-    hint.textContent = "";
-    hint.className = "np-hint";
-    return;
-  }
+  const raw  = document.getElementById('np-tel').value;
+  const hint = document.getElementById('np-tel-hint');
+  if (!raw.trim()) { hint.textContent = ''; hint.className = 'np-hint'; return; }
   const r = npNormalizarTel(raw);
   if (r.valido) {
-    const ico = r.tipo === "celular" ? "📱" : (r.tipo === "linea_o_celular" ? "📞" : "☎️");
-    hint.textContent = ico + " " + r.normalizado;
-    hint.className = "np-hint ok";
+    const ico = r.tipo === 'celular' ? '📱' : (r.tipo === 'linea_o_celular' ? '📞' : '☎️');
+    hint.textContent = ico + ' ' + r.normalizado;
+    hint.className = 'np-hint ok';
   } else {
     hint.textContent = r.hint;
-    hint.className = "np-hint err";
+    hint.className = 'np-hint err';
   }
 }
 
+
+// ══════════════════════════════════════════════════
+//  DÍAS
+// ══════════════════════════════════════════════════
+
 function npDiaKeyDesde(cual) {
   const hoy = new Date();
-  if (cual === "hoy") return fechaKey(hoy);
-  if (cual === "manana") {
+  if (cual === 'hoy') return fechaKey(hoy);
+  if (cual === 'manana') {
     const d = new Date(hoy);
     d.setDate(hoy.getDate() + 1);
     return fechaKey(d);
@@ -218,133 +221,117 @@ function npLabels() {
   const hoy = new Date();
   const man = new Date(hoy);
   man.setDate(hoy.getDate() + 1);
-  const DIAS_CORTO = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-  document.getElementById("np-lbl-hoy").textContent = DIAS_CORTO[hoy.getDay()] + " " + hoy.getDate();
-  document.getElementById("np-lbl-man").textContent = DIAS_CORTO[man.getDay()] + " " + man.getDate();
-}
-
-function npAbrirCustomDia() {
-  const inp = document.getElementById("np-dia-custom");
-  if (!inp) return;
-  inp.style.cssText = "position:static;width:100%;height:36px;opacity:1;pointer-events:auto;font-family:Outfit,sans-serif;font-size:.85rem;border:1.5px solid var(--accent);border-radius:var(--radius-sm);padding:4px 8px;background:var(--paper);color:var(--ink);margin-top:6px;display:block;";
-  inp.focus();
-  function hide() {
-    inp.style.cssText = "position:absolute;width:0;height:0;opacity:0;pointer-events:none;";
-    inp.removeEventListener("change", hide);
-    inp.removeEventListener("blur", hide);
-  }
-  inp.addEventListener("change", hide);
-  inp.addEventListener("blur", hide);
-}
-
-function npAbrirOtroDia() {
-  const panelViejo = document.getElementById("np-otro-dia-panel");
-  if (panelViejo) panelViejo.style.display = "none";
-}
-
-function npOtroSelOpc(cual) {
-  const panel = document.getElementById("np-otro-dia-panel");
-  panel.style.display = "none";
-  _npDia = "otro";
-  const hoy = new Date();
-  let fecha;
-  if (cual === "hoy") {
-    fecha = new Date();
-  } else if (cual === "manana") {
-    fecha = new Date();
-    fecha.setDate(fecha.getDate() + 1);
-  } else return;
-  _npDiaKey = fechaKey(fecha);
-  const DIAS_CORTO = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-  document.getElementById("np-lbl-otro").textContent = DIAS_CORTO[fecha.getDay()] + " " + fecha.getDate() + "/" + String(fecha.getMonth() + 1).padStart(2, "0");
-  document.querySelectorAll(".modal-np-dia-btn").forEach(b => b.classList.remove("active"));
-  document.getElementById("np-dia-hoy").classList.remove("active");
-  document.getElementById("np-dia-man").classList.remove("active");
-  document.getElementById("np-dia-otro").classList.add("active");
-  npActualizarHorario();
+  const DIAS_CORTO = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  document.getElementById('np-lbl-hoy').textContent = DIAS_CORTO[hoy.getDay()] + ' ' + hoy.getDate();
+  document.getElementById('np-lbl-man').textContent = DIAS_CORTO[man.getDay()] + ' ' + man.getDate();
 }
 
 function npSelDia(cual, el) {
-  _npDia = cual;
-  document.querySelectorAll(".modal-np-dia-btn").forEach(b => b.classList.remove("active"));
-  el.classList.add("active");
+  _npDia    = cual;
   _npDiaKey = npDiaKeyDesde(cual);
+  document.querySelectorAll('.modal-np-dia-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
   npActualizarHorario();
 }
 
+function npAbrirCustomDia() {
+  const inp = document.getElementById('np-dia-custom');
+  if (!inp) return;
+  inp.style.cssText = 'position:static;width:100%;height:36px;opacity:1;pointer-events:auto;' +
+    'font-family:Outfit,sans-serif;font-size:.85rem;border:1.5px solid var(--accent);' +
+    'border-radius:var(--radius-sm);padding:4px 8px;background:var(--paper);color:var(--ink);' +
+    'margin-top:6px;display:block;';
+  inp.focus();
+  function hide() {
+    inp.style.cssText = 'position:absolute;width:0;height:0;opacity:0;pointer-events:none;';
+    inp.removeEventListener('change', hide);
+    inp.removeEventListener('blur', hide);
+  }
+  inp.addEventListener('change', hide);
+  inp.addEventListener('blur', hide);
+}
+
 function npOnCustomDia() {
-  const val = document.getElementById("np-dia-custom").value;
+  const val = document.getElementById('np-dia-custom').value;
   if (!val) return;
-  _npDia = "otro";
+  _npDia    = 'otro';
   _npDiaKey = val;
-  const [y, m, d] = val.split("-").map(Number);
+  const [y, m, d] = val.split('-').map(Number);
   const f = new Date(y, m - 1, d);
-  const DIAS_CORTO = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-  const label = DIAS_CORTO[f.getDay()] + " " + d + "/" + m;
-  const lblOtro = document.getElementById("np-lbl-otro");
+  const DIAS_CORTO = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const label = DIAS_CORTO[f.getDay()] + ' ' + d + '/' + m;
+  const lblOtro = document.getElementById('np-lbl-otro');
   if (lblOtro) lblOtro.textContent = label;
-  document.querySelectorAll(".modal-np-dia-btn").forEach(b => b.classList.remove("active"));
-  document.getElementById("np-dia-otro").classList.add("active");
+  document.querySelectorAll('.modal-np-dia-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('np-dia-otro').classList.add('active');
   npActualizarHorario();
 }
 
 function npActualizarHorario() {
-  const nomEl = document.getElementById("np-nombre");
-  const campHora = document.getElementById("np-campo-hora");
-  const clockWrap = document.getElementById("np-clock-wrap");
-  const turnosWrap = document.getElementById("np-turnos-wrap");
+  const nomEl      = document.getElementById('np-nombre');
+  const campHora   = document.getElementById('np-campo-hora');
+  const clockWrap  = document.getElementById('np-clock-wrap');
+  const turnosWrap = document.getElementById('np-turnos-wrap');
   if (!campHora || !turnosWrap) return;
-  const val = (nomEl ? nomEl.value || "" : "").trim();
-  const isCuba = val.toLowerCase().includes("cuba");
+
+  const val    = (nomEl ? nomEl.value || '' : '').trim();
+  const isCuba = val.toLowerCase().includes('cuba');
+
   if (!_npDiaKey) {
-    campHora.style.display = isCuba ? "none" : "";
-    if (clockWrap) clockWrap.style.display = "";
-    turnosWrap.style.display = "none";
+    campHora.style.display  = isCuba ? 'none' : '';
+    if (clockWrap) clockWrap.style.display = '';
+    turnosWrap.style.display = 'none';
     return;
   }
-  const dd = datos.dias[_npDiaKey];
+
+  const dd       = datos.dias[_npDiaKey];
   const esEspecial = dd && dd.especial;
+
   if (isCuba) {
     if (esEspecial) {
-      campHora.style.display = "";
-      const lbl = document.getElementById("np-hora-label");
-      if (lbl) lbl.textContent = "Turno de envío";
-      if (clockWrap) clockWrap.style.display = "none";
-      turnosWrap.style.display = "";
-      const corte = dd.corteHora || "15:00";
-      const t1 = document.getElementById("np-t1");
-      if (t1) t1.textContent = "🟠 Turno 1 — " + corte;
-      const t2 = document.getElementById("np-t2");
-      if (t2) t2.textContent = "🔵 Turno 2 — 18:00";
+      campHora.style.display = '';
+      const lbl = document.getElementById('np-hora-label');
+      if (lbl) lbl.textContent = 'Turno de envío';
+      if (clockWrap) clockWrap.style.display = 'none';
+      turnosWrap.style.display = '';
+      const corte = dd.corteHora || '15:00';
+      const t1 = document.getElementById('np-t1');
+      if (t1) t1.textContent = '🟠 Turno 1 — ' + corte;
+      const t2 = document.getElementById('np-t2');
+      if (t2) t2.textContent = '🔵 Turno 2 — 18:00';
     } else {
-      campHora.style.display = "none";
+      campHora.style.display = 'none';
     }
   } else {
-    campHora.style.display = "";
-    const lbl = document.getElementById("np-hora-label");
-    if (lbl) lbl.textContent = "Horario de entrega";
-    if (clockWrap) clockWrap.style.display = "";
-    turnosWrap.style.display = "none";
+    campHora.style.display = '';
+    const lbl = document.getElementById('np-hora-label');
+    if (lbl) lbl.textContent = 'Horario';
+    if (clockWrap) clockWrap.style.display = '';
+    turnosWrap.style.display = 'none';
     npTimeSync();
   }
 }
 
-// ── TIME PICKER ──
-let _npTimeH = null;
-let _npTimeM = null;
+
+// ══════════════════════════════════════════════════
+//  TIME PICKER
+// ══════════════════════════════════════════════════
+
+let _npTimeH  = null;
+let _npTimeM  = null;
 let _npIsMobile = false;
 
 function npDetectMobile() {
-  return ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
+  return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 }
 
 function getHorariosParaDia(fechaStr) {
-  const localId = datos.localId || "matienzo";
+  const localId  = datos.localId || 'matienzo';
   const horarios = datos.horariosLocales || HORARIOS_DEFAULT;
-  const horLocal = horarios[localId] || horarios["matienzo"];
+  const horLocal = horarios[localId] || horarios['matienzo'];
   let diaSemana;
   if (fechaStr) {
-    const [y, mo, d] = fechaStr.split("-").map(Number);
+    const [y, mo, d] = fechaStr.split('-').map(Number);
     diaSemana = new Date(y, mo - 1, d).getDay();
   } else {
     diaSemana = new Date().getDay();
@@ -353,52 +340,49 @@ function getHorariosParaDia(fechaStr) {
 }
 
 function getHorarioActual() {
-  const fechaStr = (typeof _npDiaKey !== "undefined" && _npDiaKey) ? _npDiaKey : new Date().toISOString().slice(0, 10);
+  const fechaStr = (_npDiaKey) ? _npDiaKey : new Date().toISOString().slice(0, 10);
   return getHorariosParaDia(fechaStr);
 }
 
 function buildHorarioSlots(horario) {
   const slots = [];
   if (!horario) return slots;
-  const [oh, om] = horario.open.split(":").map(Number);
-  const [ch, cm] = horario.close.split(":").map(Number);
-  const openMin = oh * 60 + om;
+  const [oh, om] = horario.open.split(':').map(Number);
+  const [ch, cm] = horario.close.split(':').map(Number);
+  const openMin  = oh * 60 + om;
   const closeMin = ch * 60 + cm;
   for (let h = 0; h <= 23; h++) {
     for (let m of [0, 15, 30, 45]) {
-      const totalMin = h * 60 + m;
-      if (totalMin >= openMin && totalMin <= closeMin) {
-        slots.push({ h, m, label: String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") });
-      }
+      const t = h * 60 + m;
+      if (t >= openMin && t <= closeMin)
+        slots.push({ h, m, label: String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') });
     }
   }
   return slots;
 }
 
 function npBuildDropdown() {
-  const list = document.getElementById("np-tp-list");
+  const list = document.getElementById('np-tp-list');
   if (!list) return;
-  list.innerHTML = "";
+  list.innerHTML = '';
   const horario = getHorarioActual();
   if (!horario) {
-    const div = document.createElement("div");
-    div.className = "tp-dropdown-item tp-closed-msg";
-    div.textContent = "🔒 Local cerrado este día";
-    div.style.cssText = "color:var(--ink-light);font-style:italic;cursor:default;text-align:center;padding:12px;";
+    const div = document.createElement('div');
+    div.className = 'tp-dropdown-item tp-closed-msg';
+    div.textContent = '🔒 Local cerrado este día';
+    div.style.cssText = 'color:var(--ink-light);font-style:italic;cursor:default;text-align:center;padding:12px;';
     list.appendChild(div);
     return;
   }
-  const slots = buildHorarioSlots(horario);
-  slots.forEach(({ h, m, label }) => {
-    const div = document.createElement("div");
-    div.className = "tp-dropdown-item";
+  buildHorarioSlots(horario).forEach(({ h, m, label }) => {
+    const div = document.createElement('div');
+    div.className = 'tp-dropdown-item';
     div.textContent = label;
     div.dataset.h = h;
     div.dataset.m = m;
-    div.addEventListener("mousedown", e => {
+    div.addEventListener('mousedown', e => {
       e.preventDefault();
-      _npTimeH = h;
-      _npTimeM = m;
+      _npTimeH = h; _npTimeM = m;
       npTimeSync();
       npCloseDropdown();
     });
@@ -408,149 +392,134 @@ function npBuildDropdown() {
 
 function npOpenDropdown() {
   npBuildDropdown();
-  const pop = document.getElementById("np-tp-selects");
-  const btn = document.getElementById("np-tp-btn");
+  const pop = document.getElementById('np-tp-selects');
+  const btn = document.getElementById('np-tp-btn');
   if (!pop) return;
-  pop.classList.remove("hidden");
-  if (btn) btn.classList.add("open");
-  const list = document.getElementById("np-tp-list");
+  pop.classList.remove('hidden');
+  if (btn) btn.classList.add('open');
+  const list = document.getElementById('np-tp-list');
   let scrollTarget = null;
-  list.querySelectorAll(".tp-dropdown-item").forEach(el => {
+  list.querySelectorAll('.tp-dropdown-item').forEach(el => {
     const match = parseInt(el.dataset.h) === _npTimeH && parseInt(el.dataset.m) === _npTimeM;
-    el.classList.toggle("selected", match);
+    el.classList.toggle('selected', match);
     if (match) scrollTarget = el;
   });
-  if (scrollTarget) setTimeout(() => scrollTarget.scrollIntoView({ block: "nearest" }), 0);
+  if (scrollTarget) setTimeout(() => scrollTarget.scrollIntoView({ block: 'nearest' }), 0);
   setTimeout(() => {
     function onOutside(e) {
-      const pop2 = document.getElementById("np-tp-selects");
-      const btn2 = document.getElementById("np-tp-btn");
+      const pop2 = document.getElementById('np-tp-selects');
+      const btn2 = document.getElementById('np-tp-btn');
       if (pop2 && btn2 && !pop2.contains(e.target) && !btn2.contains(e.target)) {
         npCloseDropdown();
-        document.removeEventListener("mousedown", onOutside, true);
+        document.removeEventListener('mousedown', onOutside, true);
       }
     }
-    document.addEventListener("mousedown", onOutside, true);
+    document.addEventListener('mousedown', onOutside, true);
   }, 0);
 }
 
 function npCloseDropdown() {
-  const pop = document.getElementById("np-tp-selects");
-  const btn = document.getElementById("np-tp-btn");
-  if (pop) pop.classList.add("hidden");
-  if (btn) btn.classList.remove("open");
+  const pop = document.getElementById('np-tp-selects');
+  const btn = document.getElementById('np-tp-btn');
+  if (pop) pop.classList.add('hidden');
+  if (btn) btn.classList.remove('open');
 }
 
 function npOpenTimePicker() {
   _npIsMobile = npDetectMobile();
   if (_npIsMobile) {
-    const inp = document.getElementById("np-hora-mobile");
+    const inp = document.getElementById('np-hora-mobile');
     if (!inp) return;
-    inp.style.display = "block";
-    if (_npTimeH !== null && _npTimeM !== null) {
-      inp.value = String(_npTimeH).padStart(2, "0") + ":" + String(_npTimeM).padStart(2, "0");
-    }
+    inp.style.display = 'block';
+    if (_npTimeH !== null && _npTimeM !== null)
+      inp.value = String(_npTimeH).padStart(2,'0') + ':' + String(_npTimeM).padStart(2,'0');
     inp.focus();
     inp.click();
   } else {
-    const pop = document.getElementById("np-tp-selects");
-    if (pop && !pop.classList.contains("hidden")) {
-      npCloseDropdown();
-      return;
-    }
+    const pop = document.getElementById('np-tp-selects');
+    if (pop && !pop.classList.contains('hidden')) { npCloseDropdown(); return; }
     npOpenDropdown();
   }
 }
 
 function npOnMobileTimeInput(val) {
-  if (!val) {
-    _npTimeH = null;
-    _npTimeM = null;
-  } else {
-    const [h, m] = val.split(":").map(Number);
+  if (!val) { _npTimeH = null; _npTimeM = null; }
+  else {
+    const [h, m] = val.split(':').map(Number);
     _npTimeH = h;
     const quarters = [0, 15, 30, 45];
     _npTimeM = quarters.reduce((prev, cur) => Math.abs(cur - m) < Math.abs(prev - m) ? cur : prev);
   }
-  const inp = document.getElementById("np-hora-mobile");
-  if (inp) inp.style.display = "none";
+  const inp = document.getElementById('np-hora-mobile');
+  if (inp) inp.style.display = 'none';
   npTimeSync();
 }
 
 function npClearTime() {
-  _npTimeH = null;
-  _npTimeM = null;
-  const inp = document.getElementById("np-hora-mobile");
-  if (inp) {
-    inp.value = "";
-    inp.style.display = "none";
-  }
+  _npTimeH = null; _npTimeM = null;
+  const inp = document.getElementById('np-hora-mobile');
+  if (inp) { inp.value = ''; inp.style.display = 'none'; }
   npCloseDropdown();
   npTimeSync();
 }
 
 function npTimeSync() {
-  const hidden = document.getElementById("np-hora");
+  const hidden = document.getElementById('np-hora');
   if (hidden) {
-    if (_npTimeH !== null && _npTimeM !== null) {
-      hidden.value = String(_npTimeH).padStart(2, "0") + ":" + String(_npTimeM).padStart(2, "0");
-    } else {
-      hidden.value = "";
-    }
+    hidden.value = (_npTimeH !== null && _npTimeM !== null)
+      ? String(_npTimeH).padStart(2,'0') + ':' + String(_npTimeM).padStart(2,'0')
+      : '';
   }
-  const btn = document.getElementById("np-tp-btn");
-  const valEl = document.getElementById("np-tp-value");
+  const btn   = document.getElementById('np-tp-btn');
+  const valEl = document.getElementById('np-tp-value');
   if (!btn || !valEl) return;
   if (_npTimeH !== null && _npTimeM !== null) {
-    const label = String(_npTimeH).padStart(2, "0") + ":" + String(_npTimeM).padStart(2, "0");
+    const label = String(_npTimeH).padStart(2,'0') + ':' + String(_npTimeM).padStart(2,'0');
     valEl.textContent = label;
-    btn.classList.add("has-value");
+    btn.classList.add('has-value');
     npUpdateClockIcon(_npTimeH, _npTimeM);
   } else {
-    valEl.textContent = "Elegir horario";
-    btn.classList.remove("has-value");
+    valEl.textContent = 'Elegir horario';
+    btn.classList.remove('has-value');
     npUpdateClockIcon(null, null);
   }
   npCheckFueraHorario();
 }
 
 function npCheckFueraHorario() {
-  let warn = document.getElementById("np-hora-warn");
+  let warn = document.getElementById('np-hora-warn');
   if (!warn) {
-    const campo = document.getElementById("np-campo-hora");
+    const campo = document.getElementById('np-campo-hora');
     if (!campo) return;
-    warn = document.createElement("div");
-    warn.id = "np-hora-warn";
-    warn.style.cssText = "font-size:.68rem;color:var(--amber);margin-top:4px;display:none;";
+    warn = document.createElement('div');
+    warn.id = 'np-hora-warn';
+    warn.style.cssText = 'font-size:.68rem;color:var(--amber);margin-top:4px;display:none;';
     campo.appendChild(warn);
   }
-  if (_npTimeH === null) {
-    warn.style.display = "none";
-    return;
-  }
+  if (_npTimeH === null) { warn.style.display = 'none'; return; }
   const horario = getHorarioActual();
   if (!horario) {
-    warn.textContent = "🌙 El local está cerrado este día — el pedido se guardará igual.";
-    warn.style.display = "";
+    warn.textContent = '🌙 El local está cerrado este día — el pedido se guardará igual.';
+    warn.style.display = '';
     return;
   }
   const slots = buildHorarioSlots(horario);
   const fuera = !slots.some(s => s.h === _npTimeH && s.m === _npTimeM);
   if (fuera) {
     warn.textContent = `🌙 Fuera del horario habitual (${horario.open}–${horario.close}) — se guardará igual.`;
-    warn.style.display = "";
+    warn.style.display = '';
   } else {
-    warn.style.display = "none";
+    warn.style.display = 'none';
   }
 }
 
 function npUpdateClockIcon(h, m) {
-  const handH = document.getElementById("np-tp-hand-h");
-  const handM = document.getElementById("np-tp-hand-m");
+  const handH = document.getElementById('np-tp-hand-h');
+  const handM = document.getElementById('np-tp-hand-m');
   if (!handH || !handM) return;
   if (h === null) {
-    handH.style.transform = "rotate(-60deg)";
-    handM.style.transform = "rotate(60deg)";
+    handH.style.transform = 'rotate(-60deg)';
+    handM.style.transform = 'rotate(60deg)';
     return;
   }
   const hDeg = ((h % 12) / 12 * 360) + ((m || 0) / 60 * 30) - 90;
@@ -560,246 +529,278 @@ function npUpdateClockIcon(h, m) {
 }
 
 function npClockInit() {
-  _npTimeH = null;
-  _npTimeM = null;
-  const inp = document.getElementById("np-hora-mobile");
-  if (inp) {
-    inp.value = "";
-    inp.style.display = "none";
-  }
+  _npTimeH = null; _npTimeM = null;
+  const inp = document.getElementById('np-hora-mobile');
+  if (inp) { inp.value = ''; inp.style.display = 'none'; }
   npCloseDropdown();
   npTimeSync();
 }
 
-function npClockClear() { npClearTime(); }
-function npClockSetHour(h) { _npTimeH = h; npTimeSync(); }
-function npClockSetMin(m) { _npTimeM = m; npTimeSync(); }
-function npClockSyncHidden() { npTimeSync(); }
+// aliases legacy
+function npClockClear()         { npClearTime(); }
+function npClockSetHour(h)      { _npTimeH = h; npTimeSync(); }
+function npClockSetMin(m)       { _npTimeM = m; npTimeSync(); }
+function npClockSyncHidden()    { npTimeSync(); }
 function npClockUpdateDisplay() { npTimeSync(); }
 
-// ── WHEEL PICKER ──
-let _wheelH = 10, _wheelM = 0;
-let _wheelCb = null;
-let _wheelSlots = [];
 
-function wheelOpen(initH, initM) {
-  _wheelH = initH !== null ? initH : 10;
-  _wheelM = initM !== null ? initM : 0;
-  const horario = getHorarioActual();
-  _wheelSlots = horario ? buildHorarioSlots(horario) : [];
-  if (!_wheelSlots.length) return;
-  const firstSlot = _wheelSlots[0];
-  const lastSlot = _wheelSlots[_wheelSlots.length - 1];
-  const initMin = _wheelH * 60 + _wheelM;
-  const openMin = firstSlot.h * 60 + firstSlot.m;
-  const closeMin = lastSlot.h * 60 + lastSlot.m;
-  if (initMin < openMin) { _wheelH = firstSlot.h; _wheelM = firstSlot.m; }
-  if (initMin > closeMin) { _wheelH = lastSlot.h; _wheelM = lastSlot.m; }
-  const hours = [...new Set(_wheelSlots.map(s => s.h))];
-  const mins = _wheelSlots.filter(s => s.h === _wheelH).map(s => s.m);
-  wheelBuild("wheel-col-h", hours, _wheelH, (v) => {
-    _wheelH = v;
-    const newMins = _wheelSlots.filter(s => s.h === v).map(s => s.m);
-    if (!newMins.includes(_wheelM)) _wheelM = newMins[0] || 0;
-    wheelBuild("wheel-col-m", newMins, _wheelM, (mv) => { _wheelM = mv; });
-  });
-  wheelBuild("wheel-col-m", mins, _wheelM, (v) => { _wheelM = v; });
-  document.getElementById("wheel-overlay").classList.remove("hidden");
-}
-
-function wheelConfirm() {
-  _npTimeH = _wheelH;
-  _npTimeM = _wheelM;
-  npTimeSync();
-  document.getElementById("wheel-overlay").classList.add("hidden");
-}
-
-function wheelCancel() {
-  document.getElementById("wheel-overlay").classList.add("hidden");
-}
-
-document.addEventListener("click", e => {
-  const overlay = document.getElementById("wheel-overlay");
-  if (overlay && !overlay.classList.contains("hidden") && e.target === overlay) {
-    wheelCancel();
-  }
-});
-
-function wheelBuild(colId, items, selected, onChange) {
-  const col = document.getElementById(colId);
-  if (!col) return;
-  col.innerHTML = "";
-  const ITEM_H = 40;
-  items.forEach((v, i) => {
-    const el = document.createElement("div");
-    el.className = "wheel-item" + (v === selected ? " selected" : "");
-    el.textContent = String(v).padStart(2, "0");
-    el.dataset.val = v;
-    col.appendChild(el);
-  });
-  const selIdx = items.indexOf(selected);
-  const wrap = col.parentElement;
-  wrap.scrollTop = selIdx * ITEM_H;
-  let snapTimer;
-  wrap.onscroll = () => {
-    clearTimeout(snapTimer);
-    snapTimer = setTimeout(() => {
-      const idx = Math.round(wrap.scrollTop / ITEM_H);
-      const clamped = Math.max(0, Math.min(items.length - 1, idx));
-      wrap.scrollTo({ top: clamped * ITEM_H, behavior: "smooth" });
-      const val = items[clamped];
-      onChange(val);
-      col.querySelectorAll(".wheel-item").forEach((el, i) => {
-        el.classList.toggle("selected", i === clamped);
-      });
-    }, 80);
-  };
-  let isDragging = false, startY = 0, startScroll = 0;
-  col.addEventListener("mousedown", e => {
-    isDragging = true;
-    startY = e.clientY;
-    startScroll = wrap.scrollTop;
-    e.preventDefault();
-  });
-  document.addEventListener("mousemove", e => {
-    if (!isDragging) return;
-    wrap.scrollTop = startScroll - (e.clientY - startY);
-  });
-  document.addEventListener("mouseup", () => { isDragging = false; });
-}
+// ══════════════════════════════════════════════════
+//  TURNOS CUBA
+// ══════════════════════════════════════════════════
 
 function npSelTurno(n) {
-  const dd = datos.dias[_npDiaKey] || {};
-  const corte = dd.corteHora || "15:00";
-  document.getElementById("np-t1").classList.toggle("active", n === 1);
-  document.getElementById("np-t2").classList.toggle("active", n === 2);
-  const hora = n === 1 ? corte : "18:00";
-  document.getElementById("np-hora").value = hora;
+  const dd    = datos.dias[_npDiaKey] || {};
+  const corte = dd.corteHora || '15:00';
+  document.getElementById('np-t1').classList.toggle('active', n === 1);
+  document.getElementById('np-t2').classList.toggle('active', n === 2);
+  document.getElementById('np-hora').value = n === 1 ? corte : '18:00';
 }
 
-function npOnHoraInput() {
-  document.getElementById("np-t1").classList.remove("active");
-  document.getElementById("np-t2").classList.remove("active");
+
+// ══════════════════════════════════════════════════
+//  TOGGLE CLIENTE / CUBA
+// ══════════════════════════════════════════════════
+
+function npUiModoCliente() {
+  const nomInp = document.getElementById('np-nombre');
+  if ((nomInp.value || '').toLowerCase().includes('cuba')) {
+    nomInp.value = '';
+    npActualizarBotonesCuba(false);
+    npActualizarHorario();
+  }
+  document.getElementById('np-btn-cliente-ui').classList.add('active-cliente');
+  document.getElementById('np-btn-cuba').classList.remove('active-cuba');
 }
 
 function npToggleCuba() {
-  const nomInp = document.getElementById("np-nombre");
-  const isCubaAhora = (nomInp.value || "").toLowerCase().includes("cuba");
+  const nomInp    = document.getElementById('np-nombre');
+  const isCubaAhora = (nomInp.value || '').toLowerCase().includes('cuba');
   if (isCubaAhora) {
-    nomInp.value = "";
+    nomInp.value = '';
     npActualizarBotonesCuba(false);
     npActualizarHorario();
+    document.getElementById('np-btn-cliente-ui').classList.add('active-cliente');
+    document.getElementById('np-btn-cuba').classList.remove('active-cuba');
   } else {
-    nomInp.value = "Cuba";
+    nomInp.value = 'Cuba';
     npActualizarBotonesCuba(true);
     npActualizarHorario();
-    document.getElementById("np-autocomp").style.display = "none";
+    document.getElementById('np-autocomp').style.display = 'none';
+    document.getElementById('np-btn-cliente-ui').classList.remove('active-cliente');
+    document.getElementById('np-btn-cuba').classList.add('active-cuba');
   }
 }
 
 function npActualizarBotonesCuba(isCuba) {
-  document.getElementById("np-cuba-badge").style.display = isCuba ? "" : "none";
-  document.getElementById("np-campo-tel").style.display = isCuba ? "none" : "";
-  document.getElementById("np-campo-pago").style.display = isCuba ? "none" : "";
-  const btn = document.getElementById("np-btn-cuba");
-  if (btn) {
-    btn.style.background = isCuba ? "var(--cuba-ink,var(--accent))" : "var(--paper)";
-    btn.style.color = isCuba ? "#fff" : "var(--ink-mid)";
-    btn.style.borderColor = isCuba ? "var(--cuba-ink,var(--accent))" : "var(--border)";
-  }
+  document.getElementById('np-cuba-badge').style.display = isCuba ? '' : 'none';
+  const filaNombre = document.getElementById('np-fila-nombre');
+  if (filaNombre) filaNombre.style.display = isCuba ? 'none' : '';
+  document.getElementById('np-campo-tel').style.display = isCuba ? 'none' : '';
+  const optPago = document.getElementById('np-opt-pago');
+  if (optPago) optPago.style.display = isCuba ? 'none' : '';
 }
 
+
+// ══════════════════════════════════════════════════
+//  AUTOCOMPLETADO CLIENTE
+// ══════════════════════════════════════════════════
+
 function npOnNombreInput() {
-  const val = (document.getElementById("np-nombre").value || "").trim();
-  const isCuba = val.toLowerCase().includes("cuba");
+  const val    = (document.getElementById('np-nombre').value || '').trim();
+  const isCuba = val.toLowerCase().includes('cuba');
   npActualizarBotonesCuba(isCuba);
+  // sincronizar clases del toggle
+  if (isCuba) {
+    document.getElementById('np-btn-cliente-ui').classList.remove('active-cliente');
+    document.getElementById('np-btn-cuba').classList.add('active-cuba');
+  } else {
+    document.getElementById('np-btn-cliente-ui').classList.add('active-cliente');
+    document.getElementById('np-btn-cuba').classList.remove('active-cuba');
+  }
   npActualizarHorario();
-  const q = val.toLowerCase();
-  const ac = document.getElementById("np-autocomp");
-  if (!q || q.length < 2 || isCuba) {
-    ac.style.display = "none";
-    return;
-  }
-  const matches = datos.clientes.filter(c => c.nombre.toLowerCase().includes(q) && !esCuba(c.nombre)).slice(0, 6);
-  if (!matches.length) {
-    ac.style.display = "none";
-    return;
-  }
+  const q  = val.toLowerCase();
+  const ac = document.getElementById('np-autocomp');
+  if (!q || q.length < 2 || isCuba) { ac.style.display = 'none'; return; }
+  const matches = datos.clientes
+    .filter(c => c.nombre.toLowerCase().includes(q) && !esCuba(c.nombre))
+    .slice(0, 6);
+  if (!matches.length) { ac.style.display = 'none'; return; }
   const sorted = [...matches].sort((a, b) => (b.frecuente ? 1 : 0) - (a.frecuente ? 1 : 0));
   ac.innerHTML = sorted.map(c => `
-    <div style="padding:9px 12px;border-bottom:1px solid var(--border);font-size:.82rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;"
+    <div style="padding:9px 12px;border-bottom:1px solid var(--border);font-size:.82rem;
+                cursor:pointer;display:flex;align-items:center;justify-content:space-between;"
       onmousedown="event.preventDefault();_npSeleccionandoAutocomp=true;npSelAutocompById('${c.id}')"
       ontouchstart="event.preventDefault();_npSeleccionandoAutocomp=true;npSelAutocompById('${c.id}')">
-      <span>${c.frecuente ? "⭐ " : ""}<strong>${esc(c.nombre)}</strong></span>
-      <span style="font-size:.68rem;color:var(--ink-light)">${esc(c.tel || "")}</span>
+      <span>${c.frecuente ? '⭐ ' : ''}<strong>${esc(c.nombre)}</strong></span>
+      <span style="font-size:.68rem;color:var(--ink-light)">${esc(c.tel || '')}</span>
     </div>
-  `).join("");
-  ac.style.display = "";
+  `).join('');
+  ac.style.display = '';
 }
 
 function npSelAutocompById(clienteId) {
   const c = datos.clientes.find(x => x.id === clienteId);
   if (!c) return;
-  npSelAutocomp(c.nombre, c.tel || "");
+  npSelAutocomp(c.nombre, c.tel || '');
 }
 
 function npSelAutocomp(nombre, tel) {
   _npSeleccionandoAutocomp = false;
-  const nomInp = document.getElementById("np-nombre");
-  const telInp = document.getElementById("np-tel");
-  nomInp.value = nombre;
+  document.getElementById('np-nombre').value = nombre;
   if (tel) {
-    telInp.value = tel;
+    document.getElementById('np-tel').value = tel;
     npOnTelInput();
   }
-  document.getElementById("np-autocomp").style.display = "none";
-  const isCuba = nombre.toLowerCase().includes("cuba");
+  document.getElementById('np-autocomp').style.display = 'none';
+  const isCuba = nombre.toLowerCase().includes('cuba');
   npActualizarBotonesCuba(isCuba);
   npActualizarHorario();
 }
 
 function npOcultarAutocomp() {
-  const ac = document.getElementById("np-autocomp");
-  if (ac) ac.style.display = "none";
+  const ac = document.getElementById('np-autocomp');
+  if (ac) ac.style.display = 'none';
 }
 
-// ── PRODUCTOS TEMPORALES ──
+
+// ══════════════════════════════════════════════════
+//  PILLS: PAGO / NOTA / ESTADO
+// ══════════════════════════════════════════════════
+
+// ── PAGO ──
+function npUiTogglePago() {
+  if (!_npPagado) {
+    _pagoId       = '__np__';
+    _pagoDeshacer = false;
+    _pagoMetodo   = null;
+    document.querySelectorAll('.modal-metodo').forEach(m => m.classList.remove('selected'));
+    document.getElementById('modal-pago-titulo').textContent = 'Confirmar pago';
+    document.getElementById('modal-pago-desc').textContent   = 'Seleccioná el método de pago.';
+    document.getElementById('modal-pago').classList.remove('hidden');
+  } else {
+    _npPagado     = false;
+    _npMetodoPago = '';
+    npUiActualizarPagoPill();
+  }
+}
+
+function npUiActualizarPagoPill() {
+  const pill = document.getElementById('np-opt-pago');
+  if (!pill) return;
+  if (_npPagado) {
+    pill.textContent = '✅ Pagado · ' + (_npMetodoPago || '');
+    pill.classList.add('active');
+  } else {
+    pill.textContent = '💳 Confirmar pago';
+    pill.classList.remove('active');
+  }
+}
+
+// ── NOTA ──
+function npUiToggleNota() {
+  const wrap    = document.getElementById('np-nota-wrap');
+  const pill    = document.getElementById('np-opt-nota');
+  const visible = wrap.style.display !== 'none';
+
+  // cerrar estado si estaba abierto
+  document.getElementById('np-estado-wrap').style.display = 'none';
+
+  wrap.style.display = visible ? 'none' : 'block';
+  if (!visible) {
+    document.getElementById('np-nota').focus();
+    pill.classList.add('active');
+  } else {
+    const val = (document.getElementById('np-nota').value || '').trim();
+    if (!val) pill.classList.remove('active');
+  }
+}
+
+function npUiNotaInput() {
+  const val  = (document.getElementById('np-nota').value || '').trim();
+  const pill = document.getElementById('np-opt-nota');
+  if (val) {
+    pill.textContent = '📝 ' + val.slice(0, 22) + (val.length > 22 ? '…' : '');
+    pill.classList.add('active');
+  } else {
+    pill.textContent = '📝 Nota';
+    pill.classList.remove('active');
+  }
+}
+
+// ── ESTADO ──
+function npUiToggleEstado() {
+  const wrap    = document.getElementById('np-estado-wrap');
+  const visible = wrap.style.display !== 'none';
+
+  // cerrar nota si estaba abierto
+  document.getElementById('np-nota-wrap').style.display = 'none';
+  const notaPill = document.getElementById('np-opt-nota');
+  const notaVal  = (document.getElementById('np-nota').value || '').trim();
+  if (!notaVal) notaPill.classList.remove('active');
+
+  wrap.style.display = visible ? 'none' : 'block';
+}
+
+function npSelEstadoUi(estado, el) {
+  _npEstado = estado;
+  document.querySelectorAll('#np-estado-sel .estado-opt').forEach(b => b.className = 'estado-opt');
+  el.className = 'estado-opt active-' + estado;
+  const pill = document.getElementById('np-opt-estado');
+  if (pill) {
+    pill.textContent = NP_ESTADO_LABELS[estado] || '⏳ Pendiente';
+    pill.classList.toggle('active', estado !== 'pendiente');
+  }
+  document.getElementById('np-estado-wrap').style.display = 'none';
+}
+
+// alias para compatibilidad con código viejo que llame npSelEstado
+function npSelEstado(estado, el) { npSelEstadoUi(estado, el); }
+// alias viejo npToggleNota → nuevo
+function npToggleNota() { npUiToggleNota(); }
+
+
+// ══════════════════════════════════════════════════
+//  PRODUCTOS DEL PEDIDO
+// ══════════════════════════════════════════════════
+
 function npRenderProds() {
-  const wrap = document.getElementById("np-prods-wrap");
+  const wrap = document.getElementById('np-prods-wrap');
   if (!_npPedido || !_npPedido.productos.length) {
-    wrap.innerHTML = "";
+    wrap.innerHTML = '';
     npRenderTotal();
     return;
   }
-  wrap.innerHTML = _npPedido.productos.map((r, i) => {
-    const nom = r.tipo === "catalogo" ? r.nombre : r.libre;
-    const cat = datos.catalogo.find(c => c.nombre === r.nombre && c.tipo === (r.tacc === "s" ? "sin_tacc" : "con_tacc"));
-    const tieneTalle = r.tipo === "catalogo" ? (cat ? cat.tiene_talle : true) : true;
-    const precioBase = r.tipo === "libre" ? (r.precio_libre || 0) : getPrecioCat(cat, r.tamano);
-    const precioStr = precioBase ? `<span class="prod-precio">$${precioBase.toLocaleString("es-AR")}</span>` : "";
-    const pill = r.tacc === "s" ? '<span class="tacc-pill s">ST</span>' : '<span class="tacc-pill c">C</span>';
-    const TAMANIOS_LOCAL = ["Chico", "Mediano", "Grande"];
+  const TAMANIOS_LOCAL = ['Chico','Mediano','Grande'];
+  wrap.innerHTML = _npPedido.productos.map(r => {
+    const nom        = r.tipo === 'catalogo' ? r.nombre : r.libre;
+    const cat        = datos.catalogo.find(c => c.nombre === r.nombre && c.tipo === (r.tacc === 's' ? 'sin_tacc' : 'con_tacc'));
+    const tieneTalle = r.tipo === 'catalogo' ? (cat ? cat.tiene_talle : true) : true;
+    const precioBase = r.tipo === 'libre' ? (r.precio_libre || 0) : getPrecioCat(cat, r.tamano);
+    const precioStr  = precioBase ? `<span class="prod-precio">$${precioBase.toLocaleString('es-AR')}</span>` : '';
+    const pill       = r.tacc === 's' ? '<span class="tacc-pill s">ST</span>' : '<span class="tacc-pill c">C</span>';
     const libreActivo = r._tamLibre || (!!(r.tamano) && !TAMANIOS_LOCAL.includes(r.tamano));
-    const sinTalleWarn = tieneTalle && !(r.tamano || "").trim() ? '<span style="font-size:.58rem;color:var(--red);font-weight:700;margin-left:4px;">⚠ TALLE</span>' : "";
+    const sinTalleWarn = tieneTalle && !(r.tamano || '').trim()
+      ? '<span style="font-size:.58rem;color:var(--red);font-weight:700;margin-left:4px;">⚠ TALLE</span>' : '';
     const extrasHTML = (r.extras || []).map((ex, ei) => `
       <div class="prod-extra-row" id="np-extra-${r.id}-${ei}">
         <div style="display:flex;flex-direction:column;gap:2px;flex:1;">
           <span style="font-size:.55rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);font-weight:600;">Descripción extra</span>
-          <input class="prod-extra-desc" type="text" value="${esc(ex.desc || "")}" placeholder="ej: extra frutilla, baño chocolate" oninput="npSetExtraDesc('${r.id}',${ei},this.value)">
+          <input class="prod-extra-desc" type="text" value="${esc(ex.desc || '')}" placeholder="ej: extra frutilla" oninput="npSetExtraDesc('${r.id}',${ei},this.value)">
         </div>
         <div style="display:flex;flex-direction:column;gap:2px;">
           <span style="font-size:.55rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);font-weight:600;">Precio</span>
           <div style="display:flex;align-items:center;gap:3px;">
             <span class="prod-extra-sep">$</span>
-            <input class="prod-extra-precio" type="number" min="0" value="${ex.precio || ""}" placeholder="0" oninput="npSetExtraPrecio('${r.id}',${ei},this.value)">
+            <input class="prod-extra-precio" type="number" min="0" value="${ex.precio || ''}" placeholder="0" oninput="npSetExtraPrecio('${r.id}',${ei},this.value)">
           </div>
         </div>
         <button class="prod-extra-del" onclick="npEliminarExtra('${r.id}',${ei})" style="align-self:flex-end;padding-bottom:4px;">✕</button>
-      </div>`).join("");
+      </div>`).join('');
+
     return `<div class="prod-edit-fila" id="np-prod-${r.id}">
       <div class="prod-edit-top">
-        <div class="prod-listo-chk${r.listo ? " on" : ""}" onclick="npToggleProdListo('${r.id}')">✓</div>
-        <div class="prod-edit-nombre${r.tipo === "libre" ? " libre" : ""}">${esc(nom || "(sin nombre)")}</div>
+        <div class="prod-listo-chk${r.listo ? ' on' : ''}" onclick="npToggleProdListo('${r.id}')">✓</div>
+        <div class="prod-edit-nombre${r.tipo === 'libre' ? ' libre' : ''}">${esc(nom || '(sin nombre)')}</div>
         ${precioStr}${pill}
         <button class="btn-cambiar-prod" onclick="npCambiarProd('${r.id}')">Cambiar</button>
         <button class="btn-remove-prod" onclick="npEliminarProd('${r.id}')">✕</button>
@@ -807,48 +808,40 @@ function npRenderProds() {
       <div class="prod-mid-row">
         <div class="prod-mid-cant">
           <button class="cant-btn" onclick="npAjustarCant('${r.id}',-1)">−</button>
-          <span style="font-size:.88rem;min-width:20px;text-align:center;">${(() => { const _n = Number(r.cantidad); return isNaN(_n) ? 1 : _n; })()}</span>
+          <span style="font-size:.88rem;min-width:20px;text-align:center;">${Math.max(1, Number(r.cantidad) || 1)}</span>
           <button class="cant-btn" onclick="npAjustarCant('${r.id}',1)">＋</button>
         </div>
         ${tieneTalle ? `<div class="prod-mid-talle">
-          ${TAMANIOS_LOCAL.map(t => `<button class="tam-btn${!libreActivo && r.tamano === t ? " active" : ""}" onclick="npSetTamano('${r.id}','${t}')">${t}</button>`).join("")}
-          <button class="tam-btn tam-btn-libre${libreActivo ? " active" : ""}" onclick="npSetTamano('${r.id}','__libre__')">Libre</button>
-        </div>` : ""}
+          ${TAMANIOS_LOCAL.map(t => `<button class="tam-btn${!libreActivo && r.tamano === t ? ' active' : ''}" onclick="npSetTamano('${r.id}','${t}')">${t}</button>`).join('')}
+          <button class="tam-btn tam-btn-libre${libreActivo ? ' active' : ''}" onclick="npSetTamano('${r.id}','__libre__')">Libre</button>
+        </div>` : ''}
         ${sinTalleWarn}
       </div>
-      ${tieneTalle ? `<input type="text" class="tam-libre-input${libreActivo ? " visible" : ""}" value="${esc(libreActivo && r.tamano ? r.tamano : "")}" placeholder="ej: 2kg, bandeja..." oninput="npSetTamanoLibre('${r.id}',this.value)" style="margin-top:4px;">` : ""}
-      ${r.tipo === "libre" ? `<div class="prod-precio-libre-row">
+      ${tieneTalle ? `<input type="text" class="tam-libre-input${libreActivo ? ' visible' : ''}" value="${esc(libreActivo && r.tamano ? r.tamano : '')}" placeholder="ej: 2kg, bandeja..." oninput="npSetTamanoLibre('${r.id}',this.value)" style="margin-top:4px;">` : ''}
+      ${r.tipo === 'libre' ? `<div class="prod-precio-libre-row">
         <span class="prod-precio-libre-lbl">$ precio</span>
-        <input class="prod-precio-libre-input" type="number" min="0" value="${r.precio_libre || ""}" placeholder="0" oninput="npSetPrecioLibre('${r.id}',this.value)">
-      </div>` : ""}
+        <input class="prod-precio-libre-input" type="number" min="0" value="${r.precio_libre || ''}" placeholder="0" oninput="npSetPrecioLibre('${r.id}',this.value)">
+      </div>` : ''}
       <div style="padding-top:4px;">
-        <button class="prod-nota-toggle" onclick="npToggleNotaProd('${r.id}')">${r.nota_prod ? "✏️ " + esc(r.nota_prod) : "＋ Nota del producto"}</button>
-        <textarea class="prod-nota-textarea${r.nota_prod ? " visible" : ""}" id="np-nota-prod-${r.id}" placeholder="ej: sin glaseado, con fruta..." oninput="npSetNotaProd('${r.id}',this.value)">${esc(r.nota_prod || "")}</textarea>
+        <button class="prod-nota-toggle" onclick="npToggleNotaProd('${r.id}')">${r.nota_prod ? '✏️ ' + esc(r.nota_prod) : '＋ Nota del producto'}</button>
+        <textarea class="prod-nota-textarea${r.nota_prod ? ' visible' : ''}" id="np-nota-prod-${r.id}" placeholder="ej: sin glaseado..." oninput="npSetNotaProd('${r.id}',this.value)">${esc(r.nota_prod || '')}</textarea>
       </div>
       <div class="prod-extras-wrap">
         ${extrasHTML}
         <button class="prod-extra-add" onclick="npAgregarExtra('${r.id}')">＋ extra</button>
       </div>
     </div>`;
-  }).join("");
+  }).join('');
   npRenderTotal();
 }
 
-function npAgregarProducto() {
-  if (!_npPedido) _npPedido = { id: "__np__", productos: [] };
-  _selectorPedidoId = "__np__";
-  _selectorProdId = null;
-  document.getElementById("selector-search").value = "";
-  renderSelectorLista();
-  document.getElementById("selector-overlay").classList.remove("hidden");
-}
-
+// npCambiarProd abre el selector overlay (se mantiene por si se necesita cambiar desde la card)
 function npCambiarProd(rId) {
-  _selectorPedidoId = "__np__";
-  _selectorProdId = rId;
-  document.getElementById("selector-search").value = "";
+  _selectorPedidoId = '__np__';
+  _selectorProdId   = rId;
+  document.getElementById('selector-search').value = '';
   renderSelectorLista();
-  document.getElementById("selector-overlay").classList.remove("hidden");
+  document.getElementById('selector-overlay').classList.remove('hidden');
 }
 
 function npEliminarProd(rId) {
@@ -867,19 +860,15 @@ function npToggleProdListo(rId) {
 function npAjustarCant(rId, delta) {
   const r = _npPedido && _npPedido.productos.find(x => x.id === rId);
   if (!r) return;
-  r.cantidad = Math.max(1, (() => { const _n = Number(r.cantidad); return isNaN(_n) ? 1 : _n; })() + delta);
+  r.cantidad = Math.max(1, (Number(r.cantidad) || 1) + delta);
   npRenderProds();
 }
 
 function npSetTamano(rId, tam) {
   const r = _npPedido && _npPedido.productos.find(x => x.id === rId);
   if (!r) return;
-  if (tam === "__libre__") {
-    r._tamLibre = true;
-  } else {
-    r.tamano = tam;
-    r._tamLibre = false;
-  }
+  if (tam === '__libre__') { r._tamLibre = true; }
+  else { r.tamano = tam; r._tamLibre = false; }
   npRenderProds();
 }
 
@@ -890,22 +879,23 @@ function npSetTamanoLibre(rId, val) {
 }
 
 function npToggleNotaProd(rId) {
-  const ta = document.getElementById("np-nota-prod-" + rId);
+  const ta = document.getElementById('np-nota-prod-' + rId);
   if (!ta) return;
-  const visible = ta.classList.contains("visible");
-  ta.classList.toggle("visible", !visible);
+  const visible = ta.classList.contains('visible');
+  ta.classList.toggle('visible', !visible);
   if (!visible) ta.focus();
-  const r = _npPedido && _npPedido.productos.find(x => x.id === rId);
+  const r   = _npPedido && _npPedido.productos.find(x => x.id === rId);
   const btn = ta.previousElementSibling;
-  if (btn && r) btn.textContent = (r.nota_prod ? "✏️ " + r.nota_prod : "＋ Nota del producto");
+  if (btn && r) btn.textContent = r.nota_prod ? '✏️ ' + r.nota_prod : '＋ Nota del producto';
 }
 
 function npSetNotaProd(rId, val) {
   const r = _npPedido && _npPedido.productos.find(x => x.id === rId);
   if (!r) return;
   r.nota_prod = val;
-  const btn = document.getElementById("np-nota-prod-" + rId);
-  if (btn && btn.previousElementSibling) btn.previousElementSibling.textContent = val ? "✏️ " + val : "＋ Nota del producto";
+  const ta = document.getElementById('np-nota-prod-' + rId);
+  if (ta && ta.previousElementSibling)
+    ta.previousElementSibling.textContent = val ? '✏️ ' + val : '＋ Nota del producto';
 }
 
 function npSetPrecioLibre(rId, val) {
@@ -919,7 +909,7 @@ function npAgregarExtra(rId) {
   const r = _npPedido && _npPedido.productos.find(x => x.id === rId);
   if (!r) return;
   if (!r.extras) r.extras = [];
-  r.extras.push({ desc: "", precio: 0 });
+  r.extras.push({ desc: '', precio: 0 });
   npRenderProds();
 }
 
@@ -943,84 +933,440 @@ function npSetExtraPrecio(rId, ei, val) {
   npRenderTotal();
 }
 
-function calcTotalPedido(pedido) {
-  if (!pedido || !pedido.productos) return 0;
-  return pedido.productos.reduce((sum, r) => {
-    const cant = Number(r.cantidad) || 1;
-    const cat = datos.catalogo.find(c => c.nombre === r.nombre && c.tipo === (r.tacc === "s" ? "sin_tacc" : "con_tacc"));
-    const base = r.tipo === "libre" ? (r.precio_libre || 0) : getPrecioCat(cat, r.tamano);
-    const extras = (r.extras || []).reduce((s, ex) => s + (parseFloat(ex.precio) || 0), 0);
-    return sum + (base * cant) + extras;
-  }, 0);
-}
+function calcTotalPedido(pedido) { return totalDePedido(pedido); }
 
 function npRenderTotal() {
-  const wrap = document.getElementById("np-total-wrap");
+  const wrap = document.getElementById('np-total-wrap');
   if (!wrap) return;
   const total = calcTotalPedido(_npPedido);
-  if (!total) {
-    wrap.style.display = "none";
+  if (!total) { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  const efectivo = Math.round(total * 0.9);
+  wrap.innerHTML = `
+    <div>
+      <span class="np-total-label">Total</span>
+      <span class="np-total-ef">💵 efectivo $${efectivo.toLocaleString('es-AR')}</span>
+    </div>
+    <span class="np-total-num">$${total.toLocaleString('es-AR')}</span>`;
+}
+
+
+// ══════════════════════════════════════════════════
+//  BUSCADOR INLINE DE PRODUCTOS
+// ══════════════════════════════════════════════════
+
+const NP_CAT_ORDEN  = ['tortas','mousses','bandejas','cuadrados','congelados','otros'];
+const NP_CAT_LABELS = {
+  tortas:    '🎂 Tortas',
+  mousses:   '🍮 Mousses',
+  bandejas:  '🍫 Bandejas',
+  cuadrados: '🟫 Cuadrados',
+  congelados:'❄️ Congelados',
+  otros:     '✨ Otros',
+};
+
+let _npSearchHighlight = -1;
+
+function npSearchProd(query) {
+  const q       = (query || '').trim().toLowerCase();
+  const results = document.getElementById('np-search-prod-results');
+  const clearBtn = document.getElementById('np-search-prod-clear');
+  if (!results) return;
+
+  if (clearBtn) clearBtn.style.display = q ? '' : 'none';
+
+  if (!q) {
+    results.style.display = 'none';
+    results.innerHTML = '';
+    _npSearchHighlight = -1;
     return;
   }
-  wrap.style.display = "";
-  const efectivo = Math.round(total * 0.9);
-  wrap.innerHTML = `<span class="np-total-label">Total</span>
-    <span class="np-total-num">$${total.toLocaleString("es-AR")}</span>
-    <span class="np-total-ef">💵 efectivo $${efectivo.toLocaleString("es-AR")}</span>`;
-}
 
-// ── ESTADO / PAGO / NOTA ──
-function npSelEstado(estado, el) {
-  _npEstado = estado;
-  document.querySelectorAll("#np-estado-sel .estado-opt").forEach(b => {
-    b.className = "estado-opt";
+  const matches = (datos.catalogo || []).filter(c => c.nombre.toLowerCase().includes(q));
+
+  if (!matches.length) {
+    results.innerHTML = `<div class="np-search-no-results">
+      Sin resultados para "<strong>${esc(q)}</strong>"
+      <br><span style="font-size:.7rem;">Podés agregarlo como producto libre ↓</span>
+    </div>`;
+    results.style.display = '';
+    _npSearchHighlight = -1;
+    return;
+  }
+
+  const grupos = { s: {}, c: {} };
+  matches.forEach(c => {
+    const tacc = c.tipo === 'sin_tacc' ? 's' : 'c';
+    const cat  = NP_CAT_ORDEN.includes(c.categoria) ? c.categoria : 'otros';
+    if (!grupos[tacc][cat]) grupos[tacc][cat] = [];
+    grupos[tacc][cat].push(c);
   });
-  el.className = "estado-opt active-" + estado;
+
+  const fragment  = document.createDocumentFragment();
+  let   itemIndex = 0;
+
+  ['s','c'].forEach(tacc => {
+    NP_CAT_ORDEN.forEach(cat => {
+      const items = grupos[tacc][cat];
+      if (!items || !items.length) return;
+
+      const sep = document.createElement('div');
+      sep.className   = 'np-search-cat-sep';
+      sep.textContent = (tacc === 's' ? 'SIN TACC · ' : 'CON TACC · ') + NP_CAT_LABELS[cat];
+      fragment.appendChild(sep);
+
+      items.sort((a,b) => a.nombre.localeCompare(b.nombre)).forEach(c => {
+        const item = document.createElement('div');
+        item.className    = 'np-search-prod-item';
+        item.dataset.index = itemIndex++;
+
+        const pill = document.createElement('span');
+        pill.className   = 'tacc-pill ' + tacc;
+        pill.textContent = tacc === 's' ? 'ST' : 'C';
+
+        const nomSpan = document.createElement('span');
+        nomSpan.className = 'np-search-prod-nombre';
+        const idx = c.nombre.toLowerCase().indexOf(q);
+        if (idx >= 0) {
+          nomSpan.innerHTML =
+            esc(c.nombre.slice(0, idx)) +
+            `<mark>${esc(c.nombre.slice(idx, idx + q.length))}</mark>` +
+            esc(c.nombre.slice(idx + q.length));
+        } else {
+          nomSpan.textContent = c.nombre;
+        }
+
+        const precioSpan = document.createElement('span');
+        precioSpan.className = 'np-search-prod-precio';
+        if (c.precio) precioSpan.textContent = '$' + Number(c.precio).toLocaleString('es-AR');
+
+        item.appendChild(pill);
+        item.appendChild(nomSpan);
+        item.appendChild(precioSpan);
+
+        item.addEventListener('mousedown', e => { e.preventDefault(); npSearchSeleccionar(c, 'catalogo', tacc); });
+        item.addEventListener('touchstart', e => { e.preventDefault(); npSearchSeleccionar(c, 'catalogo', tacc); }, { passive: false });
+
+        fragment.appendChild(item);
+      });
+    });
+  });
+
+  // Opción libre si no hay match exacto
+  const hayExacto = (datos.catalogo || []).some(c => c.nombre.toLowerCase() === q);
+  if (!hayExacto) {
+    const libreItem = document.createElement('div');
+    libreItem.className = 'np-search-prod-item np-search-libre';
+    libreItem.style.cssText = 'border-top:2px dashed var(--border);color:var(--accent);font-style:italic;';
+    libreItem.innerHTML = `<span style="font-size:.85rem;">＋ Agregar "<strong>${esc(query.trim())}</strong>" como producto libre</span>`;
+    libreItem.addEventListener('mousedown', e => { e.preventDefault(); npSearchSeleccionarLibre(query.trim()); });
+    libreItem.addEventListener('touchstart', e => { e.preventDefault(); npSearchSeleccionarLibre(query.trim()); }, { passive: false });
+    fragment.appendChild(libreItem);
+  }
+
+  results.innerHTML = '';
+  results.appendChild(fragment);
+  results.style.display = '';
+  _npSearchHighlight = -1;
 }
 
-function npTogglePago() {
-  if (!_npPagado) {
-    _pagoId = "__np__";
-    _pagoDeshacer = false;
-    _pagoMetodo = null;
-    document.querySelectorAll(".modal-metodo").forEach(m => m.classList.remove("selected"));
-    document.getElementById("modal-pago-titulo").textContent = "Confirmar pago";
-    document.getElementById("modal-pago-desc").textContent = "Seleccioná el método de pago.";
-    document.getElementById("modal-pago").classList.remove("hidden");
-  } else {
-    _npPagado = false;
-    _npMetodoPago = "";
-    const bar = document.getElementById("np-pago-bar");
-    bar.className = "pago-bar no";
-    bar.innerHTML = "💳 Sin confirmar pago <button class=\"btn-pagar pagar\" onclick=\"npTogglePago()\">Confirmar</button>";
+function npSearchSeleccionar(cat, tipo, tacc) {
+  if (!_npPedido) _npPedido = { id: '__np__', productos: [] };
+  _npPedido.productos.push(crearProductoBase({
+    nombre: cat.nombre, tipo, tacc,
+    libre:  tipo === 'libre' ? cat.nombre : undefined,
+  }));
+  npSearchProdClear();
+  npRenderProds();
+  setTimeout(() => {
+    const wrap = document.getElementById('np-prods-wrap');
+    if (wrap) wrap.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 60);
+}
+
+function npSearchSeleccionarLibre(nombre) {
+  if (!nombre) return;
+  if (!_npPedido) _npPedido = { id: '__np__', productos: [] };
+  _npPedido.productos.push(crearProductoBase({
+    nombre, tipo: 'libre', tacc: 'c', libre: nombre,
+  }));
+  npSearchProdClear();
+  npRenderProds();
+  setTimeout(() => {
+    const wrap = document.getElementById('np-prods-wrap');
+    if (wrap) wrap.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 60);
+}
+
+function npSearchProdClear() {
+  const inp     = document.getElementById('np-search-prod-input');
+  const results = document.getElementById('np-search-prod-results');
+  const clearBtn = document.getElementById('np-search-prod-clear');
+  if (inp)     inp.value = '';
+  if (results) { results.style.display = 'none'; results.innerHTML = ''; }
+  if (clearBtn) clearBtn.style.display = 'none';
+  _npSearchHighlight = -1;
+}
+
+function npSearchKeydown(e) {
+  const results = document.getElementById('np-search-prod-results');
+  if (!results || results.style.display === 'none') return;
+  const items = results.querySelectorAll('.np-search-prod-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    _npSearchHighlight = Math.min(_npSearchHighlight + 1, items.length - 1);
+    npSearchUpdateHighlight(items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    _npSearchHighlight = Math.max(_npSearchHighlight - 1, 0);
+    npSearchUpdateHighlight(items);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (_npSearchHighlight >= 0 && items[_npSearchHighlight])
+      items[_npSearchHighlight].dispatchEvent(new MouseEvent('mousedown'));
+  } else if (e.key === 'Escape') {
+    npSearchProdClear();
   }
 }
 
-function npToggleNota() {
-  const wrap = document.getElementById("np-nota-wrap");
-  const visible = wrap.style.display !== "none";
-  wrap.style.display = visible ? "none" : "block";
-  if (!visible) document.getElementById("np-nota").focus();
+function npSearchUpdateHighlight(items) {
+  items.forEach((el, i) => el.classList.toggle('np-search-highlighted', i === _npSearchHighlight));
+  if (_npSearchHighlight >= 0) items[_npSearchHighlight].scrollIntoView({ block: 'nearest' });
 }
 
-// ── ABRIR / CERRAR ──
+// Cerrar resultados al hacer click fuera
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('np-search-prod-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    const results = document.getElementById('np-search-prod-results');
+    if (results) results.style.display = 'none';
+  }
+});
+
+
+// ══════════════════════════════════════════════════
+//  ABRIR / CERRAR / GUARDAR
+// ══════════════════════════════════════════════════
 
 let _npTabAnterior = 'tab-pedidos';
 
 function abrirModalNP() {
   const activo = document.querySelector('.tab-content.active');
   if (activo) _npTabAnterior = activo.id;
+
+  // Reset estado interno
+  _npDia        = null;
+  _npDiaKey     = null;
+  _npPedido     = { id: '__np__', productos: [] };
+  _npPagado     = false;
+  _npMetodoPago = '';
+  _npEstado     = 'pendiente';
+
+  // Reset días
+  document.querySelectorAll('.modal-np-dia-btn').forEach(b => b.classList.remove('active'));
+  const customInput = document.getElementById('np-dia-custom');
+  if (customInput) customInput.value = '';
+  const lblOtro = document.getElementById('np-lbl-otro');
+  if (lblOtro) lblOtro.textContent = 'Otro día';
+
+  // Reset campos de texto
+  document.getElementById('np-nombre').value = '';
+  document.getElementById('np-tel').value    = '';
+  document.getElementById('np-tel-hint').textContent = '';
+  document.getElementById('np-tel-hint').className   = 'np-hint';
+  document.getElementById('np-hora').value   = '';
+  _npTimeH = null; _npTimeM = null;
+  setTimeout(() => { npClockInit(); }, 30);
+
+  // Reset error
+  const errDiv = document.getElementById('np-error');
+  errDiv.style.display = 'none';
+  errDiv.textContent   = '';
+
+  // Reset modo Cuba — volver a Cliente
+  document.getElementById('np-cuba-badge').style.display = 'none';
+  const filaNombre = document.getElementById('np-fila-nombre');
+  if (filaNombre) filaNombre.style.display = '';
+  document.getElementById('np-campo-tel').style.display = '';
+  document.getElementById('np-btn-cliente-ui').classList.add('active-cliente');
+  document.getElementById('np-btn-cuba').classList.remove('active-cuba');
+
+  // Reset turnos Cuba
+  document.getElementById('np-t1').classList.remove('active');
+  document.getElementById('np-t2').classList.remove('active');
+
+  // Reset pills
+  const optPago = document.getElementById('np-opt-pago');
+  if (optPago)   { optPago.textContent = '💳 Confirmar pago'; optPago.classList.remove('active'); optPago.style.display = ''; }
+  const optNota = document.getElementById('np-opt-nota');
+  if (optNota)   { optNota.textContent = '📝 Nota'; optNota.classList.remove('active'); }
+  const optEstado = document.getElementById('np-opt-estado');
+  if (optEstado) { optEstado.textContent = '⏳ Pendiente'; optEstado.classList.remove('active'); }
+
+  // Reset paneles expandidos
+  document.getElementById('np-nota-wrap').style.display   = 'none';
+  document.getElementById('np-estado-wrap').style.display = 'none';
+  document.getElementById('np-nota').value = '';
+
+  // Reset selector de estado
+  document.querySelectorAll('#np-estado-sel .estado-opt').forEach(b => b.className = 'estado-opt');
+  const firstOpt = document.querySelector('#np-estado-sel .estado-opt');
+  if (firstOpt) firstOpt.className = 'estado-opt active-pendiente';
+
+  // Reset buscador
+  npSearchProdClear();
+
+  // Render inicial
+  npRenderProds();
+  npLabels();
+  npActualizarHorario();
+
+  // Mostrar página
+  document.getElementById('tab-contents').style.display   = 'none';
+  document.getElementById('tab-np-page').style.display = 'flex';
+
+  setTimeout(() => { document.getElementById('np-dia-hoy')?.focus(); npClockInit(); }, 80);
+}
+
+function cerrarModalNP() {
+  document.getElementById('tab-np-page').style.display    = 'none';
+  document.getElementById('tab-contents').style.display   = '';
+  document.getElementById(_npTabAnterior)?.classList.add('active');
+  _npPedido = null;
+}
+
+function confirmarNP() {
+  const errDiv = document.getElementById('np-error');
+  errDiv.textContent = '';
+  errDiv.style.display = 'none';
+
+  const nombre = (document.getElementById('np-nombre').value || '').trim();
+  const tel    = (document.getElementById('np-tel').value    || '').trim();
+  const hora   = (document.getElementById('np-hora').value   || '').trim();
+  const nota   = (document.getElementById('np-nota').value   || '').trim();
+  const isCuba = nombre.toLowerCase().includes('cuba');
+
+  const errores = [];
+  if (!_npDiaKey)                                errores.push('Seleccioná un día de entrega');
+  if (!isCuba && !nombre)                        errores.push('Falta el nombre del cliente');
+  if (!isCuba && !hora)                          errores.push('Falta el horario de entrega');
+  if (!_npPedido || !_npPedido.productos.length) errores.push('Agregá al menos un producto');
+
+  if (errores.length) {
+    errDiv.textContent = '⚠️ ' + errores.join(' · ');
+    errDiv.style.display = '';
+    return;
+  }
+
+  const sinTalle = (_npPedido.productos || []).filter(r => {
+    const cat    = datos.catalogo.find(c => c.nombre === r.nombre && c.tipo === (r.tacc === 's' ? 'sin_tacc' : 'con_tacc'));
+    const obliga = r.tipo === 'catalogo' ? (cat ? cat.tiene_talle : false) : false;
+    return obliga && !(r.tamano || '').trim();
+  });
+  if (sinTalle.length) {
+    errDiv.innerHTML = '⚠️ Completá el talle de: <strong>' + sinTalle.map(r => esc(r.nombre)).join(', ') + '</strong>';
+    errDiv.style.display = '';
+    return;
+  }
+
+  _npPedido.productos.forEach(r => { delete r._tamLibre; });
+
+  const clienteNorm = normalizarCliente(nombre);
+  if (!isCuba && nombre) {
+    const yaExiste = datos.clientes.find(c => c.nombre.toLowerCase() === clienteNorm.toLowerCase());
+    if (!yaExiste) datos.clientes.push({ id: uid(), nombre: clienteNorm, tel: tel || '', frecuente: false });
+  }
+
+  const pedido = crearPedidoBase({
+    cliente:       clienteNorm,
+    cliente_input: nombre,
+    tel:           isCuba ? '' : tel,
+    hora_entrega:  hora,
+    productos:     _npPedido.productos,
+    estado:        _npEstado || ESTADOS.PENDIENTE,
+    pagado:        _npPagado,
+    metodoPago:    _npMetodoPago || '',
+    notas:         nota,
+  });
+
+  if (!datos.dias[_npDiaKey])          datos.dias[_npDiaKey] = { pedidos: [] };
+  if (!datos.dias[_npDiaKey].pedidos)  datos.dias[_npDiaKey].pedidos = [];
+  datos.dias[_npDiaKey].pedidos.push(pedido);
+
+  guardar();
+  mostrarToastGuardado();
+  cerrarModalNP();
+  renderPedidos();
+
+  const prodTab = document.getElementById('tab-produccion');
+  if (prodTab && prodTab.classList.contains('active')) renderProduccion();
+}
+
+// alias
+function agregarPedido() { abrirModalNP(); }
+// ── ABRIR / CERRAR ──
+
+
+
+function abrirModalNP() {
+  const activo = document.querySelector('.tab-content.active');
+  if (activo) _npTabAnterior = activo.id;
+
+  _npDia = null;
+  _npDiaKey = null;
+  _npPedido = { id: '__np__', productos: [] };
+  _npPagado = false;
+  _npMetodoPago = '';
+  _npEstado = 'pendiente';
+
+  document.querySelectorAll('.modal-np-dia-btn').forEach(b => b.classList.remove('active'));
+  const customInput = document.getElementById('np-dia-custom');
+  if (customInput) customInput.value = '';
+  const lblOtro = document.getElementById('np-lbl-otro');
+  if (lblOtro) lblOtro.textContent = 'Otro día';
+
+  document.getElementById('np-nombre').value = '';
+  document.getElementById('np-tel').value = '';
+  document.getElementById('np-tel-hint').textContent = '';
+  document.getElementById('np-tel-hint').className = 'np-hint';
+  document.getElementById('np-hora').value = '';
+  _npTimeH = null; _npTimeM = null;
+  setTimeout(() => { npClockInit(); }, 30);
+
+  document.getElementById('np-error').style.display = 'none';
+  document.getElementById('np-error').textContent = '';
+  document.getElementById('np-cuba-badge').style.display = 'none';
+  document.getElementById('np-campo-tel').style.display = '';
+  document.getElementById('np-campo-pago').style.display = '';
+  npActualizarBotonesCuba(false);
+  document.getElementById('np-t1').classList.remove('active');
+  document.getElementById('np-t2').classList.remove('active');
+
+  document.querySelectorAll('#np-estado-sel .estado-opt').forEach(b => b.className = 'estado-opt');
+  document.querySelector('#np-estado-sel .estado-opt').className = 'estado-opt active-pendiente';
+
+  const bar = document.getElementById('np-pago-bar');
+  bar.className = 'pago-bar no';
+  bar.innerHTML = '💳 Sin confirmar pago <button class="btn-pagar pagar" onclick="npTogglePago()">Confirmar</button>';
+
+  document.getElementById('np-nota').value = '';
+  document.getElementById('np-nota-wrap').style.display = 'none';
+
+  npRenderProds();
+  npLabels();
+  npActualizarHorario();
+
   document.getElementById('tab-contents').style.display = 'none';
   document.getElementById('tab-np-page').style.display = 'flex';
-  // ... resto del init igual
+
+  setTimeout(() => { document.getElementById('np-dia-hoy')?.focus(); npClockInit(); }, 80);
 }
 
 function cerrarModalNP() {
   document.getElementById('tab-np-page').style.display = 'none';
   document.getElementById('tab-contents').style.display = '';
   document.getElementById(_npTabAnterior)?.classList.add('active');
-  const fab = document.getElementById('fab-nuevo-pedido');
-  if (fab) fab.style.display = '';
   _npPedido = null;
 }
 
@@ -1084,20 +1430,17 @@ function confirmarNP() {
   }
 
   // Armar pedido final
-  const pedido = {
-    id: uid(),
-    cliente: clienteNorm,
-    cliente_input: nombre,
-    tel: isCuba ? '' : tel,
-    hora_entrega: hora,
-    productos: _npPedido.productos,
-    estado: _npEstado || 'pendiente',
-    pagado: _npPagado,
-    metodoPago: _npMetodoPago || '',
-    notas: nota,
-    cargado: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
-    timestamp: Date.now()
-  };
+const pedido = crearPedidoBase({
+  cliente: clienteNorm,
+  cliente_input: nombre,
+  tel: isCuba ? '' : tel,
+  hora_entrega: hora,
+  productos: _npPedido.productos,
+  estado: _npEstado || ESTADOS.PENDIENTE,
+  pagado: _npPagado,
+  metodoPago: _npMetodoPago || '',
+  notas: nota,
+});
 
   // Guardar en el día correspondiente
   if (!datos.dias[_npDiaKey]) datos.dias[_npDiaKey] = { pedidos: [] };
@@ -1164,8 +1507,10 @@ function renderSelectorLista() {
   libreWrap.style.display = (q && !hayMatchExacto) ? "" : "none";
   if (typeof kbClearHighlight === "function") kbClearHighlight();
 }
+
 function seleccionarProducto(cat, tipo, tacc) {
   const pedidoId = _selectorPedidoId;
+
   if (pedidoId === "__ed__") {
     if (!_edPedido) return;
     const prodId = _selectorProdId;
@@ -1173,12 +1518,16 @@ function seleccionarProducto(cat, tipo, tacc) {
       const r = _edPedido.productos.find(x => x.id === prodId);
       if (r) { r.nombre = cat.nombre; r.tipo = tipo; r.tacc = tacc; r.libre = tipo === "libre" ? cat.nombre : undefined; r.tamano = ""; r.listo = false; r.pedido_cuba = false; r.separado_cuba = false; }
     } else {
-      _edPedido.productos.push({ id: uid(), nombre: cat.nombre, tipo, tacc, libre: tipo === "libre" ? cat.nombre : undefined, tamano: "", cantidad: 1, listo: false, pedido_cuba: false, separado_cuba: false, precio_libre: 0, extras: [] });
+      _edPedido.productos.push(crearProductoBase({
+        nombre: cat.nombre, tipo, tacc,
+        libre: tipo === "libre" ? cat.nombre : undefined,
+      }));
     }
     cerrarSelector();
     edRenderProds();
     return;
   }
+
   if (pedidoId === "__np__") {
     if (!_npPedido) _npPedido = { id: "__np__", productos: [] };
     const prodId = _selectorProdId;
@@ -1186,12 +1535,16 @@ function seleccionarProducto(cat, tipo, tacc) {
       const r = _npPedido.productos.find(x => x.id === prodId);
       if (r) { r.nombre = cat.nombre; r.tipo = tipo; r.tacc = tacc; r.libre = tipo === "libre" ? cat.nombre : undefined; r.tamano = ""; r.listo = false; r.pedido_cuba = false; r.separado_cuba = false; }
     } else {
-      _npPedido.productos.push({ id: uid(), nombre: cat.nombre, tipo, tacc, libre: tipo === "libre" ? cat.nombre : undefined, tamano: "", cantidad: 1, listo: false, pedido_cuba: false, separado_cuba: false, precio_libre: 0, extras: [] });
+      _npPedido.productos.push(crearProductoBase({
+        nombre: cat.nombre, tipo, tacc,
+        libre: tipo === "libre" ? cat.nombre : undefined,
+      }));
     }
     cerrarSelector();
     npRenderProds();
     return;
   }
+
   const p = getAllPedidos().find(x => x.id === pedidoId);
   if (!p) return;
   const prodId = _selectorProdId;
@@ -1199,7 +1552,10 @@ function seleccionarProducto(cat, tipo, tacc) {
     const r = p.productos.find(x => x.id === prodId);
     if (r) { r.nombre = cat.nombre; r.tipo = tipo; r.tacc = tacc; r.libre = tipo === "libre" ? cat.nombre : undefined; r.tamano = ""; r.listo = false; r.pedido_cuba = false; r.separado_cuba = false; }
   } else {
-    p.productos.push({ id: uid(), nombre: cat.nombre, tipo, tacc, libre: tipo === "libre" ? cat.nombre : undefined, tamano: "", cantidad: 1, listo: false, pedido_cuba: false, separado_cuba: false });
+    p.productos.push(crearProductoBase({
+      nombre: cat.nombre, tipo, tacc,
+      libre: tipo === "libre" ? cat.nombre : undefined,
+    }));
   }
   cerrarSelector();
   guardar();
@@ -1223,15 +1579,11 @@ function selMetodo(m, el) {
   el.classList.add("selected");
 }
 function confirmarPago() {
-  if (_pagoId === "__np__") {
-    if (!_pagoMetodo) { alert("Seleccioná un método de pago."); return; }
-    _npPagado = true;
+  if (_pagoId === '__np__') {
+    if (!_pagoMetodo) { alert('Seleccioná un método de pago.'); return; }
+    _npPagado     = true;
     _npMetodoPago = _pagoMetodo;
-    const bar = document.getElementById("np-pago-bar");
-    if (bar) {
-      bar.className = "pago-bar si";
-      bar.innerHTML = "✅ Pagado · " + esc(_pagoMetodo) + " <button class=\"btn-pagar despagar\" onclick=\"npTogglePago()\">Deshacer</button>";
-    }
+    npUiActualizarPagoPill();   // ← única línea nueva
     cerrarModalPago();
     return;
   }
@@ -1549,8 +1901,9 @@ function edRenderEdicion() {
       : '<div class="modal-np-campo"><label>Hora de entrega</label>'
       + '<input type="time" id="ed-hora" value="' + esc(p.hora_entrega || "") + '" oninput="_edPedido.hora_entrega=this.value">'
       + '</div>';
+  
   document.getElementById("ed-titulo").textContent = isCuba ? "✏️ Editar pedido Cuba" : "✏️ Editar pedido";
-  document.getElementById("ed-body").innerHTML =
+  document.getElementById("ed-body").innerHTML = 
     (isCuba
       ? '<div class="modal-np-campo"><div style="background:var(--cuba-bg);border:1.5px solid var(--cuba-border);border-radius:var(--radius-sm);padding:7px 12px;font-size:.78rem;color:var(--cuba-ink);font-weight:500;">🏪 Pedido de Cuba</div></div>'
       : '<div class="modal-np-campo">'
@@ -1795,20 +2148,277 @@ function guardarEdicion() {
     return;
   }
   _edPedido.productos.forEach(r => { delete r._tamLibre; });
-  let guardadoOk = false;
-  Object.values(datos.dias).forEach(dData => {
-    if (guardadoOk) return;
-    const ps = dData.pedidos || [];
-    const idx = ps.findIndex(x => x.id === _edPedidoId);
-    if (idx >= 0) {
-      ps[idx] = { ...ps[idx], ..._edPedido };
-      guardadoOk = true;
-    }
-  });
-  guardar();
+  guardarPedido(_edPedido);
   mostrarToastGuardado();
   cerrarModalEdicion();
   renderPedidos();
   const prodTab = document.getElementById("tab-produccion");
   if (prodTab && prodTab.classList.contains("active")) renderProduccion();
 }
+
+// ── Orden y etiquetas de categorías ──
+const NP_CAT_ORDEN  = ["tortas","mousses","bandejas","cuadrados","congelados","otros"];
+const NP_CAT_LABELS = {
+  tortas:    "🎂 Tortas",
+  mousses:   "🍮 Mousses",
+  bandejas:  "🍫 Bandejas",
+  cuadrados: "🟫 Cuadrados",
+  congelados:"❄️ Congelados",
+  otros:     "✨ Otros",
+};
+ 
+// ── Estado del teclado (navegación con flechas) ──
+let _npSearchHighlight = -1;
+ 
+// ─────────────────────────────────────────────────────
+//  npSearchProd(query)
+//  Llamada desde oninput del input de búsqueda.
+//  Filtra el catálogo y renderiza resultados.
+// ─────────────────────────────────────────────────────
+function npSearchProd(query) {
+  const q       = (query || "").trim().toLowerCase();
+  const results = document.getElementById("np-search-prod-results");
+  const clearBtn= document.getElementById("np-search-prod-clear");
+  if (!results) return;
+ 
+  // Mostrar/ocultar botón de limpiar
+  if (clearBtn) clearBtn.style.display = q ? "" : "none";
+ 
+  if (!q) {
+    results.style.display = "none";
+    results.innerHTML = "";
+    _npSearchHighlight = -1;
+    return;
+  }
+ 
+  // ── Filtrar catálogo ──
+  const matches = (datos.catalogo || []).filter(c =>
+    c.nombre.toLowerCase().includes(q)
+  );
+ 
+  if (!matches.length) {
+    results.innerHTML = `<div class="np-search-no-results">
+      Sin resultados para "<strong>${esc(q)}</strong>"
+      <br><span style="font-size:.7rem;">Podés agregarlo como producto libre abajo ↓</span>
+    </div>`;
+    results.style.display = "";
+    _npSearchHighlight = -1;
+    return;
+  }
+ 
+  // ── Agrupar por tipo y categoría ──
+  const grupos = { s: {}, c: {} };  // s = sin TACC, c = con TACC
+ 
+  matches.forEach(c => {
+    const tacc = c.tipo === "sin_tacc" ? "s" : "c";
+    const cat  = NP_CAT_ORDEN.includes(c.categoria) ? c.categoria : "otros";
+    if (!grupos[tacc][cat]) grupos[tacc][cat] = [];
+    grupos[tacc][cat].push(c);
+  });
+ 
+  // ── Construir HTML usando fragment para evitar problemas de escapado ──
+  const fragment = document.createDocumentFragment();
+  let   itemIndex = 0;
+ 
+  ["s","c"].forEach(tacc => {
+    NP_CAT_ORDEN.forEach(cat => {
+      const items = grupos[tacc][cat];
+      if (!items || !items.length) return;
+ 
+      // Separador de categoría
+      const sep = document.createElement("div");
+      sep.className = "np-search-cat-sep";
+      sep.textContent = (tacc === "s" ? "SIN TACC · " : "CON TACC · ") + NP_CAT_LABELS[cat];
+      fragment.appendChild(sep);
+ 
+      // Items
+      items
+        .sort((a,b) => a.nombre.localeCompare(b.nombre))
+        .forEach(c => {
+          const item = document.createElement("div");
+          item.className = "np-search-prod-item";
+          item.dataset.index = itemIndex++;
+ 
+          // Pill TACC
+          const pill = document.createElement("span");
+          pill.className = "tacc-pill " + tacc;
+          pill.textContent = tacc === "s" ? "ST" : "C";
+ 
+          // Nombre con highlight
+          const nomSpan = document.createElement("span");
+          nomSpan.className = "np-search-prod-nombre";
+          const nomText = c.nombre;
+          const idx = nomText.toLowerCase().indexOf(q);
+          if (idx >= 0) {
+            nomSpan.innerHTML =
+              esc(nomText.slice(0, idx)) +
+              `<mark>${esc(nomText.slice(idx, idx + q.length))}</mark>` +
+              esc(nomText.slice(idx + q.length));
+          } else {
+            nomSpan.textContent = nomText;
+          }
+ 
+          // Precio
+          const precioSpan = document.createElement("span");
+          precioSpan.className = "np-search-prod-precio";
+          if (c.precio) {
+            precioSpan.textContent = "$" + Number(c.precio).toLocaleString("es-AR");
+          }
+ 
+          item.appendChild(pill);
+          item.appendChild(nomSpan);
+          item.appendChild(precioSpan);
+ 
+          // ── Evento de selección (sin onclick inline = sin problemas de escape) ──
+          item.addEventListener("mousedown", function(e) {
+            e.preventDefault(); // evita que el input pierda el foco antes del click
+            npSearchSeleccionar(c, "catalogo", tacc);
+          });
+          item.addEventListener("touchstart", function(e) {
+            e.preventDefault();
+            npSearchSeleccionar(c, "catalogo", tacc);
+          }, { passive: false });
+ 
+          fragment.appendChild(item);
+        });
+    });
+  });
+ 
+  // ── Opción "Agregar como libre" al final si no hay match exacto ──
+  const hayExacto = (datos.catalogo || []).some(
+    c => c.nombre.toLowerCase() === q
+  );
+  if (!hayExacto) {
+    const libreItem = document.createElement("div");
+    libreItem.className = "np-search-prod-item np-search-libre";
+    libreItem.style.cssText = "border-top:2px dashed var(--border);color:var(--accent);font-style:italic;";
+    libreItem.innerHTML = `<span style="font-size:.85rem;">＋ Agregar "<strong>${esc(query.trim())}</strong>" como producto libre</span>`;
+    libreItem.addEventListener("mousedown", function(e) {
+      e.preventDefault();
+      npSearchSeleccionarLibre(query.trim());
+    });
+    libreItem.addEventListener("touchstart", function(e) {
+      e.preventDefault();
+      npSearchSeleccionarLibre(query.trim());
+    }, { passive: false });
+    fragment.appendChild(libreItem);
+  }
+ 
+  results.innerHTML = "";
+  results.appendChild(fragment);
+  results.style.display = "";
+  _npSearchHighlight = -1;
+}
+ 
+// ─────────────────────────────────────────────────────
+//  npSearchSeleccionar(cat, tipo, tacc)
+//  Agrega el producto al pedido temporal y limpia el buscador.
+// ─────────────────────────────────────────────────────
+function npSearchSeleccionar(cat, tipo, tacc) {
+  if (!_npPedido) _npPedido = { id: "__np__", productos: [] };
+ 
+  _npPedido.productos.push(crearProductoBase({
+    nombre: cat.nombre,
+    tipo,
+    tacc,
+    libre: tipo === "libre" ? cat.nombre : undefined,
+  }));
+ 
+  npSearchProdClear();
+  npRenderProds();
+ 
+  // Scroll suave al último producto agregado
+  setTimeout(() => {
+    const wrap = document.getElementById("np-prods-wrap");
+    if (wrap) wrap.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, 60);
+}
+ 
+// ─────────────────────────────────────────────────────
+//  npSearchSeleccionarLibre(nombre)
+//  Agrega producto libre (sin catálogo).
+// ─────────────────────────────────────────────────────
+function npSearchSeleccionarLibre(nombre) {
+  if (!nombre) return;
+  if (!_npPedido) _npPedido = { id: "__np__", productos: [] };
+ 
+  // Pide tipo TACC antes de agregar (usando el toggle existente o default "c")
+  _npPedido.productos.push(crearProductoBase({
+    nombre: nombre,
+    tipo:   "libre",
+    tacc:   "c",
+    libre:  nombre,
+  }));
+ 
+  npSearchProdClear();
+  npRenderProds();
+ 
+  setTimeout(() => {
+    const wrap = document.getElementById("np-prods-wrap");
+    if (wrap) wrap.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, 60);
+}
+ 
+// ─────────────────────────────────────────────────────
+//  npSearchProdClear()
+//  Limpia el input y oculta resultados.
+// ─────────────────────────────────────────────────────
+function npSearchProdClear() {
+  const inp     = document.getElementById("np-search-prod-input");
+  const results = document.getElementById("np-search-prod-results");
+  const clearBtn= document.getElementById("np-search-prod-clear");
+  if (inp)     inp.value = "";
+  if (results) { results.style.display = "none"; results.innerHTML = ""; }
+  if (clearBtn) clearBtn.style.display = "none";
+  _npSearchHighlight = -1;
+}
+ 
+// ─────────────────────────────────────────────────────
+//  Navegación con teclado (↑ ↓ Enter Escape)
+//  Agregar al input del buscador con onkeydown="npSearchKeydown(event)"
+// ─────────────────────────────────────────────────────
+function npSearchKeydown(e) {
+  const results = document.getElementById("np-search-prod-results");
+  if (!results || results.style.display === "none") return;
+ 
+  const items = results.querySelectorAll(".np-search-prod-item");
+  if (!items.length) return;
+ 
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    _npSearchHighlight = Math.min(_npSearchHighlight + 1, items.length - 1);
+    npSearchUpdateHighlight(items);
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    _npSearchHighlight = Math.max(_npSearchHighlight - 1, 0);
+    npSearchUpdateHighlight(items);
+  } else if (e.key === "Enter") {
+    e.preventDefault();
+    if (_npSearchHighlight >= 0 && items[_npSearchHighlight]) {
+      items[_npSearchHighlight].dispatchEvent(new MouseEvent("mousedown"));
+    }
+  } else if (e.key === "Escape") {
+    npSearchProdClear();
+  }
+}
+ 
+function npSearchUpdateHighlight(items) {
+  items.forEach((el, i) => {
+    el.classList.toggle("np-search-highlighted", i === _npSearchHighlight);
+  });
+  if (_npSearchHighlight >= 0) {
+    items[_npSearchHighlight].scrollIntoView({ block: "nearest" });
+  }
+}
+ 
+// ─────────────────────────────────────────────────────
+//  Cerrar resultados al hacer click fuera
+// ─────────────────────────────────────────────────────
+document.addEventListener("click", function(e) {
+  const wrap = document.getElementById("np-search-prod-wrap");
+  if (wrap && !wrap.contains(e.target)) {
+    const results = document.getElementById("np-search-prod-results");
+    if (results) results.style.display = "none";
+  }
+});
+ 
