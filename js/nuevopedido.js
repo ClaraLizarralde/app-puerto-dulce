@@ -1726,7 +1726,7 @@ function confirmarNP() {
   // ── Fin modo EDICIÓN ─────────────────────────────────────────
 
   // ── Modo CREACIÓN (igual que antes) ──────────────────────────
-  const pedido = crearPedidoBase({
+const pedido = crearPedidoBase({
     cliente:       clienteNorm,
     cliente_input: nombre,
     tel:           isCuba ? '' : tel,
@@ -1736,6 +1736,7 @@ function confirmarNP() {
     pagado:        _npPagado,
     metodoPago:    _npMetodoPago || '',
     notas:         nota,
+    _creadoPor:    (typeof usuarioActivo !== 'undefined' && usuarioActivo.nombre) ? usuarioActivo.nombre : '—',
   });
 
   if (!datos.dias[_npDiaKey])          datos.dias[_npDiaKey] = { pedidos: [] };

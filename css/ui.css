@@ -284,3 +284,116 @@ BASES DE MODALES REUTILIZABLES (MODAL, SELECTOR, DETALLE)
   border-bottom:1px solid var(--border);
   cursor:pointer;
 }
+
+/* ── MODAL PAGO — rediseño ── */
+#modal-pago.modal-overlay {
+  align-items: center;
+}
+
+.modal-pago-box {
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 24px 22px 20px;
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 16px 48px rgba(0,0,0,.3);
+}
+.modal-pago-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-pago-header span {
+  font-family: 'Outfit', sans-serif;
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.modal-pago-x {
+  background: none;
+  border: none;
+  color: var(--ink-light);
+  font-size: .85rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color .12s;
+}
+.modal-pago-x:hover { color: var(--ink); }
+.modal-pago-desc {
+  font-family: 'Outfit', sans-serif;
+  font-size: .78rem;
+  color: var(--ink-light);
+  margin: 0;
+}
+.modal-pago-metodos {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.modal-metodo {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink-mid);
+  font-family: 'Outfit', sans-serif;
+  font-size: .82rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all .12s;
+}
+.modal-metodo:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.modal-metodo.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.modal-pago-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+#modal-pago .modal-btn-confirm {
+  font-family: 'Outfit', sans-serif;
+  font-size: .85rem;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 50px;
+  border: none;
+  background: var(--accent);
+  color: #0a0a0a;
+  cursor: pointer;
+  width: 100%;
+  transition: opacity .15s;
+}
+#modal-pago .modal-btn-confirm:hover { opacity: .88; }
+
+#modal-pago .modal-btn-cancel {
+  font-family: 'Outfit', sans-serif;
+  font-size: .75rem;
+  font-weight: 500;
+  padding: 10px;
+  border-radius: 50px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink-light);
+  cursor: pointer;
+  width: 100%;
+  transition: all .15s;
+}
+#modal-pago .modal-btn-cancel:hover {
+  color: var(--ink);
+  border-color: var(--ink-mid);
+}

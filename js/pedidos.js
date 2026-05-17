@@ -1489,8 +1489,8 @@ function renderPedidosTable() {
         if (cat) totalTortas += cant; else totalOtros += cant;
         return `<span class="po-prod-pill${isST ? " st" : ""}">${esc(nom)} ×${cant}</span>`;
       }).join("");
-
-      const estadoLabels = { pendiente: "Pendiente", prod: "En prod.", listo: "Listo", entregado: "Retirado" };
+      
+      const estadoLabels = { pendiente: "Pendiente", listo: "Listo", entregado: "Retirado", suspendido: "Suspendido" };
       const notaIcon = p.notas ? `<span title="${esc(p.notas)}" style="font-size:.7rem;margin-left:3px;">📝</span>` : "";
       const pagadoBadge = p.pagado ? `<span class="po-pagado-badge">✓ PAGADO</span>` : "";
 
@@ -1507,13 +1507,15 @@ function renderPedidosTable() {
           <td class="po-td-hora">
             ${esc(p.hora_entrega || "--:--")}${p.fuera_horario ? ' <span title="Fuera de horario" style="font-size:.6rem">🌙</span>' : ""}
           </td>
-      <td>
-  ${mostrarSep ? `<div class="po-td-dia-tag">${_poDayTabLabel(diaKey)}</div>` : ""}
-  <div class="po-cliente-nombre${isCuba ? " cuba" : ""}">${isCuba ? "🏪 " : ""}${esc(nombre)}${notaIcon}</div>
-  ${p.tel ? `<div class="po-cliente-tel">${esc(p.tel)}</div>` : ""}
-  ${pagadoBadge}
-</td>
-          <td><div class="po-prod-pills">${pills}</div></td>
+          <td>
+            <div class="po-td-cliente-wrap">
+              ${mostrarSep ? `<div class="po-td-dia-tag">${_poDayTabLabel(diaKey)}</div>` : ""}
+              <div class="po-cliente-nombre${isCuba ? " cuba" : ""}">${isCuba ? "🏪 " : ""}${esc(nombre)}${notaIcon}</div>
+              ${p.tel ? `<div class="po-cliente-tel-row"><span class="po-cliente-tel">${esc(p.tel)}</span>${pagadoBadge}</div>` : pagadoBadge}
+            </div>
+            ${p.hora_entrega && !isExp ? `<span class="po-td-hora-mobile">${esc(p.hora_entrega)}</span>` : ""}
+          </td>
+          <td>${isExp ? "" : `<div class="po-prod-pills">${pills}</div>`}</td>
           <td class="po-td-total${total === 0 ? " zero" : ""}">${totalStr}</td>
           <td><span class="po-estado-badge ${estado}">${estadoLabels[estado] || estado}</span></td>
           <td onclick="event.stopPropagation()">
@@ -1522,25 +1524,34 @@ function renderPedidosTable() {
           ? `<button class="po-btn-action ret" onclick="setEstado('${p.id}','entregado')">Retirado</button>`
           : `<button class="po-btn-action undo" onclick="setEstado('${p.id}','listo')">↩ Deshacer</button>`
         }
-              <button class="po-btn-expand" onclick="poToggleExpand('${p.id}')">
-                ${isExp ? "−" : "＋"}
+              <button class="po-btn-vermobile" onclick="event.stopPropagation();poToggleExpand('${p.id}')">
+                ${isExp ? "ver menos" : "ver más"}
               </button>
             </div>
           </td>
         </tr>`;
 
-      const expProds = (p.productos || []).map(r => {
+        const expProds = (p.productos || []).map(r => {
         const nom = r.tipo === "catalogo" ? r.nombre : r.libre;
         const cant = Number(r.cantidad) || 1;
         const tam = r.tamano ? ` · ${r.tamano}` : "";
         const isST = r.tacc === "s";
+
+        // Círculo de "pedido a Cuba" (solo para productos comunes)
+        const cubaPedidoChk = r.tacc === "c"
+          ? `<div onclick="event.stopPropagation();toggleCubaPedido('${p.id}','${r.id}')"
+                title="${r.pedido_cuba ? "Pedido a Cuba ✓" : "Pedir a Cuba"}"
+                style="width:14px;height:14px;border-radius:50%;border:1.5px solid ${r.pedido_cuba ? "var(--accent)" : "var(--border)"};background:${r.pedido_cuba ? "var(--amber)" : "transparent"};display:flex;align-items:center;justify-content:center;font-size:7px;color:${r.pedido_cuba ? "#fff" : "transparent"};flex-shrink:0;cursor:pointer;transition:all .15s;">✓</div>`
+          : "";
+
         return `
           <div>
             <div class="po-exp-prod-row">
               <div class="po-exp-prod-chk${r.listo ? " on" : ""}"
-                   onclick="toggleProdListo('${p.id}','${r.id}')">✓</div>
+                   onclick="event.stopPropagation();toggleProdListo('${p.id}','${r.id}')">✓</div>
               <span class="po-exp-tacc ${isST ? "st" : "com"}">${isST ? "ST" : "C"}</span>
-              <span class="po-exp-prod-nombre${r.listo ? " listo" : ""}">${esc(nom)}${esc(tam)} ×${cant}</span>
+              <span class="po-exp-prod-nombre">${esc(nom)}${esc(tam)} ×${cant}</span>
+              ${cubaPedidoChk}
             </div>
             ${r.nota_prod ? `<div class="po-exp-prod-nota">↳ ${esc(r.nota_prod)}</div>` : ""}
           </div>`;
@@ -1548,32 +1559,92 @@ function renderPedidosTable() {
 
       const diaDePedido = _poGetDiaDePedido(p.id);
 
-      html += `
+     html += `
         <tr class="po-tr-expanded${isExp ? " open" : ""}" data-expanded-id="${p.id}">
           <td class="po-expanded-cell" colspan="9">
             <div class="po-expanded-inner">
-              <div>
+
+              <!-- 1: nombre+tel -->
+              <div class="po-exp-cliente">
+                <div class="po-exp-cliente-nombre">${isCuba ? "🏪 " : ""}${esc(nombre)}</div>
+                ${p.tel ? `<div class="po-exp-cliente-tel">📞 ${esc(p.tel)}</div>` : ""}
+              </div>
+
+              <!-- 2: productos -->
+              <div class="po-exp-left">
                 <div class="po-exp-products">${expProds}</div>
                 ${p.notas ? `<div class="po-exp-nota">📝 ${esc(p.notas)}</div>` : ""}
-                <div class="po-exp-actions">
-                  <button class="po-btn-exp primary" onclick="abrirModalNP_edicion('${p.id}')">✏️ Editar</button>
-                  <button class="po-btn-exp danger"  onclick="confirmarEliminar('${p.id}')">🗑 Eliminar</button>
-                </div>
               </div>
+
+              <!-- 3: info (fecha/hora/pago/estado/botones) -->
               <div class="po-exp-right">
-                ${["pendiente", "prod", "listo", "entregado"].map(e =>
-          `<button class="po-exp-estado-opt${estado === e ? " active-" + e : ""}"
-                     onclick="setEstado('${p.id}','${e}')">
-                     ${{ pendiente: "⏳ Pendiente", prod: "⚙️ En producción", listo: "✅ Listo", entregado: "📦 Retirado" }[e]}
-                   </button>`
-        ).join("")}
-                <div class="po-exp-meta" style="margin-top:8px;">
-                  <b>DÍA:</b> ${_poDaySepLabel(diaDePedido)}<br>
-                  <b>ID:</b> #${p._pid || "—"}<br>
-                  ${p.creado ? `<b>CARGADO:</b> ${_poFormatTs(p.creado)}<br>` : ""}
-                  ${p.pagado ? `<b>PAGO:</b> ${esc(p.metodoPago || "—")}` : "<b>PAGO:</b> Sin confirmar"}
+
+                <!-- Día + hora -->
+                <div class="po-exp-info-row">
+                  <span class="po-exp-info-label">📅</span>
+                  <span class="po-exp-info-val">${_poDaySepLabel(diaDePedido)}</span>
+                </div>
+                ${p.hora_entrega ? `<div class="po-exp-info-row">
+                  <span class="po-exp-info-label">🕐</span>
+                  <span class="po-exp-info-val">${esc(p.hora_entrega)}</span>
+                </div>` : ""}
+
+                <!-- Total + pago -->
+                ${total > 0 ? `<div class="po-exp-total-row">
+                  <span class="po-exp-total-num">$${total.toLocaleString("es-AR")}</span>
+                  ${p.pagado
+                    ? `<span class="po-exp-pago-pill pagado" onclick="event.stopPropagation();abrirModalPago('${p.id}',true)">✓ ${esc(p.metodoPago || "Pagado")}</span>`
+                    : `<span class="po-exp-pago-pill nopago" onclick="event.stopPropagation();abrirModalPago('${p.id}',false)">Sin confirmar</span>`
+                  }
+                  ${!p.pagado ? `
+                  <div class="po-exp-pago-inline" id="po-pago-inline-${p.id}" style="display:none">
+                    ${["💵 Efectivo","🏦 Transferencia","💳 Otro"].map(m =>
+                      `<button class="po-exp-pago-metodo" onclick="event.stopPropagation();poConfirmarPagoInline('${p.id}','${m}')">${m}</button>`
+                    ).join("")}
+                  </div>` : ""}
+                </div>` : ""}
+
+                <!-- Estado -->
+                <div class="po-exp-estado-wrap">
+                  <select class="po-exp-estado-select po-exp-estado-${estado}"
+                    onchange="event.stopPropagation();setEstado('${p.id}',this.value)"
+                    onclick="event.stopPropagation()">
+                    <option value="pendiente"${estado==="pendiente"?" selected":""}>⏳ Pendiente</option>
+                    <option value="listo"${estado==="listo"?" selected":""}>✅ Listo</option>
+                    <option value="entregado"${estado==="entregado"?" selected":""}>📦 Retirado</option>
+                    <option value="suspendido"${estado==="suspendido"?" selected":""}>🚫 Suspendido</option>
+                  </select>
+                </div>
+
+                <!-- Nota -->
+                ${p.notas ? `<div class="po-exp-nota-pill">📝 ${esc(p.notas)}</div>` : ""}
+
+                <!-- Botones -->
+                <div class="po-exp-actions">
+                  <button class="po-btn-exp primary" onclick="event.stopPropagation();abrirModalNP_edicion('${p.id}')">✏️ Editar</button>
+                  <button class="po-btn-exp danger"  onclick="event.stopPropagation();confirmarEliminar('${p.id}')">🗑 Eliminar</button>
+                </div>
+
+                <!-- Watermark -->
+                <div class="po-exp-watermark">
+                  #${p._pid || "—"} · ${p.creado ? _poFormatTs(p.creado) : "sin fecha"}${p._creadoPor ? ` · ${esc(p._creadoPor)}` : ""}
+                </div>
+
+              </div>
+
+              <!-- 4: fila final mobile: total | badge estado | [Retirado] [ver menos] -->
+              <div class="po-exp-bottom-row">
+                <span class="po-td-total">${totalStr}</span>
+                <span class="po-estado-badge ${estado}">${estadoLabels[estado] || estado}</span>
+                <div style="display:flex;gap:6px;align-items:center;margin-left:auto;">
+                  ${estado !== "entregado"
+                    ? `<button class="po-btn-action ret" onclick="event.stopPropagation();setEstado('${p.id}','entregado')">Retirado</button>`
+                    : `<button class="po-btn-action undo" onclick="event.stopPropagation();setEstado('${p.id}','listo')">↩ Deshacer</button>`
+                  }
+                  <button class="po-btn-vermobile" onclick="event.stopPropagation();poToggleExpand('${p.id}')">ver menos</button>
                 </div>
               </div>
+
             </div>
           </td>
         </tr>`;

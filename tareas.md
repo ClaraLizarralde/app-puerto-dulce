@@ -1,27 +1,26 @@
-Lista de tareas pendientes:
-Producto libre no funciona
+cosas que quiero cambiar/arreglar:
+nuevo pedido:
+el dropdown que se cierre cuando aprieto denueov en el input
+si no tiene ningun pedido cargado y quiero cambiar de tab, que se cambie (si tiene algo cargado que me aparezca el warning)
 
-Click en "Agregar como producto libre" no hace nada
-Sospecha: algo cierra los resultados antes de que el click llegue (blur del input o listener externo)
-Ya tiene mousedown + touchstart + onclick — revisar si hay un onblur en el input o un listener global que oculta results antes
+como se ve en mobile
 
-Dropdown catálogo
 
-Los resultados tienen que flotar sobre el contenido (position absolute), no empujar el layout
-CSS ya sugerido: position:absolute; top:calc(100% + 4px); z-index:400 en .np-search-prod-results y position:relative en .np-search-prod-wrap
+pagina de pedidos:
 
-Estilos cards de producto
+Hola! estoy armando una spa de gestion de pedidos de pasteleria con html css y js vainilla. 
+ahora mismo quiero cambiar la tab de "pedidos" que muestra todos los pedidos y los filtra por dia, estado, etc. 
 
-Tag ST/C y precio tienen que verse más chicos y en la misma línea (.pe-info-sub ya está en el JS, falta verificar que el CSS esté aplicado)
-.pe-talle-warn no tiene estilo definido
+Cada pedido se muestra como en la foto en este momento, los cambios que quiero son:
+1. antes para que producto comun aparecia un circulo clickeable que denotaba que ya se habia pedido a la otra sucursal, en algun arreglo uqe hice desaparecio, pero la logia debe seguir andando por ahi 
+2. po-exp-right deberia cmabiar a la izquierda y tener 
+      nombre cliente y telefono
+      dia y horario
+      Total + pill de pago
+      Estado (pero en una sola pill cambiable)
+      nota adicional 
+      boton de editar y eliminar
 
-Total
+y los productos pasarían a listarse a la izquierda (con la misma logica que aparecen ahora)
 
-Formato tiene que ser: Total (efectivo $X) a la izquierda, $63.000 grande verde a la derecha
-npRenderTotal() ya genera el HTML correcto, falta CSS para #np-total-wrap
-
-Contexto importante para el próximo chat
-
-Archivos: nuevopedido.js, nuevopedido.css, nuevopedido.html (el div #tab-np-page)
-El JS de patches está al final de nuevopedido.js
-Tema oscuro/claro se maneja por separado, no tocar colores
+Abajo bien chiquito como medio marca d eagua (no sé ocmo se llama) el ID del pedido y fehcah y horario de cuando fue creado y por que usuario

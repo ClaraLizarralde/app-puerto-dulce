@@ -124,6 +124,14 @@ body {
     padding-bottom: calc(var(--bottombar-height) + 20px);
   }
 }
+/* tab-pedidos sin padding en mobile — el topbar es sticky y maneja su propio espaciado */
+@media (max-width: 767px) {
+  #tab-pedidos {
+    padding: 0 !important;
+    padding-bottom: calc(var(--bottombar-height) + 20px) !important;
+  }
+}
+
 
 
 /* ══════════════════════════════════════
@@ -643,83 +651,35 @@ body {
     display: flex;
     flex-direction: column;
     gap: 7px;
-    padding: 8px 12px 6px;
+    padding: 8px 10px 6px;
   }
-  .po-search-wrap { width: 100%; }
+  .po-search-wrap { width: 100%; max-width: 100%; }
   .po-topbar-actions {
     display: flex;
-    gap: 6px;
+    gap: 5px;
     width: 100%;
+    align-items: center;
+    flex-wrap: nowrap;
   }
   .po-topbar-actions .po-btn-sm {
-    flex: 1;
-    font-size: 0.65rem;
-    padding: 6px 4px;
+    font-size: .6rem;
+    padding: 5px 8px;
     white-space: nowrap;
-    text-align: center;
+    flex-shrink: 1;
   }
+  .po-topbar-actions .po-btn-accent {
+    margin-left: auto;
+    flex-shrink: 0;
+    padding: 6px 14px;
+    font-size: .7rem;
+  }
+  .po-btn-arch span:not(.po-arch-cnt) { display: none; }
 
-  /* Filtros colapsables */
-  .po-filter-row {
-    flex-wrap: nowrap;
-    overflow: hidden;
-    max-height: 0;
-    padding: 0 12px;
-    margin: 0;
-    transition: max-height 0.25s ease, padding 0.2s ease;
-    border-bottom: none;
-  }
-  .po-filter-row.abierto {
-    max-height: 120px;
-    padding: 6px 12px 8px;
-    flex-wrap: wrap;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .po-filter-toggle {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.68rem;
-    font-weight: 600;
-    color: var(--ink-mid);
-    background: var(--paper);
-    border: 1.5px solid var(--border);
-    border-radius: 20px;
-    padding: 4px 11px;
-    cursor: pointer;
-    margin: 0 12px 6px;
-    width: fit-content;
-    transition: border-color .15s, color .15s;
-  }
-  .po-filter-toggle.activo {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: var(--accent-soft);
-  }
-  .po-filter-toggle .toggle-arrow {
-    font-size: 0.6rem;
-    transition: transform 0.2s;
-    display: inline-block;
-  }
-  .po-filter-toggle.activo .toggle-arrow { transform: rotate(180deg); }
-
-  .po-table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .po-table th,
-  .po-table td {
-    font-size: 0.65rem;
-    padding: 6px 5px;
-    white-space: nowrap;
-  }
+  /* Filtros: no tocar en mobile, lo maneja pedidos.css */
 
   .po-footer-stats { padding: 8px 12px; gap: 8px; }
   .po-stat-num { font-size: 1.1rem; }
 
-  /* Subtabs horizontales visibles en vertical */
   .prod-tabs,
   .cfg-tabs {
     display: flex !important;
@@ -729,12 +689,6 @@ body {
     border-bottom: 1px solid var(--border);
     margin-bottom: 8px;
   }
-}
-
-/* Ocultar columna extra solo en móvil puro */
-@media (max-width: 767px) {
-  .po-table th:nth-child(4),
-  .po-table td:nth-child(4) { display: none; }
 }
 
 

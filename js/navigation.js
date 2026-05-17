@@ -155,15 +155,11 @@ function showTab(id, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + id)?.classList.add('active');
 
-  // Si no viene el, buscarlo por data-title o por onclick
   const tabEl = el || document.querySelector(`.tab[data-title="${id}"]`)
              || document.querySelector(`.tab[onclick*="'${id}'"]`);
   if (tabEl) tabEl.classList.add('active');
 
-  if (id === 'produccion') {
-    const elTab = document.getElementById('prodtab-' + _prodTabActiva);
-    showProdTab(_prodTabActiva, elTab || document.getElementById('prodtab-hoy'));
-  }
+  if (id === 'produccion') renderProduccion();
   if (id === 'cuba') renderCuba();
   if (id === 'config') {
     const activePanel = document.querySelector('.cfg-panel.active');

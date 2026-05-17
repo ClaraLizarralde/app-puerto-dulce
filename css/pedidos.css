@@ -465,9 +465,9 @@
   font-weight: 500;
   padding: 2px 7px;
   border-radius: 3px;
-  background: var(--bg);
-  color: var(--ink-mid);
-  border: 1px solid var(--border);
+  background: rgba(245,158,11,.1);
+  color: var(--amber);
+  border: 1px solid var(--amber);
   white-space: nowrap;
 }
 .po-prod-pill.st {
@@ -562,15 +562,26 @@
   border-bottom: 1px solid var(--border);
 }
 
+/* ── FILA EXPANDIDA ── */
+.po-tr-expanded { display: none; }
+.po-tr-expanded.open { display: table-row; }
+
+.po-expanded-cell {
+  padding: 0 14px 0 46px !important;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
 .po-expanded-inner {
   padding: 14px 0 18px;
   border-top: 1px solid var(--border);
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 220px;
   gap: 18px;
 }
 
-/* productos en expanded */
+/* ── IZQUIERDA: productos ── */
+.po-exp-left { display: flex; flex-direction: column; gap: 8px; }
 .po-exp-products { display: flex; flex-direction: column; gap: 6px; }
 
 .po-exp-prod-row {
@@ -599,8 +610,7 @@
   letter-spacing: .04em;
 }
 .po-exp-tacc.st { background: var(--tacc-s-soft, rgba(16,185,129,.1)); color: var(--tacc-s, #10b981); border: 1px solid var(--tacc-s, #10b981); }
-.po-exp-tacc.com { background: var(--bg); color: var(--ink-light); border: 1px solid var(--border); }
-
+.po-exp-tacc.com { background: rgba(245,158,11,.1); color: var(--amber); border: 1px solid var(--amber); }
 .po-exp-prod-nombre { color: var(--ink); }
 .po-exp-prod-nombre.listo { color: var(--ink-light); text-decoration: line-through; }
 .po-exp-prod-nota {
@@ -618,13 +628,136 @@
   border: 1px solid var(--amber);
   border-radius: var(--radius-sm);
   padding: 6px 10px;
-  margin-top: 10px;
 }
 
+/* ── DERECHA: info del pedido ── */
+.po-exp-right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-left: 1px solid var(--border);
+  padding-left: 16px;
+  min-width: 0;
+}
+
+/* Cliente */
+.po-exp-cliente { display: flex; flex-direction: column; gap: 2px; }
+.po-exp-cliente-nombre {
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.2;
+}
+.po-exp-cliente-tel {
+  font-size: .68rem;
+  color: var(--ink-light);
+}
+
+/* Info rows (día, hora) */
+.po-exp-info-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: .68rem;
+}
+.po-exp-info-label { flex-shrink: 0; font-size: .75rem; }
+.po-exp-info-val { color: var(--ink-mid); }
+
+/* Total + pago */
+.po-exp-total-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.po-exp-total-num {
+  font-family: 'Lora', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--green);
+}
+.po-exp-pago-pill {
+  font-family: 'Outfit', sans-serif;
+  font-size: .55rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+.po-exp-pago-pill.pagado {
+  background: var(--green-soft);
+  border: 1px solid var(--green);
+  color: var(--green);
+}
+.po-exp-pago-pill.nopago {
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  color: var(--ink-light);
+  cursor: pointer;
+  transition: all .12s;
+}
+.po-exp-pago-pill.nopago:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+/* Estado: select pill */
+.po-exp-estado-wrap { display: flex; }
+.po-exp-estado-select {
+  font-family: 'Outfit', sans-serif;
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 5px 22px 5px 8px;
+  border-radius: 3px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--ink-mid);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23999'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  transition: all .12s;
+  width: 100%;
+}
+.po-exp-estado-select.po-exp-estado-pendiente {
+  background-color: var(--amber-soft);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+.po-exp-estado-select.po-exp-estado-prod {
+  background-color: var(--blue-soft);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+.po-exp-estado-select.po-exp-estado-listo {
+  background-color: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+.po-exp-estado-select.po-exp-estado-entregado {
+  background-color: var(--border);
+  border-color: var(--border);
+  color: var(--ink-light);
+}
+
+/* Nota en pill */
+.po-exp-nota-pill {
+  font-size: .68rem;
+  color: var(--amber);
+  background: var(--amber-soft);
+  border: 1px solid var(--amber);
+  border-radius: 3px;
+  padding: 4px 8px;
+}
+
+/* Botones */
 .po-exp-actions {
   display: flex;
   gap: 6px;
-  margin-top: 12px;
   flex-wrap: wrap;
 }
 .po-btn-exp {
@@ -645,42 +778,19 @@
 .po-btn-exp.danger { border-color: var(--red, #ef4444); color: var(--red, #ef4444); }
 .po-btn-exp.danger:hover { background: rgba(239,68,68,.08); }
 
-/* estado selector en expanded */
-.po-exp-right {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 160px;
-}
-.po-exp-estado-opt {
-  font-family: 'Outfit', sans-serif;
-  font-size: .62rem;
-  font-weight: 600;
-  padding: 6px 10px;
-  border-radius: var(--radius-sm);
-  border: 1.5px solid var(--border);
-  background: transparent;
-  color: var(--ink-mid);
-  cursor: pointer;
-  text-align: left;
-  transition: all .12s;
-  letter-spacing: .03em;
-}
-.po-exp-estado-opt:hover { border-color: var(--ink-mid); color: var(--ink); }
-.po-exp-estado-opt.active-pendiente { background: var(--amber-soft); border-color: var(--amber); color: var(--amber); }
-.po-exp-estado-opt.active-prod      { background: var(--blue-soft);  border-color: var(--blue);  color: var(--blue); }
-.po-exp-estado-opt.active-listo     { background: var(--green-soft); border-color: var(--green); color: var(--green); }
-.po-exp-estado-opt.active-entregado { background: var(--border);     border-color: var(--border); color: var(--ink-light); }
-
-.po-exp-meta {
-  font-family: 'Outfit', sans-serif;
-  font-size: .58rem;
+/* Watermark */
+.po-exp-watermark {
+  font-family: 'Outfit', monospace;
+  font-size: .52rem;
   color: var(--ink-light);
-  line-height: 1.7;
-  margin-top: 8px;
+  opacity: .4;
+  font-style: italic;
+  letter-spacing: .03em;
+  margin-top: auto;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border);
+  line-height: 1.4;
 }
-.po-exp-meta b { color: var(--ink-mid); font-weight: 600; }
-
 /* empty */
 .po-empty-row td {
   padding: 40px 14px;
@@ -1332,4 +1442,433 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23999'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 6px center;
+}
+
+
+.po-exp-estado-select.po-exp-estado-suspendido {
+  background-color: rgba(239,68,68,.08);
+  border-color: var(--red, #ef4444);
+  color: var(--red, #ef4444);
+}
+
+.po-exp-pago-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 2px;
+}
+.po-exp-pago-metodo {
+  font-family: 'Outfit', sans-serif;
+  font-size: .62rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 3px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--ink-mid);
+  cursor: pointer;
+  text-align: left;
+  transition: all .12s;
+}
+.po-exp-pago-metodo:hover {
+  border-color: var(--green);
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+/* ══════════════════════════════════════
+   PEDIDOS — RESPONSIVE MOBILE
+   ══════════════════════════════════════ */
+
+/* ── Desktop-only: ocultar elementos exclusivos de mobile ── */
+.po-td-hora-mobile { display: none; }
+.po-exp-bottom-row { display: none; }
+.po-btn-vermobile  { display: none; }
+
+@media (max-width: 767px) {
+
+  /* ══════════════════════════════════════
+     TOPBAR
+     ══════════════════════════════════════ */
+  .po-topbar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 40 !important;
+    background: var(--paper) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    padding: 8px 10px 6px !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
+  .po-search-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+  }
+  .po-topbar-actions {
+    display: flex !important;
+    gap: 5px !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    flex-wrap: nowrap !important;
+  }
+  .po-topbar-actions .po-btn-sm {
+    font-size: .58rem !important;
+    padding: 5px 7px !important;
+    flex-shrink: 1 !important;
+  }
+  .po-btn-sm.po-btn-accent {
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+    padding: 6px 12px !important;
+    font-size: .68rem !important;
+  }
+  .po-btn-arch span:not(.po-arch-cnt) { display: none !important; }
+  .po-btn-todos {
+    font-size: .56rem !important;
+    padding: 5px 7px !important;
+    letter-spacing: .02em !important;
+  }
+
+  /* ══════════════════════════════════════
+     FILTROS
+     ══════════════════════════════════════ */
+  .po-filter-row {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 5px 10px !important;
+    gap: 4px !important;
+    border-bottom: 1px solid var(--border) !important;
+    max-height: none !important;
+    background: var(--paper) !important;
+  }
+  .po-chip { font-size: .56rem !important; padding: 3px 8px !important; }
+  .po-sort-wrap { flex-shrink: 0 !important; }
+  .po-filter-label { display: none !important; }
+
+  /* ══════════════════════════════════════
+     DAY TABS
+     ══════════════════════════════════════ */
+  .po-day-tabs {
+    display: flex !important;
+    padding: 4px 8px 0 !important;
+  }
+  .po-day-tab {
+    font-size: .56rem !important;
+    padding: 5px 9px 6px !important;
+    letter-spacing: .03em !important;
+  }
+
+  /* ══════════════════════════════════════
+     TABLA → CARDS
+     ══════════════════════════════════════ */
+  .po-table-wrap { overflow-x: unset !important; }
+  .po-table { min-width: unset !important; }
+  .po-table thead { display: none !important; }
+  .po-table,
+  .po-table tbody { display: block !important; }
+
+  /* separador de día */
+  .po-tr-day-sep { display: block !important; position: static !important; }
+  .po-tr-day-sep td {
+    display: block !important;
+    padding: 8px 10px 3px !important;
+    border: none !important;
+    position: static !important;
+  }
+
+  /* ══════════════════════════════════════
+     CARDS — estructura base
+     ══════════════════════════════════════ */
+  .po-tr {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin: 0 8px 6px !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-sm) !important;
+    background: var(--paper) !important;
+    cursor: pointer !important;
+    overflow: hidden !important;
+  }
+  .po-tr.po-expanded {
+    border-color: var(--accent) !important;
+    border-bottom: none !important;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important;
+  }
+  .po-tr.po-retirado { opacity: .38 !important; }
+
+  /* reset todas las celdas */
+  .po-tr td {
+    display: block !important;
+    padding: 0 !important;
+    border: none !important;
+    vertical-align: unset !important;
+    position: static !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ── Ocultar: check (1), flecha (2), id (3), hora columna desktop (4) ── */
+  .po-tr td:nth-child(1),
+  .po-tr td:nth-child(2),
+  .po-tr td:nth-child(3),
+  .po-tr td:nth-child(4) { display: none !important; }
+
+  /* ══════════════════════════════════════
+     td(5) — CLIENTE: nombre izq / hora der
+     ══════════════════════════════════════ */
+  .po-tr td:nth-child(5) {
+    width: 100% !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    padding: 9px 11px 4px !important;
+  }
+  .po-td-cliente-wrap {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+  .po-td-dia-tag    { font-size: .46rem !important; margin-bottom: 2px !important; }
+  .po-cliente-nombre { font-size: .82rem !important; font-weight: 600 !important; }
+  /* tel + pagado en fila */
+  .po-cliente-tel-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-top: 2px !important;
+  }
+  .po-cliente-tel  { font-size: .6rem !important; }
+  .po-pagado-badge { font-size: .5rem !important; }
+  /* hora mobile — derecha, solo cuando cerrada (JS no la renderiza si isExp) */
+  .po-td-hora-mobile {
+    display: block !important;
+    flex-shrink: 0 !important;
+    font-size: .8rem !important;
+    font-weight: 600 !important;
+    color: var(--accent) !important;
+    white-space: nowrap !important;
+    margin-top: 1px !important;
+  }
+
+  /* ══════════════════════════════════════
+     td(6) — PILLS de productos
+     ══════════════════════════════════════ */
+  .po-tr td:nth-child(6) {
+    width: 100% !important;
+    padding: 0 11px 5px !important;
+  }
+
+  /* ══════════════════════════════════════
+     td(7) td(8) td(9) — footer de la card:
+     total | badge estado | [acciones]
+     Separados por borde top, en una sola fila
+     ══════════════════════════════════════ */
+  .po-tr td:nth-child(7),
+  .po-tr td:nth-child(8),
+  .po-tr td:nth-child(9) {
+    border-top: 1px solid var(--border) !important;
+  }
+
+  /* td7 — total: izquierda */
+  .po-tr td:nth-child(7) {
+    display: flex !important;
+    align-items: center !important;
+    padding: 5px 5px 6px 11px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* td8 — badge estado: junto al total */
+  .po-tr td:nth-child(8) {
+    display: flex !important;
+    align-items: center !important;
+    padding: 5px 4px 6px 5px !important;
+    flex-shrink: 0 !important;
+    border-top: none !important; /* comparte borde con td7 */
+  }
+
+  /* td9 — acciones: empuja a la derecha */
+  .po-tr td:nth-child(9) {
+    flex: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    padding: 5px 10px 6px 0 !important;
+    border-top: none !important; /* comparte borde con td7 */
+  }
+
+  .po-row-actions {
+    display: flex !important;
+    opacity: 1 !important;
+    align-items: center !important;
+    gap: 5px !important;
+  }
+  .po-btn-action  { font-size: .56rem !important; padding: 3px 8px !important; width: auto !important; }
+  .po-btn-expand  { display: none !important; }
+
+  /* ── botón "ver más" / "ver menos" — solo mobile ── */
+  .po-btn-vermobile {
+    display: inline-flex !important;
+    align-items: center !important;
+    font-size: .52rem !important;
+    padding: 3px 8px !important;
+    border-radius: 3px !important;
+    border: 1px solid var(--border) !important;
+    background: transparent !important;
+    color: var(--ink-light) !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    letter-spacing: .02em !important;
+  }
+
+  /* ══════════════════════════════════════
+     CARD EXPANDIDA — ocultar td(6..9)
+     (todo va en el panel .po-tr-expanded)
+     ══════════════════════════════════════ */
+  .po-tr.po-expanded td:nth-child(6),
+  .po-tr.po-expanded td:nth-child(7),
+  .po-tr.po-expanded td:nth-child(8),
+  .po-tr.po-expanded td:nth-child(9) { display: none !important; }
+
+  /* empty row */
+  .po-empty-row { display: table-row !important; }
+  .po-empty-row td { display: table-cell !important; padding: 30px 14px !important; }
+
+  /* ══════════════════════════════════════
+     PANEL EXPANDIDO (.po-tr-expanded)
+     ══════════════════════════════════════ */
+  .po-tr-expanded { display: none !important; }
+  .po-tr-expanded.open { display: block !important; }
+
+  .po-expanded-cell {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 8px 6px !important;
+    border: 1px solid var(--accent) !important;
+    border-top: none !important;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm) !important;
+    background: var(--paper) !important;
+    overflow: hidden !important;
+  }
+
+  .po-expanded-inner {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: unset !important;
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* ── 1: bloque cliente — OCULTO en mobile
+          (nombre y tel ya están en la card td5) ── */
+  .po-exp-cliente { display: none !important; }
+
+  /* ── 2: productos (po-exp-left) ── */
+  .po-exp-left {
+    padding: 9px 11px 8px !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
+  .po-exp-prod-row { font-size: .74rem !important; gap: 6px !important; }
+  .po-exp-prod-nombre { font-size: .74rem !important; }
+  .po-exp-prod-nota { font-size: .62rem !important; }
+
+  /* ── 3: info (po-exp-right): fecha, hora, pago, estado select, botones ── */
+  .po-exp-right {
+    display: flex !important;
+    flex-direction: column !important;
+    border-left: none !important;
+    border-top: none !important;
+    padding: 9px 11px 6px !important;
+    gap: 6px !important;
+  }
+
+  /* Ocultar el select de estado — en mobile el estado va en po-exp-bottom-row como badge */
+  .po-exp-estado-wrap { display: none !important; }
+
+  /* Ocultar total dentro del panel — va en po-exp-bottom-row */
+  .po-exp-total-row { display: none !important; }
+
+  /* ── Info rows: fecha y hora en una sola línea ──
+     po-exp-right pasa a flex-row para que 📅 y 🕐 queden inline */
+  .po-exp-right {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 4px 12px !important;
+    padding-bottom: 8px !important;
+  }
+  .po-exp-info-row {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    font-size: .7rem !important;
+    flex-shrink: 0 !important;
+  }
+  /* Botones y watermark ocupan el ancho completo dentro del flex-row */
+  .po-exp-actions  { width: 100% !important; gap: 5px !important; margin-top: 4px !important; }
+  .po-exp-nota-pill { width: 100% !important; }
+  .po-exp-watermark {
+    width: 100% !important;
+    font-size: .48rem !important;
+    padding-top: 4px !important;
+    margin-top: 2px !important;
+  }
+
+  .po-btn-exp {
+    font-size: .58rem !important;
+    padding: 5px 10px !important;
+  }
+
+  /* ── 4: fila final mobile: total | badge | [Retirado] [ver menos] ── */
+  .po-exp-bottom-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 11px 7px !important;
+    border-top: 1px solid var(--border) !important;
+    background: var(--bg) !important;
+  }
+  /* total a la izquierda */
+  .po-exp-bottom-row .po-td-total {
+    font-size: .82rem !important;
+    font-weight: 600 !important;
+    flex-shrink: 0 !important;
+  }
+  /* badge de estado junto al total */
+  .po-exp-bottom-row .po-estado-badge {
+    font-size: .5rem !important;
+    padding: 2px 6px !important;
+    flex-shrink: 0 !important;
+  }
+  /* botones al extremo derecho */
+  .po-exp-bottom-row > div {
+    margin-left: auto !important;
+    display: flex !important;
+    gap: 5px !important;
+    align-items: center !important;
+  }
+  .po-exp-bottom-row .po-btn-action {
+    font-size: .56rem !important;
+    padding: 3px 9px !important;
+  }
+  .po-exp-bottom-row .po-btn-vermobile {
+    display: inline-flex !important;
+    font-size: .52rem !important;
+    padding: 3px 8px !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 3px !important;
+    background: transparent !important;
+    color: var(--ink-light) !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+  }
+
+  /* ══════════════════════════════════════
+     FOOTER STATS
+     ══════════════════════════════════════ */
+  .po-stat     { padding: 6px 4px !important; }
+  .po-stat-num { font-size: 1rem !important; }
+  .po-stat-lbl { font-size: .44rem !important; }
 }

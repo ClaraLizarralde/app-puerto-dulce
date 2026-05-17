@@ -89,3 +89,25 @@ Arquitectura deseada:
 - funciones chicas
 - estado centralizado simple
 - render desacoplado
+
+
+
+Camila Torres   +549110099877
+─────────────────────────────
+[✓] ST  Bom Bom · Grande ×1
+    ↳ decorar con frutos rojos
+[ ] ST  Cocadas ×2
+─────────────────────────────
+📅 DOMINGO 17 DE MAY · HOY    🕐 16:00
+Pago confirmado
+[⏳ Pendiente ▼]
+[✏️ Editar]  [🗑 Eliminar]
+─────────────────────────────
+$41.000              Retirado   [ver menos]
+
+
+
+Camila Torres                    16:00
++549110099877        ✓ PAGADO
+[Bom Bom ×1] [Cocadas ×2]
+PENDIENTE   Retirado   [ver más]
