@@ -16,6 +16,7 @@ let _prodTabActiva = null;
 const _prodHechos = new Set();
 window._prodGrupoKeys = {};
 const _prodCatColapsadas = new Set();
+let _lvTabActiva = null;
 
 
 /* ══════════════════════════════════════
@@ -187,6 +188,7 @@ function renderProduccion() {
   const todasLasKeys = activos.map(x => x.diaKey);
   if (
     _prodTabActiva !== "semanal" && _prodTabActiva !== "futuro" &&
+    _prodTabActiva !== "libreta" && _prodTabActiva !== "resumen" &&
     _prodTabActiva !== null && !todasLasKeys.includes(_prodTabActiva)
   ) _prodTabActiva = null;
 
@@ -195,6 +197,7 @@ function renderProduccion() {
 
   _renderProdTabs(activos, futuros);
   _renderProdPanel(map, activos, futuros);
+
 }
 
 
@@ -233,7 +236,22 @@ function _renderProdTabs(activos, futuros) {
     ${totalFuturo > 0 ? `<span class="prod-tab-badge futuro">${totalFuturo}</span>` : ""}
   </button>`;
 
-  bar.innerHTML = html;
+  const libretaActive = _prodTabActiva === "libreta";
+  const totalLibreta = Object.entries(datos.libretaVenta || {})
+    .reduce((s, [k, v]) => s + (Array.isArray(v) ? v.length : 0), 0);
+
+  const btnLibreta = `<button class="prod-tab-btn prod-tab-libreta${libretaActive ? " active" : ""}" onclick="_prodSetTab('libreta')">
+    <span class="prod-tab-label">&#128221; Libreta</span>
+    ${totalLibreta > 0 ? `<span class="prod-tab-badge prod-tab-badge-libreta">${totalLibreta}</span>` : ""}
+  </button>`;
+
+  const resumenActive = _prodTabActiva === "resumen";
+  const btnResumen = `<button class="prod-tab-btn prod-tab-resumen${resumenActive ? " active" : ""}" onclick="_prodSetTab('resumen')">
+    <span class="prod-tab-label">&#128203; Resumen</span>
+  </button>`;
+
+  bar.innerHTML = `<div class="prod-tabs-izq">${html}</div><div class="prod-tabs-der">${btnResumen}${btnLibreta}</div>`;
+
   setTimeout(() => {
     const a = bar.querySelector(".prod-tab-btn.active");
     if (a) a.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
@@ -241,7 +259,12 @@ function _renderProdTabs(activos, futuros) {
 }
 
 function _prodSetTab(key) {
+    console.log("_prodSetTab llamado con:", key);
   _prodTabActiva = key;
+  if (key === "libreta" && _lvTabActiva === null) {
+    _lvTabActiva = _prodFechaKey(new Date());
+  }
+  if (key !== "libreta") _lvTabActiva = null;
   renderProduccion();
 }
 
@@ -251,8 +274,19 @@ function _prodSetTab(key) {
    ══════════════════════════════════════ */
 
 function _renderProdPanel(map, activos, futuros) {
+  console.log("_renderProdPanel, tab activa:", _prodTabActiva);
   const wrap = document.getElementById("prod-panel-wrap");
   if (!wrap) return;
+  if (_prodTabActiva === "libreta") {
+    console.log("entrando a libreta...");
+    wrap.innerHTML = "";
+    if (!datos.libretaVenta) datos.libretaVenta = {};
+    const hoyKey = _prodFechaKey(new Date());
+    if (!_lvTabActiva) _lvTabActiva = hoyKey;
+    renderLibretaVenta();
+    return;
+  }
+  if (_prodTabActiva === "resumen") { wrap.innerHTML = _buildProdResumen(); return; }
   if (_prodTabActiva === "semanal") { wrap.innerHTML = _buildProdSemanal(map); return; }
   if (_prodTabActiva === "futuro")  { wrap.innerHTML = _buildProdFuturo(futuros); return; }
   const dia = activos.find(x => x.diaKey === _prodTabActiva);
@@ -319,6 +353,7 @@ function _buildCatHTML(porCat, scope, mode, diaKey) {
         <span class="prod-cat-chevron">${colapsada ? "&#9654;" : "&#9660;"}</span>
       </div>
       <div class="prod-cat-body" id="${catId}" style="${colapsada ? "display:none" : ""}">
+        <div class="prod-tabla-wrap">
         <table class="prod-tabla">
           <colgroup>
             <col class="prod-col-prod">
@@ -489,8 +524,9 @@ function _buildCatHTML(porCat, scope, mode, diaKey) {
     });
 
     html += `</tbody></table>
+        </div>
       </div>
-    </div>`; // cierra prod-cat-body + prod-cat-bloque
+    </div>`; // cierra prod-tabla-wrap + prod-cat-body + prod-cat-bloque
   });
 
   return html;
@@ -665,4 +701,334 @@ function _prodToggleGrupo(keys) {
   const todosOn = keys.every(k => { const [p, r] = k.split(":"); return _prodEsHecho(p, r); });
   keys.forEach(k => todosOn ? _prodHechos.delete(k) : _prodHechos.add(k));
   renderProduccion();
+}
+
+/* ══════════════════════════════════════
+   LIBRETA DE VENTA
+   ══════════════════════════════════════ */
+
+function renderLibretaVenta() {
+  const wrap = document.getElementById("prod-panel-wrap");
+  if (!wrap) return;
+
+  // datos.libretaVenta = { "2026-05-18": [ { id, nombre, cantidad, hecho }, ... ] }
+  const libreta = datos.libretaVenta || {};
+  const hoyKey  = _prodFechaKey(new Date());
+
+  if (_lvTabActiva === null) _lvTabActiva = hoyKey;
+
+  // ── Tabs por día ──
+  const diasConItems = Object.keys(libreta)
+    .filter(k => (libreta[k] || []).length > 0)
+    .sort();
+  const tabKeys = [...new Set([hoyKey, ...diasConItems])].sort();
+
+  const tabsHTML = tabKeys.map(k => {
+    const items  = libreta[k] || [];
+    const activa = k === _lvTabActiva;
+    const label  = k === hoyKey ? "Hoy" : _prodLabelDia(k);
+    return `<button class="lv-tab${activa ? " lv-tab-activa" : ""}" onclick="_lvSetTab('${k}')">
+      ${esc(label)}
+      ${items.length ? `<span class="lv-tab-badge">${items.length}</span>` : ""}
+    </button>`;
+  }).join("");
+
+  // ── Lista del día activo ──
+  const items = libreta[_lvTabActiva] || [];
+  const listaHTML = items.length
+    ? items.map(it => `
+        <div class="lv-item${it.hecho ? " hecho" : ""}" id="lv-item-${it.id}">
+          <div class="lv-chk${it.hecho ? " on" : ""}" onclick="_lvToggle('${_lvTabActiva}','${it.id}')">&#10003;</div>
+          <div class="lv-item-body">
+            <span class="lv-item-nom">${esc(it.nombre)}</span>
+            <span class="lv-item-cant">&times;${it.cantidad || 1}</span>
+          </div>
+          <button class="lv-del" onclick="_lvDel('${_lvTabActiva}','${it.id}')" title="Eliminar">&#10005;</button>
+        </div>`).join("")
+    : `<div class="lv-vacio">Sin ítems para este d&iacute;a.</div>`;
+
+  wrap.innerHTML = `
+    <div id="libreta-venta-wrap-inner">
+      <div class="lv-header">
+        <div class="lv-titulo">&#128221; Libreta de venta</div>
+      </div>
+      <div class="lv-tabs">${tabsHTML}</div>
+      <div class="lv-lista">${listaHTML}</div>
+      <div class="lv-form">
+        <input id="lv-inp-nom"  class="lv-input lv-input-nom"  type="text"   placeholder="Ej: crema pastelera 3L…">
+        <input id="lv-inp-cant" class="lv-input lv-input-cant" type="number" min="1" value="1" placeholder="Cant.">
+        <button class="lv-btn-add" onclick="_lvAdd()">+ Agregar</button>
+      </div>
+    </div>`;
+}
+
+function _lvSetTab(key) {
+  _lvTabActiva = key;
+  renderLibretaVenta();
+}
+
+function _lvAdd() {
+  const nom  = (document.getElementById("lv-inp-nom")?.value || "").trim();
+  if (!nom) return;
+  const cant = Math.max(1, parseInt(document.getElementById("lv-inp-cant")?.value) || 1);
+  const key  = _lvTabActiva || _prodFechaKey(new Date());
+
+  if (!datos.libretaVenta)      datos.libretaVenta = {};
+  if (!datos.libretaVenta[key]) datos.libretaVenta[key] = [];
+
+  datos.libretaVenta[key].push({
+    id:       `lv-${Date.now()}`,
+    nombre:   nom,
+    cantidad: cant,
+    hecho:    false,
+  });
+
+  guardar();
+  renderProduccion();
+}
+
+function _lvToggle(diaKey, id) {
+  const items = (datos.libretaVenta?.[diaKey] || []);
+  const item  = items.find(x => x.id === id);
+  if (item) item.hecho = !item.hecho;
+  guardar();
+  renderLibretaVenta();
+}
+
+function _lvDel(diaKey, id) {
+  if (!datos.libretaVenta?.[diaKey]) return;
+  datos.libretaVenta[diaKey] = datos.libretaVenta[diaKey].filter(x => x.id !== id);
+  guardar();
+  renderProduccion();
+}
+
+/* ══════════════════════════════════════
+   RESUMEN DEL DÍA
+   Producción de pedidos + Libreta de venta
+   ══════════════════════════════════════ */
+
+function _buildProdResumen() {
+  const hoyKey = _prodFechaKey(new Date());
+  const [y, m, d] = hoyKey.split("-").map(Number);
+  const DIAS  = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+  const MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+  const labelFecha = `${DIAS[new Date(y,m-1,d).getDay()]} ${d} ${MESES[m-1]}`;
+
+  // ── Producción de pedidos de hoy ──
+  const map = _prodBuildMap();
+  const itemsHoy = map.get(hoyKey) || [];
+  const prodHTML = itemsHoy.length
+    ? _buildProdDia(hoyKey, itemsHoy)
+    : `<div class="vacio" style="padding:16px 0;">Sin pedidos para hoy.</div>`;
+
+  // ── Libreta de hoy ──
+  const libretaHoy = (datos.libretaVenta || {})[hoyKey] || [];
+  let libretaHTML = "";
+  if (libretaHoy.length) {
+    libretaHTML = `<div class="pres-libreta-bloque">
+      <div class="pres-cat-label">&#128221; Libreta de venta</div>
+      <div class="pres-libre-lista">
+        ${libretaHoy.map(it => `
+          <div class="pres-libre-item">
+            <span class="pres-libre-nom">${esc(it.nombre)}</span>
+            <span class="pres-libre-cant">× ${it.cantidad || 1}</span>
+          </div>`).join("")}
+      </div>
+    </div>`;
+  }
+
+  if (!itemsHoy.length && !libretaHoy.length) {
+    return `<div class="vacio" style="padding:32px 0;text-align:center;">Sin producción ni libreta para hoy.</div>`;
+  }
+
+  return `<div class="pres-wrap">
+    <div class="pres-header">
+      <div class="pres-titulo">&#128203; Resumen de producción</div>
+      <div class="pres-fecha">${labelFecha}</div>
+      <button class="pres-btn-export" onclick="exportarResumenXLSX()">&#8595; Exportar Excel</button>
+    </div>
+    ${prodHTML}
+    ${libretaHTML}
+  </div>`;
+}
+
+
+/* ══════════════════════════════════════
+   EXPORTAR RESUMEN A XLSX — hoja única con formato
+   ══════════════════════════════════════ */
+
+function exportarResumenXLSX() {
+  if (typeof XLSX === "undefined") { alert("La librería de Excel no está cargada."); return; }
+
+  const hoyKey = _prodFechaKey(new Date());
+  const [y, m, d] = hoyKey.split("-").map(Number);
+  const DIAS  = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+  const MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+  const labelFecha = `${DIAS[new Date(y,m-1,d).getDay()]} ${d} ${MESES[m-1]} ${y}`;
+  const CAT_NOMBRES = { tortas:"Tortas", mousses:"Mousses", bandejas:"Bandejas", cuadrados:"Cuadrados", congelados:"Congelados", otros:"Otros" };
+
+  // Colores
+  const COLOR_TITULO  = "2D2250"; // violeta oscuro
+  const COLOR_CAT     = "4B3A8A"; // violeta medio
+  const COLOR_HEADER  = "6C5BB5"; // violeta claro
+  const COLOR_LIBRETA = "B45309"; // ámbar oscuro
+  const COLOR_WHITE   = "FFFFFF";
+  const COLOR_ROW_ALT = "F3F0FA"; // lavanda muy suave
+  const COLOR_TOTAL   = "E8E3F5"; // fila total
+
+  const wb = XLSX.utils.book_new();
+  const aoa = []; // array of arrays para la hoja
+  const estilos = {}; // { "A1": { style } } — se aplica después
+
+  let fila = 0; // índice 0-based
+
+  const celda = (r, c) => XLSX.utils.encode_cell({ r, c });
+
+  const pushFila = (arr) => { aoa.push(arr); fila++; };
+
+  // ── Título principal ──
+  pushFila([`📋 Producción del día — ${labelFecha}`]);
+  pushFila([]); // espacio
+
+  // ── Producción de pedidos ──
+  const map = _prodBuildMap();
+  const itemsHoy = map.get(hoyKey) || [];
+
+  const porCat = new Map();
+  itemsHoy.forEach(({ producto }) => {
+    const nom  = producto.tipo === "catalogo" ? producto.nombre : (producto.libre || "Libre");
+    const tam  = producto.tamano || "Sin talle";
+    const cat  = producto.tipo === "catalogo" ? _prodCatDeProducto(producto.nombre) : "otros";
+    const cant = Number(producto.cantidad) || 1;
+    if (!porCat.has(cat)) porCat.set(cat, new Map());
+    const porNom = porCat.get(cat);
+    if (!porNom.has(nom)) porNom.set(nom, new Map());
+    porNom.get(nom).set(tam, (porNom.get(nom).get(tam) || 0) + cant);
+  });
+
+  _PROD_CAT_ORDEN.forEach(cat => {
+    if (!porCat.has(cat)) return;
+    const porNom = porCat.get(cat);
+
+    // Talles de esta categoría
+    const todosT = new Set();
+    porNom.forEach(porTam => porTam.forEach((_, t) => todosT.add(t)));
+    const talles = _sortTam([...todosT].map(t => [t])).map(([t]) => t);
+    const nCols = 1 + talles.length + 1; // Producto + talles + Total
+
+    // Fila categoría
+    const filasCat = fila;
+    pushFila([CAT_NOMBRES[cat] || cat]);
+
+    // Fila header
+    const filasHeader = fila;
+    pushFila(["Producto", ...talles, "Total"]);
+
+    // Filas de productos
+    let filasPar = true;
+    [...porNom.entries()].sort(([a],[b]) => a.localeCompare(b,"es")).forEach(([nom, porTam]) => {
+      let total = 0;
+      const row = [nom, ...talles.map(t => { const v = porTam.get(t) || 0; total += v; return v || 0; })];
+      row.push(total);
+      const filaActual = fila;
+      pushFila(row);
+      filasPar = !filasPar;
+
+      // Estilo filas alternadas
+      for (let c = 0; c < nCols; c++) {
+        estilos[celda(filaActual, c)] = {
+          fill: { fgColor: { rgb: filasPar ? "FFFFFF" : COLOR_ROW_ALT } },
+          border: { top:{style:"thin",color:{rgb:"D1C9F0"}}, bottom:{style:"thin",color:{rgb:"D1C9F0"}}, left:{style:"thin",color:{rgb:"D1C9F0"}}, right:{style:"thin",color:{rgb:"D1C9F0"}} },
+          font: { name:"Calibri", sz:11 },
+          alignment: { horizontal: c === 0 ? "left" : "center" },
+        };
+      }
+      // Total en negrita
+      estilos[celda(filaActual, nCols-1)] = {
+        ...estilos[celda(filaActual, nCols-1)],
+        font: { name:"Calibri", sz:11, bold:true },
+        fill: { fgColor: { rgb: COLOR_TOTAL } },
+      };
+    });
+
+    // Estilo fila categoría
+    for (let c = 0; c < nCols; c++) {
+      estilos[celda(filasCat, c)] = {
+        fill: { fgColor: { rgb: COLOR_CAT } },
+        font: { name:"Calibri", sz:12, bold:true, color:{ rgb:COLOR_WHITE } },
+        alignment: { horizontal:"left" },
+      };
+    }
+    // Estilo fila header
+    for (let c = 0; c < nCols; c++) {
+      estilos[celda(filasHeader, c)] = {
+        fill: { fgColor: { rgb: COLOR_HEADER } },
+        font: { name:"Calibri", sz:10, bold:true, color:{ rgb:COLOR_WHITE } },
+        alignment: { horizontal: c === 0 ? "left" : "center" },
+        border: { top:{style:"medium",color:{rgb:"2D2250"}}, bottom:{style:"medium",color:{rgb:"2D2250"}} },
+      };
+    }
+
+    pushFila([]); // espacio entre categorías
+  });
+
+  // ── Libreta ──
+  const libretaHoy = (datos.libretaVenta || {})[hoyKey] || [];
+  if (libretaHoy.length) {
+    pushFila([]); // espacio
+
+    const filaLibCat = fila;
+    pushFila(["📝 Libreta de venta"]);
+    const filaLibHeader = fila;
+    pushFila(["Producto", "Cantidad"]);
+
+    libretaHoy.forEach((it, i) => {
+      const filaActual = fila;
+      pushFila([it.nombre, it.cantidad || 1]);
+      for (let c = 0; c < 2; c++) {
+        estilos[celda(filaActual, c)] = {
+          fill: { fgColor: { rgb: i % 2 === 0 ? "FFFFFF" : "FEF3C7" } },
+          border: { top:{style:"thin",color:{rgb:"F59E0B"}}, bottom:{style:"thin",color:{rgb:"F59E0B"}}, left:{style:"thin",color:{rgb:"F59E0B"}}, right:{style:"thin",color:{rgb:"F59E0B"}} },
+          font: { name:"Calibri", sz:11 },
+          alignment: { horizontal: c === 0 ? "left" : "center" },
+        };
+      }
+    });
+
+    // Estilo cabecera libreta
+    for (let c = 0; c < 2; c++) {
+      estilos[celda(filaLibCat, c)] = {
+        fill: { fgColor: { rgb: COLOR_LIBRETA } },
+        font: { name:"Calibri", sz:12, bold:true, color:{ rgb:COLOR_WHITE } },
+      };
+      estilos[celda(filaLibHeader, c)] = {
+        fill: { fgColor: { rgb: "D97706" } },
+        font: { name:"Calibri", sz:10, bold:true, color:{ rgb:COLOR_WHITE } },
+        alignment: { horizontal: c === 0 ? "left" : "center" },
+      };
+    }
+  }
+
+  // ── Armar hoja ──
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+  // Aplicar estilos
+  Object.entries(estilos).forEach(([addr, style]) => {
+    if (!ws[addr]) ws[addr] = { v:"", t:"s" };
+    ws[addr].s = style;
+  });
+
+  // Estilo título
+  if (ws["A1"]) ws["A1"].s = {
+    font: { name:"Calibri", sz:14, bold:true, color:{ rgb:COLOR_TITULO } },
+    alignment: { horizontal:"left" },
+  };
+
+  // Anchos de columna
+  ws["!cols"] = [{ wch:28 }, { wch:12 }, { wch:12 }, { wch:12 }, { wch:12 }, { wch:10 }];
+
+  // Usar xlsx con estilos (xlsx-js-style si está, sino xlsx normal)
+  const wbOut = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wbOut, ws, "Producción");
+  XLSX.writeFile(wbOut, `produccion_${hoyKey.replace(/-/g,"")}.xlsx`);
 }

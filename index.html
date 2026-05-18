@@ -240,9 +240,9 @@
         TODOS LOS PEDIDOS <span class="po-tab-count" id="po-todos-count">0</span>
       </button>
       <button class="po-btn-sm" onclick="mostrarCSVModal()">↓ CSV</button>
-      <button class="po-btn-sm po-btn-arch" id="btn-ver-archivados" onclick="toggleVistaArchivados()">
-        📥 Archivados <span class="po-arch-cnt" id="po-arch-cnt">0</span>
-      </button>
+<button class="po-btn-sm po-btn-arch" id="btn-ver-archivados" onclick="toggleVistaArchivados()">
+  📥 <span class="po-arch-txt">Archivados</span> <span class="po-arch-cnt" id="po-arch-cnt">0</span>
+</button>
       <button class="po-btn-sm po-btn-accent" onclick="abrirModalNP()">+ Nuevo pedido</button>
     </div>
   </div>
@@ -322,8 +322,9 @@
  
   <!-- Panel dinámico -->
   <div id="prod-panel-wrap" class="prod-panel-wrap"></div>
- 
 </div>
+
+
   <!-- CUBA -->
   <div class="tab-content" id="tab-cuba">
 
@@ -352,7 +353,19 @@
       </button>
     </div>
 
-    <div class="prod-panel" id="cubapanel-pedidos">
+    <!-- Barra de subpestañas Cuba -->
+    <div class="prod-tabs-bar-wrap">
+      <div id="cuba-subtabs" class="prod-tabs-bar">
+        <div class="prod-tabs-izq">
+          <button class="prod-tab-btn active" onclick="showCubaTab('pedidos',this)">📦 Pedidos a Cuba</button>
+          <button class="prod-tab-btn" onclick="showCubaTab('pedir',this)">🛒 Pedir a Cuba</button>
+          <button class="prod-tab-btn" onclick="showCubaTab('ventas',this)">🏪 Ventas</button>
+          <button class="prod-tab-btn" onclick="showCubaTab('exportar',this)">⬇ Exportar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="prod-panel active" id="cubapanel-pedidos">
       <div style="font-size:.72rem;color:var(--ink-light);margin-bottom:4px;">Pedidos que hay que llevar a la sucursal Cuba</div>
       <div style="font-size:.67rem;color:var(--ink-light);margin-bottom:10px;font-style:italic;">los checkbox son solo una guía visual para recordar que ese pedido ya fue separado/embolsado</div>
       <div class="cuba-banner">
@@ -367,17 +380,17 @@
         <div id="cuba-mp-lista"></div>
       </div>
     </div>
-    <div class="prod-panel" id="cubapanel-pedir">
+    <div class="prod-panel" id="cubapanel-pedir" style="display:none">
       <div style="font-size:.72rem;color:var(--ink-light);margin-bottom:10px;">Pedidos de clientes normales que incluyen productos comunes.</div>
       <div id="cuba-encargos"></div>
       <div class="vacio" id="vacio-encargos" style="display:none">Sin pedidos Con TACC pendientes.</div>
     </div>
-    <div class="prod-panel" id="cubapanel-ventas">
+    <div class="prod-panel" id="cubapanel-ventas" style="display:none">
       <div style="font-size:.72rem;color:var(--ink-light);margin-bottom:4px;">Registrá cuánto llevás de cada producto a Cuba.</div>
       <div style="font-size:.67rem;color:var(--ink-light);font-style:italic;margin-bottom:12px;">Pedida = lo que se necesita · Llevada = lo que finalmente vas a llevar</div>
       <div id="venta-lista"></div>
     </div>
-    <div class="prod-panel" id="cubapanel-exportar">
+    <div class="prod-panel" id="cubapanel-exportar" style="display:none">
       <div style="font-size:.72rem;color:var(--ink-light);margin-bottom:14px;">Exportá el movimiento de stock con Cuba para el día.</div>
       <div style="font-family:'Lora',serif;font-style:italic;font-size:.9rem;color:var(--cuba-ink);margin-bottom:4px;">🧾 Remito de egreso de stock</div>
       <div style="font-size:.68rem;color:var(--ink-light);margin-bottom:10px;">Pedidos a Cuba + ventas llevadas, sumados por producto en una sola tabla.</div>

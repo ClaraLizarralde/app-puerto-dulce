@@ -43,11 +43,11 @@ let _cubaTabActiva = "pedidos";
 // Cambia entre subpestañas de Cuba (pedidos, pedir, ventas, exportar)
 function showCubaTab(id, el) {
   _cubaTabActiva = id;
-  document.querySelectorAll("#cuba-subtabs .prod-tab").forEach(t => t.classList.remove("active"));
-  document.querySelectorAll("#tab-cuba .prod-panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll("#cuba-subtabs .prod-tab-btn").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll("#tab-cuba .prod-panel").forEach(p => { p.classList.remove("active"); p.style.display = "none"; });
   if (el) el.classList.add("active");
   const panel = document.getElementById("cubapanel-" + id);
-  if (panel) panel.classList.add("active");
+  if (panel) { panel.classList.add("active"); panel.style.display = ""; }
   if (id === "pedidos") renderCubaResumen();
   else if (id === "pedir") renderEncargos();
   else if (id === "ventas") renderVentas();
@@ -66,9 +66,13 @@ function renderCuba() {
   renderCubaResumen();
   renderMateriaPrima();
   const activeTab = _cubaTabActiva || "pedidos";
-  document.querySelectorAll("#tab-cuba .prod-panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll("#tab-cuba .prod-panel").forEach(p => { p.classList.remove("active"); p.style.display = "none"; });
   const activePanel = document.getElementById("cubapanel-" + activeTab);
-  if (activePanel) activePanel.classList.add("active");
+  if (activePanel) { activePanel.classList.add("active"); activePanel.style.display = ""; }
+  // sync tab button
+  document.querySelectorAll("#cuba-subtabs .prod-tab-btn").forEach(t => t.classList.remove("active"));
+  const activeBtn = document.querySelector(`#cuba-subtabs .prod-tab-btn[onclick*="'${activeTab}'"]`);
+  if (activeBtn) activeBtn.classList.add("active");
 }
 
 // ── ENCARGOS (pedir a Cuba) ──
@@ -146,8 +150,9 @@ function renderEncargos() {
   const vacio = document.getElementById("vacio-encargos");
   cont.innerHTML = "";
 
-  const hoyKey = getDiaOffset(0);
-  const manKey = getDiaOffset(1);
+  const _hoy = new Date(); const _man = new Date(); _man.setDate(_man.getDate() + 1);
+  const hoyKey = fechaKey(_hoy);
+  const manKey = fechaKey(_man);
 
   const HORA_CUBA = datos.horaLlegadaCuba || "16:00";
 
@@ -212,9 +217,9 @@ function renderEncargos() {
     header.style.cssText = `
       display:flex;align-items:baseline;gap:8px;
       font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
-      color:${esUrgente ? "var(--accent)" : esHoy ? "var(--cuba-ink,var(--accent))" : "var(--ink-light)"};
+      color:${esUrgente ? "var(--red)" : esHoy ? "var(--accent)" : "var(--ink-light)"};
       padding:10px 0 4px;
-      border-bottom:1.5px solid ${esUrgente ? "var(--accent)" : esHoy ? "var(--cuba-border,var(--border))" : "var(--border)"};
+      border-bottom:1.5px solid ${esUrgente ? "var(--red)" : esHoy ? "var(--accent)" : "var(--border)"};
       margin-bottom:6px;margin-top:${dPedirKey === diasOrdenados[0] ? "0" : "16px"};
     `;
     header.innerHTML = `${esUrgente ? "⚠️ " : ""}${tituloTxt}
@@ -403,7 +408,7 @@ function renderCubaResumen() {
       html += sortItems(items).map(i => {
         const notasHTML = (i.notas && i.notas.length) ? i.notas.map(n => `<div class="cuba-item-nota">${n.qty} x ${esc(n.texto)}</div>`).join("") : "";
         return `<div class="cuba-item" style="gap:8px;">
-          <div onclick="this.classList.toggle('cuba-cb-on')" class="cuba-cb" title="Marcar como separado" style="width:16px;height:16px;border-radius:4px;border:1.5px solid var(--cuba-border);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent;transition:all .15s;background:transparent;">✓</div>
+          <div onclick="this.classList.toggle('cuba-cb-on')" class="cuba-cb" title="Marcar como separado" style="width:16px;height:16px;border-radius:4px;border:1.5px solid var(--accent);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent;transition:all .15s;background:transparent;">✓</div>
           <span style="flex:1;">${esc(i.label)}</span>
           <span class="cqty">${i.qty}</span>
         </div>${notasHTML}`;
