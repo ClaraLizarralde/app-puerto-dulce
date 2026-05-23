@@ -1038,7 +1038,7 @@ function toggleProdListo(pedidoId, rId) {
   if (todosListos && (p.estado === "pendiente" || p.estado === "prod")) p.estado = "listo";
   guardar();
   renderPedidos();
-  if (_prodTabActiva === "semana") renderProduccionSemanal();
+  if (typeof renderProduccion === "function") renderProduccion();
   const cubaTab = document.getElementById("tab-cuba");
   if (cubaTab && cubaTab.classList.contains("active")) renderEncargos();
 }
@@ -1262,7 +1262,7 @@ function _poFormatTs(ts) {
 function _poGetDiaDePedido(id) {
   return getFechaDePedido(id);
 }
-let _poTabDia = null;
+let _poTabDia = _poFechaKey(new Date());
 let _poExpandedId = null;
 let _vistaArchivados = false;
 
@@ -1671,6 +1671,11 @@ renderPedidos = function () {
 // ── INIT ──
 function initPedidosBO() {
   asignarIds();
+  const hoy = _poFechaKey(new Date());
+  if (datos.dias[hoy]) {
+    _poTabDia = hoy;
+    diaActual = hoy;
+  }
   renderDayTabs();
   renderPedidosTable();
 }

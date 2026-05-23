@@ -1,10 +1,13 @@
 /**
  * ================================================================
- * PRODUCCIÓN — v6
+ * PRODUCCIÓN — v7
  * ================================================================
- * Lógica idéntica a v5. Solo cambia _buildCatHTML:
- * tabla por categoría con columnas Producto | Cantidad/Talle | Notas | Listo
- * Pills de talle expandibles, check efímero por talle (modo día).
+ * Lógica simplificada:
+ * - Sin producción anticipada. Cada pedido aparece en su día de entrega.
+ * - El día muestra todos los pedidos pendientes hasta el corte del día siguiente.
+ * - Los martes tienen corte especial a las 14:00.
+ * - Warning informativo si hay pedidos del martes tomados antes del corte
+ *   (no modifica lógica, solo avisa).
  * ================================================================
  */
 
@@ -42,36 +45,28 @@ function _prodFechaKey(d) {
   return d.toISOString().slice(0, 10);
 }
 
+// Retorna el corte en minutos para un día dado, usando la config del local.
 function _prodCorteMin(diaKey) {
-  const dd = datos.dias[diaKey] || {};
-  let corteStr;
-  if (dd.especial && dd.corteHora) {
-    corteStr = dd.corteHora;
-  } else {
-    const localId = datos.localId || "matienzo";
-    corteStr = ((datos.cortePedidosHoy || {})[localId]) || "14:00";
-  }
-  const [h, m] = corteStr.split(":").map(Number);
-  return h * 60 + m;
+  const localId = datos.localId || "matienzo";
+  const corteStr = ((datos.cortePedidosHoy || {})[localId]) || "14:00";
+  const [h, min] = corteStr.split(":").map(Number);
+  return h * 60 + min;
 }
 
-function _prodDiaDeProduccion(diaEntregaKey, horaEntrega) {
-  if (!horaEntrega) return diaEntregaKey;
-  const [h, m] = horaEntrega.split(":").map(Number);
-  if (h * 60 + m > _prodCorteMin(diaEntregaKey)) return diaEntregaKey;
-
-  const [y, mo, d] = diaEntregaKey.split("-").map(Number);
-  const f = new Date(y, mo - 1, d);
-  f.setDate(f.getDate() - 1);
+// Devuelve true si el día (por su dow 0-6) está abierto según la config del local.
+function _prodDiaAbierto(dow) {
   const localId = datos.localId || "matienzo";
-  const horarios = datos.horariosLocales ||
-    (typeof HORARIOS_DEFAULT !== "undefined" ? HORARIOS_DEFAULT : {});
+  const horarios = datos.horariosLocales || {};
   const horLocal = horarios[localId] || {};
-  for (let i = 0; i < 7; i++) {
-    if (horLocal[f.getDay()]) return _prodFechaKey(f);
-    f.setDate(f.getDate() - 1);
-  }
-  return diaEntregaKey;
+  return !!horLocal[dow];
+}
+
+// Dado un diaKey, devuelve el key del día siguiente calendario.
+function _prodKeyDiaSiguiente(diaKey) {
+  const [y, m, d] = diaKey.split("-").map(Number);
+  const f = new Date(y, m - 1, d);
+  f.setDate(f.getDate() + 1);
+  return _prodFechaKey(f);
 }
 
 function _prodSemanaActual() {
@@ -112,23 +107,98 @@ function _prodEsHecho(pedidoId, prodId) {
    ══════════════════════════════════════ */
 
 function _prodBuildMap() {
+  // Reglas:
+  // - Pedidos de HOY → siempre en hoy (nunca se adelantan)
+  //   · si hora <= corte → flag esHoyAnteCorte=true para warning visual
+  // - Pedidos futuros con hora <= corte y día anterior abierto → día anterior
+  //   · excepción: martes nunca se adelanta, tiene warning propio en sáb/dom
+  // - Pedidos futuros con hora > corte, o día anterior cerrado → su propio día
+  // - Productos con r.listo=true → no aparecen
+  const hoyKey = _prodFechaKey(new Date());
   const map = new Map();
+
+  const _addItem = (diaProduccion, item) => {
+    if (!map.has(diaProduccion)) map.set(diaProduccion, []);
+    map.get(diaProduccion).push(item);
+  };
+
   Object.entries(datos.dias).forEach(([diaEntregaKey, dData]) => {
+    const [y, m, d] = diaEntregaKey.split("-").map(Number);
+    const dowEntrega = new Date(y, m - 1, d).getDay();
+    const esHoy = diaEntregaKey === hoyKey;
+
     (dData.pedidos || []).forEach(p => {
-      if (p.estado === "entregado") return;
+      if (p.estado === "entregado" || p.estado === "listo") return;
       (p.productos || []).forEach(r => {
         if (r.tacc !== "s") return;
-        const diaProd = _prodDiaDeProduccion(diaEntregaKey, p.hora_entrega);
-        if (!map.has(diaProd)) map.set(diaProd, []);
-        map.get(diaProd).push({
-          pedido: p, producto: r,
-          diaEntrega: diaEntregaKey,
-          esAnticipada: diaProd !== diaEntregaKey,
-        });
+        if (r.listo) return;
+
+        const [hh, mm] = p.hora_entrega.split(":").map(Number);
+        const horaMin = hh * 60 + mm;
+        const corte   = _prodCorteMin(diaEntregaKey);
+
+        if (esHoy) {
+          // Pedidos de hoy: siempre en hoy, con flag si es antes del corte
+          _addItem(hoyKey, {
+            pedido: p, producto: r, diaEntrega: diaEntregaKey,
+            esHoyAnteCorte: horaMin <= corte,
+          });
+        } else if (horaMin <= corte && dowEntrega !== 2) {
+          // Futuro antes del corte y no es martes → intenta adelantar
+          const f = new Date(y, m - 1, d);
+          f.setDate(f.getDate() - 1);
+          const diaAnteriorKey = _prodFechaKey(f);
+          const dowAnterior = f.getDay();
+
+          if (_prodDiaAbierto(dowAnterior)) {
+            _addItem(diaAnteriorKey, { pedido: p, producto: r, diaEntrega: diaEntregaKey });
+          } else {
+            // Día anterior cerrado (ej: lunes) → queda en su propio día
+            _addItem(diaEntregaKey, { pedido: p, producto: r, diaEntrega: diaEntregaKey });
+          }
+        } else {
+          // Hora > corte, o es martes → queda en su propio día
+          _addItem(diaEntregaKey, { pedido: p, producto: r, diaEntrega: diaEntregaKey });
+        }
       });
     });
   });
+
   return map;
+}
+
+// Devuelve los pedidos del martes siguiente a diaKey con hora < corte y no listos.
+// Solo aplica cuando diaKey es sábado (dow=6) o domingo (dow=0).
+function _prodPedidosWarningMartes(diaKey) {
+  const [y, m, d] = diaKey.split("-").map(Number);
+  const dow = new Date(y, m - 1, d).getDay();
+
+  let diasHastaMartes;
+  if (dow === 6) diasHastaMartes = 3;       // sábado → martes en 3 días
+  else if (dow === 0) diasHastaMartes = 2;  // domingo → martes en 2 días
+  else return [];                           // solo aplica sáb y dom
+
+  const martes = new Date(y, m - 1, d);
+  martes.setDate(martes.getDate() + diasHastaMartes);
+  const martesKey = _prodFechaKey(martes);
+
+  const corte = _prodCorteMin(martesKey);
+  const resultado = [];
+
+  const dData = datos.dias[martesKey] || {};
+  (dData.pedidos || []).forEach(p => {
+    if (p.estado === "entregado" || p.estado === "listo") return;
+    if (!p.hora_entrega) return;
+    const [hh, mm] = p.hora_entrega.split(":").map(Number);
+    if (hh * 60 + mm >= corte) return;
+    (p.productos || []).forEach(r => {
+      if (r.tacc !== "s") return;
+      if (r.listo) return; // ya marcado listo → no aparece en warning
+      resultado.push({ pedido: p, producto: r });
+    });
+  });
+
+  return resultado;
 }
 
 function _prodClasificar(map) {
@@ -540,23 +610,56 @@ function _buildCatHTML(porCat, scope, mode, diaKey) {
 function _buildProdDia(diaKey, items) {
   if (!items.length) return `<div class="vacio" style="padding:24px 0;">Sin producci&oacute;n para este d&iacute;a.</div>`;
 
-  const normales    = items.filter(x => !x.esAnticipada);
-  const anticipados = items.filter(x => x.esAnticipada);
+  const [y, m, d] = diaKey.split("-").map(Number);
+  const dow = new Date(y, m - 1, d).getDay();
+  const corteStr = ((datos.cortePedidosHoy || {})[datos.localId || "matienzo"]) || "14:00";
+  let warningHTML = "";
 
-  let html = "";
-
-  if (normales.length) {
-    const porCat = _prodAgrupar(normales);
-    html += _buildCatHTML(porCat, diaKey, "dia", diaKey);
+  // ── Warning 1: pedidos de HOY antes del corte ──
+  const hoyKey = _prodFechaKey(new Date());
+  if (diaKey === hoyKey) {
+    const anteCorteHoy = items.filter(x => x.esHoyAnteCorte);
+    if (anteCorteHoy.length) {
+      const filas = anteCorteHoy.map(({ pedido, producto }) => {
+        const nom     = producto.tipo === "catalogo" ? producto.nombre : (producto.libre || "Libre");
+        const tam     = producto.tamano ? ` ${producto.tamano}` : "";
+        const cliente = pedido.cliente_input || pedido.cliente || "Sin nombre";
+        return `<div class="prod-warning-martes-fila">
+          <span class="prod-warning-martes-hora">&#128336; ${esc(pedido.hora_entrega)}</span>
+          <span class="prod-warning-martes-prod">${esc(nom)}${esc(tam)}</span>
+          <span class="prod-warning-martes-cli">${esc(cliente)}</span>
+        </div>`;
+      }).join("");
+      warningHTML += `<div class="prod-warning-martes">
+        <div class="prod-warning-martes-titulo">&#9888;&#65039; Pedidos de hoy antes de las ${esc(corteStr)} hs &mdash; ¡confirmar separaci&oacute;n!</div>
+        ${filas}
+      </div>`;
+    }
   }
 
-  if (anticipados.length) {
-    const porCat = _prodAgrupar(anticipados);
-    html += `<div class="prod-anticipada-aviso">&#128197; Producci&oacute;n anticipada &mdash; pedidos del martes antes del corte</div>`;
-    html += _buildCatHTML(porCat, `ant-${diaKey}`, "dia", diaKey);
+  // ── Warning 2: sábado y domingo → pedidos del martes antes del corte ──
+  if (dow === 6 || dow === 0) {
+    const pedidosMartes = _prodPedidosWarningMartes(diaKey);
+    if (pedidosMartes.length) {
+      const filas = pedidosMartes.map(({ pedido, producto }) => {
+        const nom     = producto.tipo === "catalogo" ? producto.nombre : (producto.libre || "Libre");
+        const tam     = producto.tamano ? ` ${producto.tamano}` : "";
+        const cliente = pedido.cliente_input || pedido.cliente || "Sin nombre";
+        return `<div class="prod-warning-martes-fila">
+          <span class="prod-warning-martes-hora">&#128336; ${esc(pedido.hora_entrega)}</span>
+          <span class="prod-warning-martes-prod">${esc(nom)}${esc(tam)}</span>
+          <span class="prod-warning-martes-cli">${esc(cliente)}</span>
+        </div>`;
+      }).join("");
+      warningHTML += `<div class="prod-warning-martes">
+        <div class="prod-warning-martes-titulo">&#9888;&#65039; Pedidos del martes antes de las ${esc(corteStr)} hs</div>
+        ${filas}
+      </div>`;
+    }
   }
 
-  return `<div class="prod-dia-wrap">${html}</div>`;
+  const porCat = _prodAgrupar(items);
+  return `<div class="prod-dia-wrap">${warningHTML}${_buildCatHTML(porCat, diaKey, "dia", diaKey)}</div>`;
 }
 
 
@@ -573,7 +676,7 @@ function _buildProdSemanal(map) {
   const porCat = new Map();
   map.forEach((items, diaKey) => {
     if (diaKey < martes || diaKey > domingo) return;
-    items.forEach(({ producto }) => {
+    items.forEach(({ pedido, producto }) => {
       const nom = producto.tipo === "catalogo" ? producto.nombre : (producto.libre || "Libre");
       const tam = producto.tamano || "";
       const cat = producto.tipo === "catalogo" ? _prodCatDeProducto(producto.nombre) : "otros";
@@ -585,7 +688,8 @@ function _buildProdSemanal(map) {
       if (!porTam.has(tam)) porTam.set(tam, { total: 0, hechos: 0 });
       const g = porTam.get(tam);
       g.total += cant;
-      if (producto.listo) g.hechos += cant;
+      // Cuenta tanto el flag persistido como el tilde efímero de esta sesión
+      if (_prodEsHecho(pedido.id, producto.id)) g.hechos += cant;
     });
   });
 

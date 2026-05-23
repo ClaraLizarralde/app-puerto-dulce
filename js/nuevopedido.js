@@ -10,9 +10,6 @@
  * === DÍAS Y HORARIOS ===
  * - npDiaKeyDesde(cual)          → Retorna fechaKey para 'hoy' o 'mañana'
  * - npLabels()                   → Actualiza etiquetas de días en modal
- * - npAbrirCustomDia()           → Muestra input date para seleccionar día personalizado
- * - npAbrirOtroDia()             → Abre panel para seleccionar otro día
- * - npOtroSelOpc(cual)           → Selecciona 'hoy' o 'mañana' desde panel otro día
  * - npSelDia(cual, el)           → Cambia día seleccionado (hoy/mañana/otro)
  * - npOnCustomDia()              → Procesa fecha seleccionada en input custom
  * - npActualizarHorario()        → Actualiza campos según día y si es Cuba
@@ -31,18 +28,6 @@
  * - npCheckFueraHorario()        → Muestra warning si hora está fuera del horario del local
  * - npUpdateClockIcon(h, m)      → Actualiza icono de reloj analógico
  * - npClockInit()                → Inicializa reloj (limpieza)
- * - npClockClear()               → Alias de npClearTime
- * - npClockSetHour(h)            → Setea hora manualmente
- * - npClockSetMin(m)             → Setea minuto manualmente
- * - npClockSyncHidden()          → Alias de npTimeSync
- * - npClockUpdateDisplay()       → Alias de npTimeSync
- * 
- *
- * === WHEEL PICKER (selector ruleta, legacy) ===
- * - wheelOpen(initH, initM)      → Abre selector tipo ruleta
- * - wheelConfirm()               → Confirma selección del wheel
- * - wheelCancel()                → Cancela wheel
- * - wheelBuild(colId, items, selected, onChange) → Construye columna del wheel
  * 
  * === SELECCIÓN DE TURNO (Cuba especial) ===
  * - npSelTurno(n)                → Selecciona turno 1 o 2 para Cuba
@@ -236,23 +221,6 @@ function npSelDia(cual, el, keyOverride) {
   el.classList.add('active');
   npActualizarHorario();
   npActualizarBtnGuardar();
-}
-
-function npAbrirCustomDia() {
-  const inp = document.getElementById('np-dia-custom');
-  if (!inp) return;
-  inp.style.cssText = 'position:static;width:100%;height:36px;opacity:1;pointer-events:auto;' +
-    'font-family:Outfit,sans-serif;font-size:.85rem;border:1.5px solid var(--accent);' +
-    'border-radius:var(--radius-sm);padding:4px 8px;background:var(--paper);color:var(--ink);' +
-    'margin-top:6px;display:block;';
-  inp.focus();
-  function hide() {
-    inp.style.cssText = 'position:absolute;width:0;height:0;opacity:0;pointer-events:none;';
-    inp.removeEventListener('change', hide);
-    inp.removeEventListener('blur', hide);
-  }
-  inp.addEventListener('change', hide);
-  inp.addEventListener('blur', hide);
 }
 
 function npOnCustomDia() {
@@ -530,13 +498,6 @@ function npClockInit() {
   npTimeSync();
 }
 
-// aliases legacy
-function npClockClear()         { npClearTime(); }
-function npClockSetHour(h)      { _npTimeH = h; npTimeSync(); }
-function npClockSetMin(m)       { _npTimeM = m; npTimeSync(); }
-function npClockSyncHidden()    { npTimeSync(); }
-function npClockUpdateDisplay() { npTimeSync(); }
-
 
 // ══════════════════════════════════════════════════
 //  TURNOS CUBA
@@ -656,6 +617,61 @@ function npOcultarAutocomp() {
   if (ac) ac.style.display = 'none';
 }
 
+function npToggleFrecuentes() {
+  const list = document.getElementById('np-frecuentes-list');
+  const ac   = document.getElementById('np-autocomp');
+
+  // Si ya está visible, cerrarlo
+  if (list.style.display !== 'none') {
+    list.style.display = 'none';
+    return;
+  }
+
+  // Cerrar autocompletado si estaba abierto
+  ac.style.display = 'none';
+
+  const frecuentes = (datos.clientes || [])
+    .filter(c => c.frecuente && !esCuba(c.nombre))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+  if (!frecuentes.length) {
+    list.innerHTML = `<div style="padding:10px 12px;font-size:.78rem;
+                       color:var(--ink-light);font-style:italic;">
+                       Sin clientes frecuentes aún.</div>`;
+  } else {
+    list.innerHTML = frecuentes.map(c => `
+      <div style="padding:9px 12px;border-bottom:1px solid var(--border);
+                  font-size:.82rem;cursor:pointer;display:flex;
+                  align-items:center;justify-content:space-between;
+                  transition:background .1s;"
+           onmouseover="this.style.background='var(--accent-soft,rgba(0,229,160,.08))'"
+           onmouseout="this.style.background=''"
+           onmousedown="event.preventDefault();
+                        _npSeleccionandoAutocomp=true;
+                        npSelAutocompById('${c.id}');
+                        document.getElementById('np-frecuentes-list').style.display='none';"
+           ontouchstart="event.preventDefault();
+                         _npSeleccionandoAutocomp=true;
+                         npSelAutocompById('${c.id}');
+                         document.getElementById('np-frecuentes-list').style.display='none';">
+        <span>⭐ <strong>${esc(c.nombre)}</strong></span>
+        <span style="font-size:.68rem;color:var(--ink-light)">${esc(c.tel || '')}</span>
+      </div>`).join('');
+  }
+
+  list.style.display = '';
+}
+
+// Cerrar lista frecuentes al hacer click fuera
+document.addEventListener('click', function(e) {
+  const list = document.getElementById('np-frecuentes-list');
+  const btn  = document.getElementById('np-btn-frecuentes');
+  if (!list || !btn) return;
+  if (!list.contains(e.target) && e.target !== btn) {
+    list.style.display = 'none';
+  }
+});
+
 
 // ══════════════════════════════════════════════════
 //  PILLS: PAGO / NOTA / ESTADO
@@ -690,6 +706,46 @@ function npUiActualizarPagoPill() {
   }
 }
 
+function npInlineTogglePago() {
+  const wrap = document.getElementById('np-pago-wrap');
+
+  // Si ya estaba pagado: click en la pill lo deshace
+  if (_npPagado) {
+    _npPagado     = false;
+    _npMetodoPago = '';
+    document.querySelectorAll('.np-pago-opt').forEach(b => b.classList.remove('active'));
+    npUiActualizarPagoPill();
+    wrap.style.display = 'none';
+    return;
+  }
+
+  // Cerrar nota/estado si están abiertos
+  document.getElementById('np-nota-wrap').style.display   = 'none';
+  document.getElementById('np-estado-wrap').style.display = 'none';
+
+  // Toggle del panel
+  const visible = wrap.style.display !== 'none';
+  wrap.style.display = visible ? 'none' : '';
+}
+
+function npInlineSelPago(metodo) {
+  _npPagado     = true;
+  _npMetodoPago = metodo;
+
+  // Marcar la pill elegida
+  document.querySelectorAll('.np-pago-opt').forEach(b => b.classList.remove('active'));
+  const map = {
+    '💵 Efectivo':      'np-pago-efectivo',
+    '🏦 Transferencia': 'np-pago-transferencia',
+    '💳 Otro':          'np-pago-otro',
+  };
+  const btn = document.getElementById(map[metodo]);
+  if (btn) btn.classList.add('active');
+
+  npUiActualizarPagoPill();
+  document.getElementById('np-pago-wrap').style.display = 'none';
+}
+
 // ── NOTA ──
 function npUiToggleNota() {
   const wrap    = document.getElementById('np-nota-wrap');
@@ -719,6 +775,22 @@ function npUiNotaInput() {
     pill.textContent = '📝 Nota';
     pill.classList.remove('active');
   }
+}
+
+function npGuardarNota() {
+  const val  = (document.getElementById('np-nota').value || '').trim();
+  const pill = document.getElementById('np-opt-nota');
+
+  // Actualizar pill (la nota se leerá realmente en confirmarNP)
+  if (val) {
+    pill.textContent = '📝 ' + val.slice(0, 22) + (val.length > 22 ? '…' : '');
+    pill.classList.add('active');
+  } else {
+    pill.textContent = '📝 Nota';
+    pill.classList.remove('active');
+  }
+
+  document.getElementById('np-nota-wrap').style.display = 'none';
 }
 
 // ── ESTADO ──
@@ -1434,11 +1506,6 @@ function npSearchIniciarUI() {
   inp.addEventListener('click', npSearchClick);
 }
 function abrirModalNP() {
-  // Reset panel pago inline
-const pagoWrap = document.getElementById('np-pago-wrap');
-if (pagoWrap) pagoWrap.style.display = 'none';
-document.querySelectorAll('.np-pago-opt').forEach(b => b.classList.remove('active'));
-
   const activo = document.querySelector('.tab-content.active');
   if (activo) _npTabAnterior = activo.id;
 
@@ -1518,6 +1585,14 @@ document.querySelectorAll('.np-pago-opt').forEach(b => b.classList.remove('activ
 
   setTimeout(() => { document.getElementById('np-dia-hoy')?.focus(); npClockInit(); }, 80);
   npActualizarBtnGuardar();
+
+  // Reset panel pago inline
+  const pagoWrap = document.getElementById('np-pago-wrap');
+  if (pagoWrap) pagoWrap.style.display = 'none';
+  document.querySelectorAll('.np-pago-opt').forEach(b => b.classList.remove('active'));
+  // Reset lista frecuentes
+  const fl = document.getElementById('np-frecuentes-list');
+  if (fl) fl.style.display = 'none';
 }
 
 // Devuelve true si el usuario ya empezó a cargar algo
@@ -2731,152 +2806,7 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// ================================================================
-//  PARCHES — nuevopedido-patches.js
-//  Cargar DESPUÉS de nuevopedido.js
-//  Tareas: 1 (frecuentes), 3 (pago inline), 4 (nota guardar), 5 (suspendido)
-// ================================================================
-
-
-// ── TAREA 1: Clientes frecuentes ─────────────────────────────────
-
-function npToggleFrecuentes() {
-  const list = document.getElementById('np-frecuentes-list');
-  const ac   = document.getElementById('np-autocomp');
-
-  // Si ya está visible, cerrarlo
-  if (list.style.display !== 'none') {
-    list.style.display = 'none';
-    return;
-  }
-
-  // Cerrar autocompletado si estaba abierto
-  ac.style.display = 'none';
-
-  const frecuentes = (datos.clientes || [])
-    .filter(c => c.frecuente && !esCuba(c.nombre))
-    .sort((a, b) => a.nombre.localeCompare(b.nombre));
-
-  if (!frecuentes.length) {
-    list.innerHTML = `<div style="padding:10px 12px;font-size:.78rem;
-                       color:var(--ink-light);font-style:italic;">
-                       Sin clientes frecuentes aún.</div>`;
-  } else {
-    list.innerHTML = frecuentes.map(c => `
-      <div style="padding:9px 12px;border-bottom:1px solid var(--border);
-                  font-size:.82rem;cursor:pointer;display:flex;
-                  align-items:center;justify-content:space-between;
-                  transition:background .1s;"
-           onmouseover="this.style.background='var(--accent-soft,rgba(0,229,160,.08))'"
-           onmouseout="this.style.background=''"
-           onmousedown="event.preventDefault();
-                        _npSeleccionandoAutocomp=true;
-                        npSelAutocompById('${c.id}');
-                        document.getElementById('np-frecuentes-list').style.display='none';"
-           ontouchstart="event.preventDefault();
-                         _npSeleccionandoAutocomp=true;
-                         npSelAutocompById('${c.id}');
-                         document.getElementById('np-frecuentes-list').style.display='none';">
-        <span>⭐ <strong>${esc(c.nombre)}</strong></span>
-        <span style="font-size:.68rem;color:var(--ink-light)">${esc(c.tel || '')}</span>
-      </div>`).join('');
-  }
-
-  list.style.display = '';
-}
-
-// Cerrar lista frecuentes al hacer click fuera
-document.addEventListener('click', function(e) {
-  const list = document.getElementById('np-frecuentes-list');
-  const btn  = document.getElementById('np-btn-frecuentes');
-  if (!list || !btn) return;
-  if (!list.contains(e.target) && e.target !== btn) {
-    list.style.display = 'none';
-  }
-});
-
-
-// ── TAREA 3: Pago inline (reemplaza npUiTogglePago que abría modal) ──
-
-function npInlineTogglePago() {
-  const wrap = document.getElementById('np-pago-wrap');
-
-  // Si ya estaba pagado: click en la pill lo deshace
-  if (_npPagado) {
-    _npPagado     = false;
-    _npMetodoPago = '';
-    document.querySelectorAll('.np-pago-opt').forEach(b => b.classList.remove('active'));
-    npUiActualizarPagoPill();
-    wrap.style.display = 'none';
-    return;
-  }
-
-  // Cerrar nota/estado si están abiertos
-  document.getElementById('np-nota-wrap').style.display   = 'none';
-  document.getElementById('np-estado-wrap').style.display = 'none';
-
-  // Toggle del panel
-  const visible = wrap.style.display !== 'none';
-  wrap.style.display = visible ? 'none' : '';
-}
-
-function npInlineSelPago(metodo) {
-  _npPagado     = true;
-  _npMetodoPago = metodo;
-
-  // Marcar la pill elegida
-  document.querySelectorAll('.np-pago-opt').forEach(b => b.classList.remove('active'));
-  const map = {
-    '💵 Efectivo':      'np-pago-efectivo',
-    '🏦 Transferencia': 'np-pago-transferencia',
-    '💳 Otro':          'np-pago-otro',
-  };
-  const btn = document.getElementById(map[metodo]);
-  if (btn) btn.classList.add('active');
-
-  npUiActualizarPagoPill();
-  document.getElementById('np-pago-wrap').style.display = 'none';
-}
-
-// También hay que resetear el panel de pago al abrir modal NP.
-// Wrapeamos abrirModalNP para hacer el reset adicional.
-(function() {
-  const _orig = abrirModalNP;
-  abrirModalNP = function() {
-    _orig.apply(this, arguments);
-    // Reset panel pago inline
-    const wrap = document.getElementById('np-pago-wrap');
-    if (wrap) wrap.style.display = 'none';
-    document.querySelectorAll('.np-pago-opt').forEach(b => b.classList.remove('active'));
-    // Reset lista frecuentes
-    const fl = document.getElementById('np-frecuentes-list');
-    if (fl) fl.style.display = 'none';
-  };
-})();
-
-
-// ── TAREA 4: Guardar nota con confirmación visual ─────────────────
-
-function npGuardarNota() {
-  const val  = (document.getElementById('np-nota').value || '').trim();
-  const pill = document.getElementById('np-opt-nota');
-
-  // Actualizar pill (la nota se leerá realmente en confirmarNP)
-  if (val) {
-    pill.textContent = '📝 ' + val.slice(0, 22) + (val.length > 22 ? '…' : '');
-    pill.classList.add('active');
-  } else {
-    pill.textContent = '📝 Nota';
-    pill.classList.remove('active');
-  }
-
-  document.getElementById('np-nota-wrap').style.display = 'none';
-}
-
-
-// ── TAREA 5: Agregar 'suspendido' al mapa de labels ───────────────
-// (por si no estaba en la versión de nuevopedido.js cargada)
-
+// Agregar 'suspendido' al mapa de labels si no estaba
 if (typeof NP_ESTADO_LABELS !== 'undefined' && !NP_ESTADO_LABELS.suspendido) {
   NP_ESTADO_LABELS.suspendido = '🚫 Suspendido';
 }

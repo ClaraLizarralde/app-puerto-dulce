@@ -441,6 +441,16 @@
   color: var(--ink-light);
   margin-top: 1px;
 }
+
+/* tel + pagado: siempre en fila */
+.po-cliente-tel-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
 .po-pagado-badge {
   font-size: .52rem;
   font-weight: 700;
@@ -576,12 +586,12 @@
   padding: 14px 0 18px;
   border-top: 1px solid var(--border);
   display: grid;
-  grid-template-columns: 1fr 220px;
+  grid-template-columns: 1fr 260px;
   gap: 18px;
 }
 
 /* ── IZQUIERDA: productos ── */
-.po-exp-left { display: flex; flex-direction: column; gap: 8px; }
+.po-exp-left { display: flex; flex-direction: column; gap: 8px; grid-column: 1; }
 .po-exp-products { display: flex; flex-direction: column; gap: 6px; }
 
 .po-exp-prod-row {
@@ -638,10 +648,12 @@
   border-left: 1px solid var(--border);
   padding-left: 16px;
   min-width: 0;
+  grid-column: 2;
+  grid-row: 1 / -1;
 }
 
 /* Cliente */
-.po-exp-cliente { display: flex; flex-direction: column; gap: 2px; }
+.po-exp-cliente { display: flex; flex-direction: column; gap: 2px; grid-column: 1; }
 .po-exp-cliente-nombre {
   font-size: .88rem;
   font-weight: 600;
@@ -721,7 +733,7 @@
   background-repeat: no-repeat;
   background-position: right 6px center;
   transition: all .12s;
-  width: 100%;
+  width: auto;
 }
 .po-exp-estado-select.po-exp-estado-pendiente {
   background-color: var(--amber-soft);

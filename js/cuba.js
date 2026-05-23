@@ -507,6 +507,14 @@ function _ventaTalleStep(id, cantKey, delta) {
 }
 
 // Renderiza tabla de ventas con steppers
+// ── modo ventas (pedido / llevado) ──
+let _ventasModo = "pedido";
+
+// Detecta si estamos en mobile (≤600px)
+function _esMobile() {
+  return window.innerWidth <= 768;
+}
+
 function renderVentas() {
   const cont = document.getElementById("venta-lista");
   if (!cont) return;
@@ -514,13 +522,12 @@ function renderVentas() {
   const catCuba = (datos.catalogo || []).filter(c => c.tipo === "sin_tacc");
   const ventas = getVentas();
 
+  // Sincronizar con catálogo
   catCuba.forEach(c => {
     if (!ventas.find(v => v.nombre === c.nombre)) {
       ventas.push({
-        id: uid(),
-        nombre: c.nombre,
-        cantidad: "",
-        llevada: "",
+        id: uid(), nombre: c.nombre,
+        cantidad: "", llevada: "",
         _deCatalogo: true,
         _categoria: c.categoria || "otros",
         _tieneTalle: c.tiene_talle || false
@@ -539,153 +546,331 @@ function renderVentas() {
   guardar();
 
   const deCatalogo = ventas.filter(v => v._deCatalogo);
-  const manuales = ventas.filter(v => !v._deCatalogo);
+  const manuales   = ventas.filter(v => !v._deCatalogo);
 
   const porCat = {};
   CAT_ORDEN.forEach(cat => { porCat[cat] = []; });
   deCatalogo.forEach(v => {
     const c = v._categoria || "otros";
-    (porCat[c] || (porCat["otros"])).push(v);
+    (porCat[c] || porCat["otros"]).push(v);
   });
 
-  const CAT_LABEL = { tortas: "🎂 Tortas", mousses: "🍮 Mousses", bandejas: "🫙 Bandejas", cuadrados: "🟫 Cuadrados", congelados: "❄️ Congelados", otros: "📦 Otros" };
   const TALLES = ["ch", "md", "gr"];
+  const CAT_LABEL = {
+    tortas: "🎂 Tortas", mousses: "🍮 Mousses",
+    bandejas: "🫙 Bandejas", cuadrados: "🟫 Cuadrados",
+    congelados: "❄️ Congelados", otros: "📦 Otros"
+  };
 
+  const mobile = _esMobile();
+
+  // ── helpers de total para summary ──
+  function totalCampo(campo) {
+    return ventas.reduce((acc, v) => {
+      if (v._tieneTalle) {
+        return acc + TALLES.reduce((s, l) => s + (parseInt(v["_" + campo.replace("cantidad","cant").replace("llevada","llev") + "_" + l]) || 0), 0);
+      }
+      return acc + (parseInt(v[campo]) || 0);
+    }, 0);
+  }
+
+  // ── stepper minimalista ──
   function stp(val, onMinus, onPlus, onInput, accent = false) {
     const n = parseInt(val) || 0;
     const on = n > 0;
     return `<div class="vg-stp${accent ? " vg-stp-acc" : ""}${on ? " vg-on" : ""}">
       <button class="vg-btn" onclick="${onMinus}">−</button>
-      <input class="vg-num" type="number" min="0" value="${on ? n : ""}" placeholder="0" oninput="${onInput}">
-      <button class="vg-btn" onclick="${onPlus}">＋</button>
+      <input class="vg-num" type="number" min="0" value="${on ? n : ""}" placeholder="·" oninput="${onInput}">
+      <button class="vg-btn" onclick="${onPlus}">+</button>
     </div>`;
   }
 
+  // ── celda de referencia (solo lectura) ──
+  function refCell(val) {
+    const n = parseInt(val) || 0;
+    return `<div class="vg-ref${n > 0 ? " vg-ref-on" : ""}">${n || "—"}</div>`;
+  }
+
+  // ── badge diferencia ──
+  function diffBadge(pedTotal, llevTotal) {
+    if (pedTotal === 0 && llevTotal === 0) return `<div class="vg-diff" style="color:var(--ink-light)">—</div>`;
+    if (llevTotal === pedTotal) return `<div class="vg-diff vg-diff-ok">✓</div>`;
+    const d = llevTotal - pedTotal;
+    if (d < 0) return `<div class="vg-diff vg-diff-low">${d}</div>`;
+    return `<div class="vg-diff vg-diff-hi">+${d}</div>`;
+  }
+
+  // ── fila sin talle ──
   function filaSimple(v, deletable = false) {
+    const modo = _ventasModo;
     const hayP = (parseInt(v.cantidad) || 0) > 0;
     const hayL = (parseInt(v.llevada) || 0) > 0;
     const rowOn = hayP || hayL;
-    return `<div class="vg-row${rowOn ? " vg-row-on" : ""}">
-      <div class="vg-nom${deletable ? " vg-nom-del" : ""}">
-        ${esc(v.nombre)}
-        ${deletable ? `<button class="vg-del-btn" onclick="eliminarVenta('${v.id}')">✕</button>` : ""}
-      </div>
-      <div class="vg-celdas">
-        <div class="vg-grupo">
-          <div class="vg-celda-wide">
+    const nomHtml = `<div class="vg-nom${deletable ? " vg-nom-del" : ""}">
+      ${esc(v.nombre)}
+      ${deletable ? `<button class="vg-del-btn" onclick="eliminarVenta('${v.id}')">✕</button>` : ""}
+    </div>`;
+
+    if (modo === "pedido") {
+      return `<div class="vg-row${rowOn ? " vg-row-on" : ""}">
+        ${nomHtml}
+        <div class="vg-celdas">
+          <div class="vg-grupo"><div class="vg-celda-wide">
             ${stp(v.cantidad,
               `_ventaStep('${v.id}','cantidad',-1)`,
               `_ventaStep('${v.id}','cantidad',1)`,
               `(function(el){var x=getVentas().find(x=>x.id==='${v.id}');if(x){x.cantidad=el.value;guardar();}})(this)`
             )}
-          </div>
+          </div></div>
         </div>
-        <div class="vg-sep-vert"></div>
-        <div class="vg-grupo vg-grupo-acc">
-          <div class="vg-celda-wide">
+      </div>`;
+    } else {
+      const pT = parseInt(v.cantidad) || 0;
+      const lT = parseInt(v.llevada) || 0;
+      return `<div class="vg-row${rowOn ? " vg-row-on" : ""}">
+        ${nomHtml}
+        <div class="vg-celdas" style="gap:4px;">
+          <div class="vg-grupo"><div class="vg-celda-wide" style="justify-content:center;">
+            ${refCell(v.cantidad)}
+          </div></div>
+          <div class="vg-sep-vert"></div>
+          <div class="vg-grupo vg-grupo-acc"><div class="vg-celda-wide">
             ${stp(v.llevada,
               `_ventaStep('${v.id}','llevada',-1)`,
               `_ventaStep('${v.id}','llevada',1)`,
-              `(function(el){var x=getVentas().find(x=>x.id==='${v.id}');if(x){x.llevada=el.value;guardar();}})(this)`,
+              `(function(el){var x=getVentas().find(x=>x.id==='${v.id}');if(x){x.llevada=el.value;guardar();renderVentas();}})(this)`,
               true
             )}
+          </div></div>
+          ${diffBadge(pT, lT)}
+        </div>
+      </div>`;
+    }
+  }
+
+  // ── fila con talle — DESKTOP ──
+  function fillaTalleDesktop(v) {
+    const modo = _ventasModo;
+    const hayDatos = TALLES.some(l =>
+      (parseInt(v["_cant_" + l]) || 0) > 0 || (parseInt(v["_llev_" + l]) || 0) > 0
+    );
+
+    if (modo === "pedido") {
+      const pedCeldas = TALLES.map(lbl => {
+        const k = "_cant_" + lbl;
+        return `<div class="vg-celda">
+          ${stp(v[k],
+            `_ventaTalleStep('${v.id}','${k}',-1)`,
+            `_ventaTalleStep('${v.id}','${k}',1)`,
+            `(function(el){var x=getVentas().find(x=>x.id==='${v.id}');if(x){x['${k}']=el.value;guardar();}})(this)`
+          )}
+        </div>`;
+      }).join("");
+      return `<div class="vg-row${hayDatos ? " vg-row-on" : ""}">
+        <div class="vg-nom">${esc(v.nombre)}</div>
+        <div class="vg-celdas"><div class="vg-grupo">${pedCeldas}</div></div>
+      </div>`;
+    } else {
+      const pT = TALLES.reduce((s, l) => s + (parseInt(v["_cant_" + l]) || 0), 0);
+      const lT = TALLES.reduce((s, l) => s + (parseInt(v["_llev_" + l]) || 0), 0);
+      const refCeldas = TALLES.map(lbl => `<div class="vg-celda">${refCell(v["_cant_" + lbl])}</div>`).join("");
+      const llevCeldas = TALLES.map(lbl => {
+        const k = "_llev_" + lbl;
+        return `<div class="vg-celda">
+          ${stp(v[k],
+            `_ventaTalleStep('${v.id}','${k}',-1)`,
+            `_ventaTalleStep('${v.id}','${k}',1)`,
+            `(function(el){var x=getVentas().find(x=>x.id==='${v.id}');if(x){x['${k}']=el.value;guardar();renderVentas();}})(this)`,
+            true
+          )}
+        </div>`;
+      }).join("");
+      return `<div class="vg-row${hayDatos ? " vg-row-on" : ""}">
+        <div class="vg-nom">${esc(v.nombre)}</div>
+        <div class="vg-celdas" style="gap:4px;">
+          <div class="vg-grupo">${refCeldas}</div>
+          <div class="vg-sep-vert"></div>
+          <div class="vg-grupo vg-grupo-acc">${llevCeldas}</div>
+          ${diffBadge(pT, lT)}
+        </div>
+      </div>`;
+    }
+  }
+
+  // ── fila con talle — MOBILE (apilada) ──
+  function fillaTalleMobile(v) {
+    const modo = _ventasModo;
+    const hayDatos = TALLES.some(l =>
+      (parseInt(v["_cant_" + l]) || 0) > 0 || (parseInt(v["_llev_" + l]) || 0) > 0
+    );
+
+    if (modo === "pedido") {
+      // Mobile pedido: igual que desktop pero sin encabezado de columnas
+      const steppers = TALLES.map(lbl => {
+        const k = "_cant_" + lbl;
+        return `<div class="vg-talle-stp">
+          <div class="vg-talle-stp-lbl">${lbl}</div>
+          ${stp(v[k],
+            `_ventaTalleStep('${v.id}','${k}',-1)`,
+            `_ventaTalleStep('${v.id}','${k}',1)`,
+            `(function(el){var x=getVentas().find(x=>x.id==='${v.id}');if(x){x['${k}']=el.value;guardar();}})(this)`
+          )}
+        </div>`;
+      }).join("");
+      return `<div class="vg-row vg-row-talle-mobile${hayDatos ? " vg-row-on" : ""}">
+        <div class="vg-row-talle-top">
+          <div class="vg-nom">${esc(v.nombre)}</div>
+        </div>
+        <div class="vg-llevado-row">
+          <div class="vg-llevado-lbl" style="color:var(--ink-light);">cant.</div>
+          <div class="vg-talle-steppers">${steppers}</div>
+        </div>
+      </div>`;
+    } else {
+      // Mobile llevado: chips de referencia arriba + steppers abajo
+      const pT = TALLES.reduce((s, l) => s + (parseInt(v["_cant_" + l]) || 0), 0);
+      const lT = TALLES.reduce((s, l) => s + (parseInt(v["_llev_" + l]) || 0), 0);
+
+      const chips = TALLES.map(lbl => {
+        const n = parseInt(v["_cant_" + lbl]) || 0;
+        return `<span class="vg-ref-chip">
+          <span class="vg-ref-chip-sz">${lbl}</span>
+          <span class="vg-ref-chip-val${n === 0 ? " zero" : ""}">${n || "—"}</span>
+        </span>`;
+      }).join("");
+
+      const steppers = TALLES.map(lbl => {
+        const k = "_llev_" + lbl;
+        return `<div class="vg-talle-stp">
+          <div class="vg-talle-stp-lbl">${lbl}</div>
+          ${stp(v[k],
+            `_ventaTalleStep('${v.id}','${k}',-1)`,
+            `_ventaTalleStep('${v.id}','${k}',1)`,
+            `(function(el){var x=getVentas().find(x=>x.id==='${v.id}');if(x){x['${k}']=el.value;guardar();renderVentas();}})(this)`,
+            true
+          )}
+        </div>`;
+      }).join("");
+
+      // diff badge
+      let diffCls = "", diffTxt = "—";
+      if (pT > 0 || lT > 0) {
+        if (lT === pT) { diffCls = "ok"; diffTxt = "✓"; }
+        else if (lT < pT) { diffCls = "low"; diffTxt = String(lT - pT); }
+        else { diffCls = "hi"; diffTxt = "+" + (lT - pT); }
+      }
+
+      return `<div class="vg-row vg-row-talle-mobile${hayDatos ? " vg-row-on" : ""}">
+        <div class="vg-row-talle-top">
+          <div class="vg-nom">${esc(v.nombre)}</div>
+          <div class="vg-ref-chips">
+            <span class="vg-ref-chips-lbl">ref</span>
+            ${chips}
           </div>
         </div>
-      </div>
-    </div>`;
+        <div class="vg-llevado-row">
+          <div class="vg-llevado-lbl">llev.</div>
+          <div class="vg-talle-steppers">${steppers}</div>
+          <div class="vg-llevado-diff ${diffCls}">${diffTxt}</div>
+        </div>
+      </div>`;
+    }
   }
 
+  // ── selector de función según plataforma ──
   function fillaTalle(v) {
-    const hayDatos = TALLES.some(l => (parseInt(v["_cant_" + l]) || 0) > 0 || (parseInt(v["_llev_" + l]) || 0) > 0);
-    const pedCeldas = TALLES.map(lbl => {
-      const k = "_cant_" + lbl;
-      return `<div class="vg-celda">
-        ${stp(v[k],
-          `_ventaTalleStep('${v.id}','${k}',-1)`,
-          `_ventaTalleStep('${v.id}','${k}',1)`,
-          `(function(el){var x=getVentas().find(x=>x.id==='${v.id}');if(x){x['${k}']=el.value;guardar();}})(this)`
-        )}
-      </div>`;
-    }).join("");
-    const llevCeldas = TALLES.map(lbl => {
-      const k = "_llev_" + lbl;
-      return `<div class="vg-celda">
-        ${stp(v[k],
-          `_ventaTalleStep('${v.id}','${k}',-1)`,
-          `_ventaTalleStep('${v.id}','${k}',1)`,
-          `(function(el){var x=getVentas().find(x=>x.id==='${v.id}');if(x){x['${k}']=el.value;guardar();}})(this)`,
-          true
-        )}
-      </div>`;
-    }).join("");
-    return `<div class="vg-row${hayDatos ? " vg-row-on" : ""}">
-      <div class="vg-nom">${esc(v.nombre)}</div>
-      <div class="vg-celdas">
-        <div class="vg-grupo">${pedCeldas}</div>
-        <div class="vg-sep-vert"></div>
-        <div class="vg-grupo vg-grupo-acc">${llevCeldas}</div>
-      </div>
-    </div>`;
+    return mobile ? fillaTalleMobile(v) : fillaTalleDesktop(v);
   }
 
-  let html = `<div class="vg-tabla">
-    <div class="vg-head-top">
-      <div class="vg-head-nom"></div>
-      <div class="vg-head-groups">
-        <div class="vg-head-grupo">pedido</div>
-        <div class="vg-head-grupo vg-head-acc">llevado</div>
-      </div>
+  // ── encabezado según modo (solo desktop) ──
+  const headTop = _ventasModo === "pedido"
+    ? `<div class="vg-head-grupo">pedido</div>`
+    : `<div class="vg-head-grupo" style="color:var(--ink-light);font-size:.52rem;">referencia</div>
+       <div class="vg-head-grupo vg-head-acc">llevado</div>`;
+
+  const headSub = _ventasModo === "pedido"
+    ? `<div class="vg-head-grupo">
+         <div class="vg-head-talle">ch</div>
+         <div class="vg-head-talle">md</div>
+         <div class="vg-head-talle">gr</div>
+       </div>`
+    : `<div class="vg-head-grupo">
+         <div class="vg-head-talle">ch</div>
+         <div class="vg-head-talle">md</div>
+         <div class="vg-head-talle">gr</div>
+       </div>
+       <div class="vg-sep-vert vg-sep-head"></div>
+       <div class="vg-head-grupo vg-head-acc">
+         <div class="vg-head-talle">ch</div>
+         <div class="vg-head-talle">md</div>
+         <div class="vg-head-talle">gr</div>
+       </div>
+       <div style="width:36px;"></div>`;
+
+  // ── summary bar (solo en modo llevado) ──
+  const totPed = totalCampo("cantidad");
+  const totLlev = totalCampo("llevada");
+  const summaryHtml = _ventasModo === "llevado" ? `
+    <div class="vg-summary-bar">
+      <div class="vg-scard"><div class="vg-scard-label">Pedido total</div><div class="vg-scard-val">${totPed}</div></div>
+      <div class="vg-scard"><div class="vg-scard-label">Llevado total</div><div class="vg-scard-val">${totLlev}</div></div>
+      <div class="vg-scard"><div class="vg-scard-label">Restante</div><div class="vg-scard-val">${totPed - totLlev}</div></div>
+    </div>` : "";
+
+  // ── armar tabla ──
+  let html = `
+    <div class="vg-mode-bar">
+      <button class="vg-mode-btn${_ventasModo === "pedido" ? " vg-mode-active" : ""}"
+        onclick="_ventasModo='pedido';renderVentas()">① Cargar pedidos</button>
+      <button class="vg-mode-btn${_ventasModo === "llevado" ? " vg-mode-active" : ""}"
+        onclick="_ventasModo='llevado';renderVentas()">② Marcar llevados</button>
     </div>
-    <div class="vg-head-sub">
-      <div class="vg-head-nom"></div>
-      <div class="vg-head-groups">
-        <div class="vg-head-grupo">
-          <div class="vg-head-talle">ch</div>
-          <div class="vg-head-talle">md</div>
-          <div class="vg-head-talle">gr</div>
-        </div>
-        <div class="vg-sep-vert vg-sep-head"></div>
-        <div class="vg-head-grupo vg-head-acc">
-          <div class="vg-head-talle">ch</div>
-          <div class="vg-head-talle">md</div>
-          <div class="vg-head-talle">gr</div>
-        </div>
+    ${summaryHtml}
+    <div class="vg-tabla">
+      <div class="vg-head-top">
+        <div class="vg-head-nom"></div>
+        <div class="vg-head-groups">${headTop}</div>
       </div>
-    </div>`;
+      <div class="vg-head-sub">
+        <div class="vg-head-nom"></div>
+        <div class="vg-head-groups">${headSub}</div>
+      </div>`;
 
   CAT_ORDEN.forEach(cat => {
     const items = porCat[cat] || [];
     if (!items.length) return;
-    const tieneData = items.some(v => {
-      if (v._tieneTalle) return ["ch", "md", "gr"].some(l => (parseInt(v["_cant_" + l]) || 0) > 0 || (parseInt(v["_llev_" + l]) || 0) > 0);
-      return (parseInt(v.cantidad) || 0) > 0 || (parseInt(v.llevada) || 0) > 0;
-    });
-    const abierto = tieneData;
+    const tieneData = items.some(v =>
+      v._tieneTalle
+        ? TALLES.some(l => (parseInt(v["_cant_" + l]) || 0) > 0 || (parseInt(v["_llev_" + l]) || 0) > 0)
+        : (parseInt(v.cantidad) || 0) > 0 || (parseInt(v.llevada) || 0) > 0
+    );
     const catId = "vg-cat-" + cat;
     html += `<div class="vg-sep-cat" onclick="(function(el){const body=document.getElementById('${catId}');const open=body.style.display!=='none';body.style.display=open?'none':'block';el.querySelector('.vg-cat-arrow').textContent=open?'▶':'▼';})(this)" style="cursor:pointer;user-select:none;">
-      <span class="vg-cat-arrow" style="font-size:.55rem;color:var(--ink-light);margin-right:5px;">${abierto ? "▼" : "▶"}</span>${CAT_LABEL[cat] || cat}
+      <span class="vg-cat-arrow" style="font-size:.55rem;color:var(--ink-light);margin-right:5px;">${tieneData ? "▼" : "▶"}</span>${CAT_LABEL[cat] || cat}
+    </div>
+    <div id="${catId}" style="display:${tieneData ? "block" : "none"}">
+      ${items.map(v => v._tieneTalle ? fillaTalle(v) : filaSimple(v)).join("")}
     </div>`;
-    html += `<div id="${catId}" style="display:${abierto ? "block" : "none"}">`;
-    items.forEach(v => {
-      html += v._tieneTalle ? fillaTalle(v) : filaSimple(v);
-    });
-    html += `</div>`;
   });
 
   html += `</div>`;
 
-  if (manuales.length || true) {
-    html += `<div class="vg-libre">
-      <div class="vg-libre-titulo">✏️ Agregar producto</div>
-      ${manuales.map(v => filaSimple(v, true)).join("")}
-      <div class="vg-libre-row">
-        <input type="text" id="venta-nueva-nombre" placeholder="Nombre del producto..."
-          class="vg-libre-input"
-          onkeydown="if(event.key==='Enter'){agregarVentaManual();event.preventDefault();}">
-        <button onclick="agregarVentaManual()" class="vg-libre-add">＋</button>
-      </div>
-    </div>`;
+  // Botón "pasar al siguiente paso" solo en modo pedido
+  if (_ventasModo === "pedido") {
+    html += `<button class="vg-mode-next" onclick="_ventasModo='llevado';renderVentas()">Listo, pasar a marcar llevados →</button>`;
   }
+
+  // Productos manuales + agregar
+  html += `<div class="vg-libre">
+    <div class="vg-libre-titulo">✏️ Agregar producto</div>
+    ${manuales.map(v => filaSimple(v, true)).join("")}
+    <div class="vg-libre-row">
+      <input type="text" id="venta-nueva-nombre" placeholder="Nombre del producto..."
+        class="vg-libre-input"
+        onkeydown="if(event.key==='Enter'){agregarVentaManual();event.preventDefault();}">
+      <button onclick="agregarVentaManual()" class="vg-libre-add">＋</button>
+    </div>
+  </div>`;
 
   cont.innerHTML = html;
   renderCubaResumen();

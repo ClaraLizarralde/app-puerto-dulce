@@ -391,31 +391,61 @@
       <div id="venta-lista"></div>
     </div>
     <div class="prod-panel" id="cubapanel-exportar" style="display:none">
-      <div style="font-size:.72rem;color:var(--ink-light);margin-bottom:14px;">Exportá el movimiento de stock con Cuba para el día.</div>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:.9rem;color:var(--cuba-ink);margin-bottom:4px;">🧾 Remito de egreso de stock</div>
-      <div style="font-size:.68rem;color:var(--ink-light);margin-bottom:10px;">Pedidos a Cuba + ventas llevadas, sumados por producto en una sola tabla.</div>
-      <div style="margin-bottom:14px;">
-        <button onclick="exportarRemitoEgreso()" style="width:100%;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:600;padding:11px;border:none;border-radius:var(--radius-sm);background:var(--cuba-ink,#7a5a10);color:#fff;cursor:pointer;">⬇ Descargar remito XLSX</button>
+
+  <p class="cexp-desc">Exportá el movimiento de stock con Cuba para el día.</p>
+
+  <div class="cexp-grid">
+
+    <div class="cexp-card">
+      <div class="cexp-card-header">
+        <div class="cexp-icon cexp-icon-amber">🧾</div>
+        <div>
+          <div class="cexp-card-title">Remito de egreso</div>
+          <div class="cexp-card-sub">Pedidos + ventas por producto</div>
+        </div>
       </div>
-      <div style="height:1px;background:var(--border);margin-bottom:14px;"></div>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:.9rem;color:var(--cuba-ink);margin-bottom:4px;">📋 Detalle por sección</div>
-      <div style="font-size:.68rem;color:var(--ink-light);margin-bottom:10px;">Pedidos a Cuba y ventas en secciones separadas.</div>
-      <div style="display:flex;gap:7px;margin-bottom:14px;">
-        <button onclick="exportarCubaHoy('xlsx')" style="flex:1;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:500;padding:9px;border:1.5px solid var(--cuba-border);border-radius:var(--radius-sm);background:transparent;color:var(--cuba-ink);cursor:pointer;">⬇ XLSX</button>
-        <button onclick="exportarCubaHoy('csv')" style="flex:1;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:500;padding:9px;border:1.5px solid var(--cuba-border);border-radius:var(--radius-sm);background:transparent;color:var(--cuba-ink);cursor:pointer;">⬇ CSV</button>
+      <div class="cexp-divider"></div>
+      <button onclick="exportarRemitoEgreso()" class="cexp-btn cexp-btn-primary">⬇ Descargar XLSX</button>
+    </div>
+
+    <div class="cexp-card">
+      <div class="cexp-card-header">
+        <div class="cexp-icon cexp-icon-blue">📋</div>
+        <div>
+          <div class="cexp-card-title">Detalle por sección</div>
+          <div class="cexp-card-sub">Pedidos y ventas separados</div>
+        </div>
       </div>
-      <div style="height:1px;background:var(--border);margin-bottom:14px;"></div>
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:.9rem;color:var(--cuba-ink);margin-bottom:4px;">📅 Días anteriores</div>
-      <div style="font-size:.68rem;color:var(--ink-light);margin-bottom:8px;">Seleccioná un día o exportá todo el historial.</div>
-      <div id="cuba-export-dias-wrap" style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;">
-        <div style="color:var(--ink-light);font-size:.72rem;font-style:italic;">Cargando días...</div>
-      </div>
-      <div style="display:flex;gap:7px;margin-bottom:14px;">
-        <button onclick="exportarCubaTodos('xlsx')" style="flex:1;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:500;padding:9px;border:1.5px solid var(--cuba-border);border-radius:var(--radius-sm);background:var(--cuba-bg,#fffdf6);color:var(--cuba-ink);cursor:pointer;">📥 Exportar todos XLSX</button>
-        <button onclick="exportarCubaTodos('csv')" style="flex:1;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:500;padding:9px;border:1.5px solid var(--cuba-border);border-radius:var(--radius-sm);background:var(--cuba-bg,#fffdf6);color:var(--cuba-ink);cursor:pointer;">📥 Exportar todos CSV</button>
+      <div class="cexp-divider"></div>
+      <div class="cexp-btn-row">
+        <button onclick="exportarCubaHoy('xlsx')" class="cexp-btn cexp-btn-outline">⬇ XLSX</button>
+        <button onclick="exportarCubaHoy('csv')"  class="cexp-btn cexp-btn-outline">⬇ CSV</button>
       </div>
     </div>
+
   </div>
+
+  <div class="cexp-card">
+    <div class="cexp-card-header">
+      <div class="cexp-icon cexp-icon-teal">📅</div>
+      <div>
+        <div class="cexp-card-title">Días anteriores</div>
+        <div class="cexp-card-sub">Seleccioná un día o exportá todo el historial</div>
+      </div>
+    </div>
+    <div class="cexp-divider"></div>
+<div id="cuba-export-dias-wrap" class="cexp-dias-wrap"></div>
+    <div class="cexp-btn-row">
+      <button onclick="exportarCubaTodos('xlsx')" class="cexp-btn cexp-btn-ghost">📥 Exportar todos XLSX</button>
+      <button onclick="exportarCubaTodos('csv')"  class="cexp-btn cexp-btn-ghost">📥 Exportar todos CSV</button>
+    </div>
+  </div>
+
+</div>
+
+  </div><!-- /tab-cuba -->
+
+ 
 
   <!-- FRECUENTES / CATÁLOGO ocultos -->
   <div class="tab-content" id="tab-frecuentes" style="display:none!important"></div>
@@ -907,32 +937,6 @@
 
 </div><!-- /app-body -->
 
-
-
-
-
-<!-- WHEEL TIME PICKER (desktop) -->
-<div class="wheel-overlay hidden" id="wheel-overlay">
-  <div class="wheel-panel">
-    <div class="wheel-panel-title">Horario de entrega</div>
-    <div class="wheel-cols">
-      <div class="wheel-col-wrap">
-        <div class="wheel-highlight"></div>
-        <div class="wheel-col" id="wheel-col-h"></div>
-      </div>
-      <div class="wheel-sep">:</div>
-      <div class="wheel-col-wrap">
-        <div class="wheel-highlight"></div>
-        <div class="wheel-col" id="wheel-col-m"></div>
-      </div>
-    </div>
-    <div class="wheel-panel-footer">
-      <button class="wheel-btn-cancel" onclick="wheelCancel()">Cancelar</button>
-      <button class="wheel-btn-ok" onclick="wheelConfirm()">Confirmar</button>
-    </div>
-  </div>
-</div>
-
 <!-- MODAL PAGO -->
 
 <div class="modal-overlay hidden" id="modal-pago">
@@ -953,32 +957,6 @@
     </div>
   </div>
 </div>
-
-<!-- MODAL EDICIÓN PEDIDO -->
-<div class="modal-overlay hidden" id="modal-edicion">
-  <div class="modal-np" id="modal-edicion-inner">
-    <div class="modal-np-header">
-      <h3 id="ed-titulo">📋 Pedido</h3>
-      <button class="modal-np-close" onclick="cerrarModalEdicion()">✕</button>
-    </div>
-    <div class="modal-np-body" id="ed-body">
-      <!-- contenido generado dinámicamente -->
-    </div>
-    <!-- Footer modo VISTA -->
-    <div class="modal-np-footer" id="ed-footer-vista">
-      <button class="btn-cancelar" onclick="cerrarModalEdicion()">Cerrar</button>
-      <button class="btn-danger" style="padding:11px 13px;font-size:.78rem;" onclick="confirmarEliminarDesdeEdicion()">🗑 Eliminar</button>
-      <button class="btn-confirmar" onclick="activarModoEdicion()">✏️ Editar pedido</button>
-    </div>
-    <!-- Footer modo EDICIÓN -->
-    <div class="modal-np-footer" id="ed-footer-edicion" style="display:none;">
-      <button class="btn-cancelar" onclick="volverModoVista()">← Vista</button>
-      <button class="btn-danger" style="padding:11px 13px;font-size:.78rem;" onclick="confirmarEliminarDesdeEdicion()">🗑 Eliminar</button>
-      <button class="btn-confirmar" onclick="guardarEdicion()">Guardar cambios</button>
-    </div>
-  </div>
-</div>
-
 
 <!-- MODAL GENÉRICO -->
 <div class="modal-overlay hidden" id="modal-gen">
@@ -1029,7 +1007,6 @@
 </div>
 
 <!-- MODAL PIZARRÓN -->
-
 <div class="bb-overlay" id="modal-pizarron">
   <div class="bb-pizarron">
 

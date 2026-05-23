@@ -45,6 +45,7 @@ function buildEtiquetas(pedidos, fechaKey) {
     const nombre = p.cliente_input || p.cliente || "Sin nombre";
     const hora = p.hora_entrega || "";
     const fecha = formatFechaEtiq(fechaKey);
+    const esCuba = p.cliente === 'cuba'; // ← detección por nombre de cliente
 
     const conTalle = [];
     const sinTalle = [];
@@ -61,7 +62,7 @@ function buildEtiquetas(pedidos, fechaKey) {
 
       if (tieneTalle) {
         for (let i = 0; i < cant; i++) {
-          conTalle.push({ nombre, hora, fecha, producto: nomProd, talle, nota, conTalle: true });
+          conTalle.push({ nombre, hora, fecha, producto: nomProd, talle, nota, conTalle: true, esCuba });
         }
       } else {
         sinTalle.push({ nomProd, cant, nota });
@@ -87,7 +88,8 @@ function buildEtiquetas(pedidos, fechaKey) {
           talle: "",
           nota: "",
           conTalle: false,
-          agrupada: true
+          agrupada: true,
+          esCuba
         });
       }
     }
@@ -168,6 +170,12 @@ function renderEtiquetas() {
     todasEtiquetas = todasEtiquetas.concat(etqs);
   }
 
+  // Ordenar: primero no-Cuba, después Cuba; dentro de cada grupo, por hora
+  todasEtiquetas.sort((a, b) => {
+    if (a.esCuba !== b.esCuba) return a.esCuba ? 1 : -1;
+    return (a.hora || "").localeCompare(b.hora || "");
+  });
+
   const preview = document.getElementById("etiq-preview");
   const selectorWrap = document.getElementById("etiq-selector-wrap");
 
@@ -193,19 +201,30 @@ function renderEtiquetas() {
       </div>`;
   }
 
-  // Preview visual
+  // Preview visual con separadores por grupo
   if (preview) {
-    preview.innerHTML = `<div class="etiq-grid">${todasEtiquetas.map(e => {
-      const excl = _etiqExcluidas.has(e._uid);
-      return `<div class="etiq-card${e.conTalle ? " etiq-con-talle" : ""}" style="opacity:${excl ? ".35" : "1"};position:relative;cursor:pointer;" onclick="etiqToggleCard('${e._uid}')" title="${excl ? "Click para incluir" : "Click para excluir"}">
-        ${excl ? `<div style="position:absolute;top:6px;right:8px;font-size:.65rem;color:var(--ink-light);">✕</div>` : ""}
-        <div class="etiq-nombre">${esc(e.nombre)}</div>
-        <div class="etiq-producto">${e.agrupada ? e.producto.split("\n").map(l => `<div>${esc(l)}</div>`).join("") : esc(e.producto)}</div>
-        ${e.talle ? `<div class="etiq-talle">${esc(e.talle)}</div>` : ""}
-        ${e.nota && !e.agrupada ? `<div class="etiq-nota">📝 ${esc(e.nota)}</div>` : ""}
-        <div class="etiq-meta">${esc(e.fecha)}${e.hora ? " · " + esc(e.hora) : ""}</div>
-      </div>`;
-    }).join("")}</div>`;
+    const noCuba = todasEtiquetas.filter(e => !e.esCuba);
+    const cuba   = todasEtiquetas.filter(e =>  e.esCuba);
+
+    const renderGrupo = (lista) =>
+      `<div class="etiq-grid">${lista.map(e => {
+        const excl = _etiqExcluidas.has(e._uid);
+        return `<div class="etiq-card${e.conTalle ? " etiq-con-talle" : ""}" style="opacity:${excl ? ".35" : "1"};position:relative;cursor:pointer;" onclick="etiqToggleCard('${e._uid}')" title="${excl ? "Click para incluir" : "Click para excluir"}">
+          ${excl ? `<div style="position:absolute;top:6px;right:8px;font-size:.65rem;color:var(--ink-light);">✕</div>` : ""}
+          <div class="etiq-nombre">${esc(e.nombre)}</div>
+          <div class="etiq-producto">${e.agrupada ? e.producto.split("\n").map(l => `<div>${esc(l)}</div>`).join("") : esc(e.producto)}</div>
+          ${e.talle ? `<div class="etiq-talle">${esc(e.talle)}</div>` : ""}
+          ${e.nota && !e.agrupada ? `<div class="etiq-nota">📝 ${esc(e.nota)}</div>` : ""}
+          <div class="etiq-meta">${esc(e.fecha)}${e.hora ? " · " + esc(e.hora) : ""}</div>
+        </div>`;
+      }).join("")}</div>`;
+
+    const sep = (titulo) =>
+      `<div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-light);margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--border);">${titulo}</div>`;
+
+    preview.innerHTML =
+      (noCuba.length ? sep(`🏠 Local (${noCuba.length})`) + renderGrupo(noCuba) : "") +
+      (cuba.length   ? sep(`📦 Cuba (${cuba.length})`)    + renderGrupo(cuba)   : "");
   }
 }
 
@@ -219,6 +238,13 @@ function imprimirEtiquetas() {
     etqs.forEach((e, i) => { e._uid = `${k}__${i}`; });
     todasEtiquetas = todasEtiquetas.concat(etqs);
   }
+
+  // Ordenar: primero no-Cuba, después Cuba; dentro de cada grupo, por hora
+  todasEtiquetas.sort((a, b) => {
+    if (a.esCuba !== b.esCuba) return a.esCuba ? 1 : -1;
+    return (a.hora || "").localeCompare(b.hora || "");
+  });
+
   const etiquetas = todasEtiquetas.filter(e => !_etiqExcluidas.has(e._uid));
   if (!etiquetas.length) {
     alert("No hay etiquetas seleccionadas para imprimir.");

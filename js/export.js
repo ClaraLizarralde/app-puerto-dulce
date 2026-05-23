@@ -636,11 +636,11 @@ function renderCubaExportSelector() {
     return `<option value="${k}">${label}</option>`;
   }).join("");
   wrap.innerHTML = `
-    <select id="cuba-export-dia-sel" style="flex:1;font-family:'Outfit',sans-serif;font-size:.78rem;padding:7px 10px;border:1.5px solid var(--cuba-border);border-radius:var(--radius-sm);background:var(--bg);color:var(--ink);outline:none;">
-      ${opts}
-    </select>
-    <button onclick="exportarCubaDiaSeleccionado('xlsx')" style="font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:500;padding:7px 10px;border:1.5px solid var(--cuba-border);border-radius:var(--radius-sm);background:transparent;color:var(--cuba-ink);cursor:pointer;">⬇ XLSX</button>
-    <button onclick="exportarCubaDiaSeleccionado('csv')" style="font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:500;padding:7px 10px;border:1.5px solid var(--cuba-border);border-radius:var(--radius-sm);background:transparent;color:var(--cuba-ink);cursor:pointer;">⬇ CSV</button>
+    <div class="cexp-dias-row">
+      <select id="cuba-export-dia-sel" class="cexp-dias-select">${opts}</select>
+      <button onclick="exportarCubaDiaSeleccionado('xlsx')" class="cexp-btn cexp-btn-outline">⬇ XLSX</button>
+      <button onclick="exportarCubaDiaSeleccionado('csv')"  class="cexp-btn cexp-btn-outline">⬇ CSV</button>
+    </div>
   `;
 }
 
