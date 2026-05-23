@@ -440,7 +440,7 @@ function renderBotonesLocales(contenedorId, onSelect) {
 // Cambia local activo y guarda en datos
 function setLocal(id) {
   const local = LOCALES_DISPONIBLES.find(l => l.id === id);
-  if (!local) return;S
+  if (!local) return;
   datos.localId = local.id;
   datos.nombre_local = local.nombre;
   guardar();
