@@ -583,8 +583,7 @@ function _buildCatHTML(porCat, scope, mode, diaKey) {
 
         html += `<tr class="prod-fila${done ? " prod-fila-hecha" : ""}">
           <td class="prod-td-prod">
-            <span class="prod-td-nom">${esc(nom)}</span>
-            <span class="prod-td-total">${totalProd - hechosProd > 0 ? totalProd - hechosProd : "&#10003;"}</span>
+            <span class="prod-td-nom">${esc(nom)}<span class="prod-td-total">&thinsp;&middot;&thinsp;${totalProd - hechosProd > 0 ? totalProd - hechosProd : "&#10003;"}</span></span>
           </td>
           <td class="prod-td-cant" colspan="2">
             <div class="prod-pills-wrap">${pillsSem}</div>

@@ -58,9 +58,7 @@ function selectMobileSubtab(parent, id, el) {
   const screen = document.getElementById("subtab-screen-" + parent);
   if (screen) screen.classList.remove("active");
 
-  if (parent === "produccion") {
-    showProdTab(id, document.getElementById("prodtab-" + id));
-  } else if (parent === "cuba") {
+  if (parent === "cuba") {
     showCubaTab(id, document.getElementById("cubatab-" + id));
   } else if (parent === "config") {
     showCfgTab(id, document.getElementById("cfgtab-" + id));
@@ -117,9 +115,7 @@ function abrirMobPanel(key, tabEl) {
 function mobPanelPick(parent, id) {
   cerrarMobPanel();
 
-  if (parent === 'produccion') {
-    showProdTab(id, document.getElementById('prodtab-' + id));
-  } else if (parent === 'cuba') {
+  if (parent === 'cuba') {
     showCubaTab(id, document.getElementById('cubatab-' + id));
   } else if (parent === 'mas') {
     if (id === 'usuario') {
@@ -169,7 +165,7 @@ function showTab(id, el) {
 
   const isMobile = isMobileLayout();
   if (isMobile) {
-    if (id === 'produccion' || id === 'cuba') {
+    if (id === 'cuba') {
       abrirMobPanel(id, el);
       return;
     }
