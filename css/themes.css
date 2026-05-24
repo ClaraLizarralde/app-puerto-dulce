@@ -416,8 +416,9 @@
    Celeste · Naranja · Amarillo · Verde · Outline negro
    ══════════════════════════════════════ */
 [data-theme="retro"] {
-  --bg:#7dd4f0;
+  --bg:#fffbe8;
   --paper:#ffffff;
+  --retro-cyan:#7dd4f0;
   --ink:#1a1010;
   --ink-mid:#3a2010;
   --ink-light:#7a6050;
@@ -426,7 +427,7 @@
 
   --accent:#f07820;
   --accent-soft:#fef0e0;
-  --accent2:#f0d020;
+  --accent2:#8040c0;
 
   --green:#48b030;
   --green-soft:#e0f8d8;
@@ -454,7 +455,7 @@
   --radius:12px;
   --radius-sm:8px;
 
-  --header-grad:linear-gradient(135deg,#8040c0,#6020a0);
+  --header-grad:linear-gradient(135deg,#8040c0,#5a18a0);
 
   --dia-lunes:#4090d0;
   --dia-lunes-text:#fff;
@@ -492,42 +493,104 @@
 }
 
 [data-theme="retro"] .header-logo {
-  font-style: normal;
+  font-style: normal !important;
   font-weight: 900;
+  font-family: 'Nunito', sans-serif !important;
 }
 
-/* ── RETRO: sidebar celeste con outline ── */
+/* ── RETRO: sync pill y badge-hoy ── */
+[data-theme="retro"] .badge-hoy {
+  background: #f0d020 !important;
+  color: #1a1010 !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  font-weight: 900 !important;
+}
+
+[data-theme="retro"] .sync-pill {
+  border: 2px solid rgba(255,255,255,0.6) !important;
+}
+
+/* ── RETRO: separadores de día en lista ── */
+[data-theme="retro"] .po-day-sep-label {
+  color: #1a1010 !important;
+  font-weight: 900 !important;
+}
+
+/* ── RETRO: sidebar amarilla con outline ── */
 [data-theme="retro"] .tabs {
-  background:  #f0d020;
-  border-right: 3px solid #1a1010;
+  background: #f0d020 !important;
+  border-right: 3px solid #1a1010 !important;
+}
+
+/* ── RETRO: cabecera sidebar ── */
+[data-theme="retro"] .tabs-side-head {
+  border-bottom: 2px solid #1a1010 !important;
+}
+[data-theme="retro"] .tabs-side-brand {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .tabs-side-sub {
+  color: #3a2010 !important;
+}
+
+/* ── RETRO: botón colapsar sidebar ── */
+[data-theme="retro"] .tabs-collapse-btn {
+  border: 2px solid #1a1010 !important;
+  background: #fff !important;
+  color: #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+}
+[data-theme="retro"] .tabs-collapse-btn:hover {
+  background: #fef0e0 !important;
+  color: #f07820 !important;
+}
+
+/* ── RETRO: btn usuario sidebar ── */
+[data-theme="retro"] .btn-usuario {
+  border: 2px solid #1a1010 !important;
+  background: #fff !important;
+  color: #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+}
+[data-theme="retro"] .btn-usuario:hover {
+  border-color: #1a1010 !important;
+  color: #f07820 !important;
 }
 
 /* ── RETRO: tabs con outline cartoon ── */
 [data-theme="retro"] .tab:hover {
-  background: #fef0e0;
-  border-color: #1a1010;
-  box-shadow: 2px 2px 0px #1a1010;
+  background: #fef0e0 !important;
+  border-color: #1a1010 !important;
+  box-shadow: 2px 2px 0px #1a1010 !important;
 }
 
 [data-theme="retro"] .tab.active {
-  border-left-color: #f07820;
-  background: #fef0e0;
-  color: #f07820;
-  box-shadow: 2px 2px 0px #1a1010;
+  border-left-color: #f07820 !important;
+  border-top-color: transparent !important;
+  background: #fff !important;
+  color: #f07820 !important;
+  box-shadow: 2px 2px 0px #1a1010 !important;
 }
 
 /* ── RETRO: btn nuevo pedido cartoon ── */
 [data-theme="retro"] .btn-nuevo-pedido-sidebar {
   border: 2.5px solid #1a1010;
   background: #8040c0;
-  color: #1a1010;
+  color: #fff;
   box-shadow: 3px 3px 0px #1a1010;
   font-weight: 900;
 }
 [data-theme="retro"] .btn-nuevo-pedido-sidebar:hover {
-  background: #f07820;
+  background: #6020a0;
   color: #fff;
-  box-shadow: 1px}
+  box-shadow: 1px 1px 0px #1a1010;
+  transform: translate(2px, 2px);
+}
 
   [data-theme="retro"] .po-btn-sm.po-btn-accent {
   background: #8040c0;
@@ -586,19 +649,7 @@
   border-bottom: 3px solid #1a1010;
 }
 
-[data-theme="retro"] .po-day-tabs {
-  background: #8040c0;
-  border-bottom: 3px solid #1a1010;
-}
-
-[data-theme="retro"] .po-day-tab {
-  color: #fff;
-}
-
-[data-theme="retro"] .po-day-tab.active {
-  color: #f0d020;
-  border-bottom-color: #f0d020;
-}
+/* retro day tabs — ver bloque completo más abajo */
 
 [data-theme="retro"] .po-filter-row {
   background: #48b030;
@@ -689,7 +740,14 @@
 [data-theme="retro"] .sem-row:nth-of-type(5n+4) { background: #f0d020 !important; }
 [data-theme="retro"] .sem-row:nth-of-type(5n+5) { background: #8040c0 !important; }
 
-[data-theme="retro"] .dia-principal-banner {
+[data-theme="retro"] .dia-principal-banner,
+[data-theme="retro"] .dia-principal-banner.dpb-lunes,
+[data-theme="retro"] .dia-principal-banner.dpb-martes,
+[data-theme="retro"] .dia-principal-banner.dpb-miercoles,
+[data-theme="retro"] .dia-principal-banner.dpb-jueves,
+[data-theme="retro"] .dia-principal-banner.dpb-viernes,
+[data-theme="retro"] .dia-principal-banner.dpb-sabado,
+[data-theme="retro"] .dia-principal-banner.dpb-domingo {
   background: #8040c0 !important;
   border-bottom: 3px solid #1a1010 !important;
   color: #fff !important;
@@ -699,4 +757,1769 @@
 [data-theme="retro"] .dia-principal-banner .dpb-fecha,
 [data-theme="retro"] .dia-principal-banner .badge-hoy {
   color: #fff !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: PEDIDOS — fixes adicionales
+   ══════════════════════════════════════ */
+
+/* Topbar buscador */
+[data-theme="retro"] .po-topbar {
+  background: #f0d020 !important;
+  border-bottom: 3px solid #1a1010 !important;
+}
+[data-theme="retro"] .po-search-wrap {
+  background: #fff !important;
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+}
+[data-theme="retro"] .po-search-wrap input {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  color: #1a1010 !important;
+}
+
+/* Botones topbar */
+[data-theme="retro"] .po-btn-sm {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  background: #fff !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .po-btn-sm:hover {
+  box-shadow: 1px 1px 0 #1a1010 !important;
+  transform: translate(1px,1px) !important;
+}
+
+/* Btn "todos los pedidos" activo */
+[data-theme="retro"] .po-btn-todos {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .po-btn-todos.active {
+  background: #f07820 !important;
+  color: #fff !important;
+  border-color: #1a1010 !important;
+}
+
+/* Estado badges en tabla */
+[data-theme="retro"] .po-estado-badge.pendiente {
+  background: #f0d020 !important;
+  color: #1a1010 !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+}
+[data-theme="retro"] .po-estado-badge.prod {
+  background: #4090d0 !important;
+  color: #fff !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+}
+[data-theme="retro"] .po-estado-badge.listo {
+  background: #48b030 !important;
+  color: #fff !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+}
+[data-theme="retro"] .po-estado-badge.entregado {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+}
+
+/* Estado select en fila expandida */
+[data-theme="retro"] .po-exp-estado-select {
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  border-radius: 10px !important;
+}
+[data-theme="retro"] .po-exp-estado-select.po-exp-estado-pendiente {
+  background: #f0d020 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .po-exp-estado-select.po-exp-estado-prod {
+  background: #4090d0 !important;
+  color: #fff !important;
+}
+[data-theme="retro"] .po-exp-estado-select.po-exp-estado-listo {
+  background: #48b030 !important;
+  color: #fff !important;
+}
+[data-theme="retro"] .po-exp-estado-select.po-exp-estado-entregado {
+  background: #8040c0 !important;
+  color: #fff !important;
+}
+
+/* Botones acción en fila expandida */
+[data-theme="retro"] .po-btn-exp {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  border-radius: 9px !important;
+}
+[data-theme="retro"] .po-btn-exp:hover {
+  box-shadow: 1px 1px 0 #1a1010 !important;
+  transform: translate(1px,1px) !important;
+}
+[data-theme="retro"] .po-btn-exp.primary {
+  border-color: #f07820 !important;
+  color: #f07820 !important;
+}
+[data-theme="retro"] .po-btn-exp.danger {
+  border-color: #e03020 !important;
+  color: #e03020 !important;
+}
+
+/* Pagado badge */
+[data-theme="retro"] .po-pagado-badge {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 1px 1px 0 #1a1010 !important;
+  font-weight: 900 !important;
+}
+
+/* Botón expandir fila */
+[data-theme="retro"] .po-btn-expand {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+}
+[data-theme="retro"] .po-btn-expand:hover {
+  border-color: #f07820 !important;
+  color: #f07820 !important;
+  box-shadow: 1px 1px 0 #1a1010 !important;
+}
+
+/* Footer stats */
+[data-theme="retro"] .po-footer-stats {
+  background: #fff !important;
+  border-top: 3px solid #1a1010 !important;
+}
+[data-theme="retro"] .po-stat-num {
+  color: #8040c0 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .po-stat-lbl {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+}
+
+/* Separador de día en tabla */
+[data-theme="retro"] .po-day-sep-inner {
+  border-radius: 0 !important;
+}
+[data-theme="retro"] .po-day-sep-label {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .po-day-sep-count {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 1px 1px 0 #1a1010 !important;
+  font-weight: 900 !important;
+}
+
+/* Header tabla */
+[data-theme="retro"] .po-table thead th {
+  background: #fff !important;
+  border-bottom: 2.5px solid #1a1010 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #3a2010 !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: PRODUCCIÓN
+   ══════════════════════════════════════ */
+
+/* Tabs de días (Hoy / Mañana / Semanal / Futuro) */
+[data-theme="retro"] .po-day-tabs {
+  background: #fffbe8 !important;
+  border-bottom: 3px solid #1a1010 !important;
+}
+[data-theme="retro"] .po-day-tab {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  border-radius: 20px !important;
+  border: 2px solid transparent !important;
+  color: var(--ink-light) !important;
+}
+[data-theme="retro"] .po-day-tab:hover {
+  background: #fef0e0 !important;
+  color: #3a2010 !important;
+}
+/* Inactivas con color del día */
+[data-theme="retro"] .po-day-tab.dia-lunes     { color: #4090d0 !important; }
+[data-theme="retro"] .po-day-tab.dia-martes    { color: #e03020 !important; }
+[data-theme="retro"] .po-day-tab.dia-miercoles { color: #c0900a !important; }
+[data-theme="retro"] .po-day-tab.dia-jueves    { color: #8040c0 !important; }
+[data-theme="retro"] .po-day-tab.dia-viernes   { color: #38901f !important; }
+[data-theme="retro"] .po-day-tab.dia-sabado    { color: #f07820 !important; }
+[data-theme="retro"] .po-day-tab.dia-domingo   { color: #1a7ac0 !important; }
+/* Activas — sólido + box-shadow cartoon */
+[data-theme="retro"] .po-day-tab.active {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+}
+[data-theme="retro"] .po-day-tab.active.dia-lunes     { background: #4090d0 !important; color: #fff !important; }
+[data-theme="retro"] .po-day-tab.active.dia-martes    { background: #e03020 !important; color: #fff !important; }
+[data-theme="retro"] .po-day-tab.active.dia-miercoles { background: #f0d020 !important; color: #1a1010 !important; }
+[data-theme="retro"] .po-day-tab.active.dia-jueves    { background: #8040c0 !important; color: #fff !important; }
+[data-theme="retro"] .po-day-tab.active.dia-viernes   { background: #48b030 !important; color: #fff !important; }
+[data-theme="retro"] .po-day-tab.active.dia-sabado    { background: #f07820 !important; color: #fff !important; }
+[data-theme="retro"] .po-day-tab.active.dia-domingo   { background: #7dd4f0 !important; color: #1a1010 !important; }
+[data-theme="retro"] .po-day-tab .po-tab-count {
+  background: rgba(0,0,0,.12) !important;
+  color: inherit !important;
+  border: none !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .po-day-tab.active .po-tab-count {
+  background: rgba(0,0,0,.2) !important;
+  color: inherit !important;
+}
+
+/* Encabezado de categoría */
+[data-theme="retro"] .prod-cat-header {
+  background: #8040c0 !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+}
+[data-theme="retro"] .prod-cat-label {
+  color: #fff !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .prod-cat-count,
+[data-theme="retro"] .prod-cat-chevron {
+  color: rgba(255,255,255,0.8) !important;
+}
+[data-theme="retro"] .prod-cat-done {
+  background: rgba(255,255,255,0.2) !important;
+  color: #fff !important;
+  border: 1.5px solid rgba(255,255,255,0.5) !important;
+}
+
+/* Tabla de productos dentro de categoría */
+[data-theme="retro"] .prod-tabla thead th {
+  background: #f0d020 !important;
+  border-bottom: 2px solid #1a1010 !important;
+  color: #1a1010 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .prod-fila td {
+  border-bottom: 1.5px solid #1a1010 !important;
+}
+[data-theme="retro"] .prod-fila:nth-of-type(odd)  { background: #fff !important; }
+[data-theme="retro"] .prod-fila:nth-of-type(even) { background: #f0f8fe !important; }
+[data-theme="retro"] .prod-td-nom {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+
+/* Pills de talle */
+[data-theme="retro"] .prod-pill {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  background: #f0d020 !important;
+  color: #1a1010 !important;
+  border-radius: 20px !important;
+}
+[data-theme="retro"] .prod-pill.hecho {
+  background: #48b030 !important;
+  color: #fff !important;
+  border-color: #1a1010 !important;
+}
+[data-theme="retro"] .prod-pill.warn {
+  background: #e03020 !important;
+  color: #fff !important;
+}
+
+/* Checkbox listo */
+[data-theme="retro"] .prod-chk-grupo {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 8px !important;
+}
+[data-theme="retro"] .prod-chk-grupo.on {
+  background: #48b030 !important;
+  border-color: #1a1010 !important;
+  color: #fff !important;
+}
+
+/* Aviso anticipada */
+[data-theme="retro"] .prod-anticipada-aviso {
+  background: #f0d020 !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  color: #1a1010 !important;
+  font-weight: 900 !important;
+  border-radius: 10px !important;
+}
+
+/* Desglose clientes */
+[data-theme="retro"] .prod-pill-dsg {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+}
+[data-theme="retro"] .prod-dsg-row {
+  border-bottom: 1.5px solid #1a1010 !important;
+}
+[data-theme="retro"] .prod-dsg-cliente {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .prod-dsg-cant {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border: 1.5px solid #1a1010 !important;
+  border-radius: 20px !important;
+  font-weight: 900 !important;
+}
+
+/* Header semanal */
+[data-theme="retro"] .prod-semanal-header,
+[data-theme="retro"] .prod-futuro-semana-header {
+  background: #8040c0 !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  color: #fff !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  border-radius: 10px !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: CUBA
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] .cuba-banner {
+  background: #f0e8fc !important;
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 3px 3px 0 #1a1010 !important;
+  color: #1a1010 !important;
+  border-radius: 10px !important;
+}
+[data-theme="retro"] .cuba-banner h3 {
+  color: #8040c0 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+}
+
+[data-theme="retro"] .cuba-grupo-titulo {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #3a2010 !important;
+  border-bottom: 2px solid #1a1010 !important;
+}
+
+[data-theme="retro"] .cuba-item {
+  border-bottom: 1.5px solid #1a1010 !important;
+}
+[data-theme="retro"] .cuba-item:nth-of-type(5n+1) { background: #7dd4f0 !important; }
+[data-theme="retro"] .cuba-item:nth-of-type(5n+2) { background: #fef0e0 !important; }
+[data-theme="retro"] .cuba-item:nth-of-type(5n+3) { background: #e0f8d8 !important; }
+[data-theme="retro"] .cuba-item:nth-of-type(5n+4) { background: #fefce0 !important; }
+[data-theme="retro"] .cuba-item:nth-of-type(5n+5) { background: #f0e8fc !important; }
+
+[data-theme="retro"] .cuba-item .cqty {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  font-weight: 900 !important;
+  border-radius: 20px !important;
+}
+
+/* Materia prima */
+[data-theme="retro"] .cuba-mp-titulo {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+  border-bottom: 2px solid #1a1010 !important;
+}
+[data-theme="retro"] .cuba-mp-add {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  font-weight: 900 !important;
+  border-radius: 9px !important;
+}
+[data-theme="retro"] .cuba-mp-item {
+  border: 1.5px solid #1a1010 !important;
+  border-radius: 8px !important;
+}
+[data-theme="retro"] .cuba-mp-chk {
+  border: 2px solid #1a1010 !important;
+}
+[data-theme="retro"] .cuba-mp-chk.on {
+  background: #48b030 !important;
+  border-color: #1a1010 !important;
+}
+
+/* Encargo */
+[data-theme="retro"] .cuba-encargo {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+}
+[data-theme="retro"] .cuba-enc-nombre {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .cuba-enc-hora {
+  color: #f07820 !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .cuba-cb {
+  border-color: #f07820 !important;
+  border-width: 2px !important;
+}
+[data-theme="retro"] .cuba-cb.cuba-cb-on {
+  background: #48b030 !important;
+  border-color: #1a1010 !important;
+}
+/* ══════════════════════════════════════
+   RETRO: FONDO GENERAL Y CONTENEDOR
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] body,
+[data-theme="retro"] .app-content,
+[data-theme="retro"] .tab-contents,
+[data-theme="retro"] .tab-content {
+  background: #fffbe8 !important;
+}
+
+[data-theme="retro"] .app-body {
+  background: #fffbe8 !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: SIDEBAR SUBTABS
+   (Hoy/Mañana/Semana, Pedidos/Pedir/Ventas/Exportar)
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] .sidebar-subtab {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  color: #3a2010 !important;
+  border-radius: 8px !important;
+}
+[data-theme="retro"] .sidebar-subtab:hover {
+  background: #fef0e0 !important;
+  color: #f07820 !important;
+}
+[data-theme="retro"] .sidebar-subtab.active {
+  background: #fff !important;
+  color: #8040c0 !important;
+  font-weight: 900 !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: LV-TABS (Cuba: Pedidos a Cuba / Pedir / Ventas / Exportar)
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] .lv-tabs {
+  border-bottom: 2.5px solid #1a1010 !important;
+  background: #f0d020 !important;
+  padding: 0 8px !important;
+}
+[data-theme="retro"] .lv-tab {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #3a2010 !important;
+  border-bottom: 3px solid transparent !important;
+}
+[data-theme="retro"] .lv-tab:hover {
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .lv-tab.lv-tab-activa {
+  color: #1a1010 !important;
+  border-bottom-color: #f07820 !important;
+}
+[data-theme="retro"] .lv-tab-badge {
+  background: #1a1010 !important;
+  color: #f0d020 !important;
+  border-radius: 4px !important;
+}
+[data-theme="retro"] .lv-tab.lv-tab-activa .lv-tab-badge {
+  background: #f07820 !important;
+  color: #fff !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: CUBA — grupo titulo y fondo lista
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] .cuba-grupo-titulo {
+  background: #8040c0 !important;
+  color: #fff !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  letter-spacing: 0.05em !important;
+}
+
+[data-theme="retro"] .lv-lista {
+  background: transparent !important;
+}
+
+[data-theme="retro"] .lv-item {
+  background: #fff !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 8px !important;
+}
+[data-theme="retro"] .lv-item:nth-of-type(4n+1) { background: #fff !important; }
+[data-theme="retro"] .lv-item:nth-of-type(4n+2) { background: #fef0e0 !important; }
+[data-theme="retro"] .lv-item:nth-of-type(4n+3) { background: #e8f8e0 !important; }
+[data-theme="retro"] .lv-item:nth-of-type(4n+4) { background: #e8f0fc !important; }
+
+[data-theme="retro"] .lv-item-nom {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .lv-item-talle {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 1px 1px 0 #1a1010 !important;
+  font-weight: 900 !important;
+  border-radius: 20px !important;
+}
+[data-theme="retro"] .lv-item-cant {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  font-weight: 900 !important;
+  border-radius: 20px !important;
+}
+[data-theme="retro"] .lv-chk {
+  border: 2px solid #1a1010 !important;
+  border-radius: 5px !important;
+}
+[data-theme="retro"] .lv-chk.on {
+  background: #48b030 !important;
+  border-color: #1a1010 !important;
+}
+[data-theme="retro"] .lv-btn-add {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  font-weight: 900 !important;
+  border-radius: 9px !important;
+}
+[data-theme="retro"] .lv-btn-add:hover {
+  box-shadow: 1px 1px 0 #1a1010 !important;
+  transform: translate(1px,1px) !important;
+}
+[data-theme="retro"] .lv-input,
+[data-theme="retro"] .lv-select-talle {
+  border: 2px solid #1a1010 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+}
+[data-theme="retro"] .lv-input:focus,
+[data-theme="retro"] .lv-select-talle:focus {
+  border-color: #f07820 !important;
+  outline: none !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: PRODUCCIÓN — fondo panel
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] .prod-panel-wrap,
+[data-theme="retro"] .prod-dia-wrap {
+  background: #fffbe8 !important;
+}
+
+[data-theme="retro"] .prod-cat-bloque {
+  background: transparent !important;
+}
+
+[data-theme="retro"] .prod-cat-body {
+  background: #fff !important;
+  border: 2px solid #1a1010 !important;
+  border-top: none !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 0 0 10px 10px !important;
+}
+
+/* Tabs superiores de producción (Hoy/Dom24/Lun25...) */
+[data-theme="retro"] .prod-tabs-bar-wrap {
+  background: #8040c0 !important;
+  border-bottom: 3px solid #1a1010 !important;
+}
+[data-theme="retro"] .prod-tab-btn {
+  color: rgba(255,255,255,0.65) !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .prod-tab-btn:hover { color: #fff !important; }
+[data-theme="retro"] .prod-tab-btn.active {
+  color: #f0d020 !important;
+  border-bottom-color: #f0d020 !important;
+}
+[data-theme="retro"] .prod-tab-badge {
+  background: rgba(255,255,255,0.2) !important;
+  color: #fff !important;
+}
+[data-theme="retro"] .prod-tab-btn.active .prod-tab-badge {
+  background: #f0d020 !important;
+  color: #1a1010 !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: ETIQUETAS
+   ══════════════════════════════════════ */
+
+/* Chips de días */
+[data-theme="retro"] #etiq-dias-checks button,
+[data-theme="retro"] #etiq-dias-checks [class*="chip"],
+[data-theme="retro"] #etiq-dias-checks > * {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 20px !important;
+  background: #fff !important;
+  color: #1a1010 !important;
+}
+
+/* Botones Todos / Ninguno */
+[data-theme="retro"] #tab-etiquetas button {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 20px !important;
+  background: #fff !important;
+  color: #1a1010 !important;
+}
+
+/* Botón imprimir */
+[data-theme="retro"] #tab-etiquetas button[onclick="imprimirEtiquetas()"] {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 3px 3px 0 #1a1010 !important;
+  border-radius: 10px !important;
+}
+[data-theme="retro"] #tab-etiquetas button[onclick="imprimirEtiquetas()"]:hover {
+  box-shadow: 1px 1px 0 #1a1010 !important;
+  transform: translate(2px,2px) !important;
+}
+
+/* Cards de etiquetas */
+[data-theme="retro"] .etiq-card {
+  border: 2.5px solid #1a1010 !important;
+  border-style: solid !important;
+  box-shadow: 3px 3px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+}
+[data-theme="retro"] .etiq-card.etiq-con-talle {
+  border-color: #f07820 !important;
+  background: #fef0e0 !important;
+}
+[data-theme="retro"] .etiq-card:nth-of-type(4n+1) { background: #fff !important; }
+[data-theme="retro"] .etiq-card:nth-of-type(4n+2) { background: #fef0e0 !important; }
+[data-theme="retro"] .etiq-card:nth-of-type(4n+3) { background: #e8f8e0 !important; }
+[data-theme="retro"] .etiq-card:nth-of-type(4n+4) { background: #e8f0fc !important; }
+
+[data-theme="retro"] .etiq-nombre {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .etiq-producto {
+  color: #f07820 !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .etiq-talle {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border-radius: 5px !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .etiq-meta {
+  border-top: 1.5px solid #1a1010 !important;
+  color: #3a2010 !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: CONFIGURACIÓN
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] .subtab-selector-title {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .subtab-selector-btn {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .subtab-selector-btn:hover {
+  background: #fef0e0 !important;
+  color: #f07820 !important;
+  box-shadow: 1px 1px 0 #1a1010 !important;
+  transform: translate(1px,1px) !important;
+}
+
+/* Sidebar subtabs de config (Catálogo / Clientes / Aesthetic...) */
+[data-theme="retro"] #sidebar-subtabs-config .sidebar-subtab,
+[data-theme="retro"] .sidebar-subtabs .sidebar-subtab {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  color: #3a2010 !important;
+}
+[data-theme="retro"] #sidebar-subtabs-config .sidebar-subtab.active,
+[data-theme="retro"] .sidebar-subtabs .sidebar-subtab.active {
+  background: #fff !important;
+  color: #8040c0 !important;
+  font-weight: 900 !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: CUBA VENTAS (vg-)
+   ══════════════════════════════════════ */
+
+/* Barra modo Cargar pedidos / Marcar llevados */
+[data-theme="retro"] .vg-mode-bar {
+  border-bottom: 2.5px solid #1a1010 !important;
+  background: #f0d020 !important;
+}
+[data-theme="retro"] .vg-mode-btn {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #3a2010 !important;
+  border-bottom: 3px solid transparent !important;
+}
+[data-theme="retro"] .vg-mode-btn.vg-mode-active {
+  color: #1a1010 !important;
+  border-bottom-color: #f07820 !important;
+}
+
+/* Separador de categoría (TORTAS, MOUSSES...) */
+[data-theme="retro"] .vg-sep-cat {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border-top: 2px solid #1a1010 !important;
+  border-bottom: 2px solid #1a1010 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  letter-spacing: .08em !important;
+}
+
+/* Filas de producto */
+[data-theme="retro"] .vg-row {
+  border-bottom: 1.5px solid #1a1010 !important;
+  background: #fff !important;
+}
+[data-theme="retro"] .vg-row:nth-of-type(odd)  { background: #fff !important; }
+[data-theme="retro"] .vg-row:nth-of-type(even) { background: #f8f4e8 !important; }
+[data-theme="retro"] .vg-row-on { background: #fef0e0 !important; }
+[data-theme="retro"] .vg-row:hover { background: #fef0e0 !important; }
+
+/* Header de tabla */
+[data-theme="retro"] .vg-head-top,
+[data-theme="retro"] .vg-head-sub {
+  background: #fff !important;
+  border-bottom: 2px solid #1a1010 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+}
+
+/* Nombre producto */
+[data-theme="retro"] .vg-nom {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+
+/* Stepper cantidad */
+[data-theme="retro"] .vg-stp {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 8px !important;
+}
+[data-theme="retro"] .vg-btn {
+  color: #1a1010 !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .vg-stp.vg-on {
+  background: #fef0e0 !important;
+  border-color: #f07820 !important;
+}
+[data-theme="retro"] .vg-stp.vg-on .vg-btn { color: #f07820 !important; }
+[data-theme="retro"] .vg-num { font-weight: 900 !important; }
+
+/* Separador vertical */
+[data-theme="retro"] .vg-sep-vert {
+  background: #8040c0 !important;
+  opacity: 1 !important;
+}
+
+/* Botón Listo, pasar a marcar llevados */
+[data-theme="retro"] .vg-mode-next {
+  background: #48b030 !important;
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 3px 3px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .vg-mode-next:hover {
+  box-shadow: 1px 1px 0 #1a1010 !important;
+  transform: translate(2px,2px) !important;
+}
+
+/* Diffs llevado */
+[data-theme="retro"] .vg-diff-ok  { color: #48b030 !important; font-weight: 900 !important; }
+[data-theme="retro"] .vg-diff-low { color: #e03020 !important; font-weight: 900 !important; }
+[data-theme="retro"] .vg-diff-hi  { color: #f07820 !important; font-weight: 900 !important; }
+
+/* Input libre */
+[data-theme="retro"] .vg-libre-input {
+  border: 2px solid #1a1010 !important;
+  border-radius: 8px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+}
+[data-theme="retro"] .vg-libre-add {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 8px !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .vg-libre-titulo {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: CONFIGURACIÓN — cfg-tabs y paneles
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] .cfg-tabs {
+  background: #f0d020 !important;
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  padding: 4px !important;
+}
+[data-theme="retro"] .cfg-tab {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  color: #3a2010 !important;
+  border-radius: 8px !important;
+}
+[data-theme="retro"] .cfg-tab:hover { background: #fef0e0 !important; }
+[data-theme="retro"] .cfg-tab.active {
+  background: #fff !important;
+  color: #8040c0 !important;
+  font-weight: 900 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border: 1.5px solid #1a1010 !important;
+}
+
+/* Selector de tema */
+[data-theme="retro"] .tema-btn {
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  color: #3a2010 !important;
+}
+[data-theme="retro"] .tema-btn:hover {
+  border-color: #f07820 !important;
+  transform: translate(-1px,-1px) !important;
+  box-shadow: 3px 3px 0 #1a1010 !important;
+}
+[data-theme="retro"] .tema-btn.activo {
+  border-color: #8040c0 !important;
+  background: #f0e8fc !important;
+  color: #8040c0 !important;
+  box-shadow: 3px 3px 0 #1a1010 !important;
+}
+
+/* Layout selector */
+[data-theme="retro"] .layout-opt {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+}
+[data-theme="retro"] .layout-opt.activo {
+  border-color: #8040c0 !important;
+  background: #f0e8fc !important;
+  color: #8040c0 !important;
+  box-shadow: 3px 3px 0 #1a1010 !important;
+}
+
+/* Catálogo — filas de items */
+[data-theme="retro"] .cat-item-row {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+}
+[data-theme="retro"] .cat-item-nombre {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .cat-item-precio { color: #48b030 !important; font-weight: 900 !important; }
+[data-theme="retro"] .cat-section-label {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #3a2010 !important;
+  border-bottom: 2px solid #1a1010 !important;
+}
+
+/* Catálogo — sección agregar */
+[data-theme="retro"] .cat-add-section {
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  background: #fffbe8 !important;
+}
+[data-theme="retro"] .cat-add-section h4 {
+  color: #8040c0 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .cat-add-row input,
+[data-theme="retro"] .cat-add-precio-row input {
+  border: 2px solid #1a1010 !important;
+  border-radius: 8px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  background: #fff !important;
+}
+[data-theme="retro"] .cat-add-row input:focus,
+[data-theme="retro"] .cat-add-precio-row input:focus {
+  border-color: #f07820 !important;
+  outline: none !important;
+}
+[data-theme="retro"] .cat-add-row button {
+  background: #8040c0 !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 8px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .cat-add-row button:hover {
+  box-shadow: 1px 1px 0 #1a1010 !important;
+  transform: translate(1px,1px) !important;
+}
+
+/* Toggle talle */
+[data-theme="retro"] .cat-tiene-talle.on .cat-talle-toggle { background: #48b030 !important; }
+[data-theme="retro"] .cat-talle-toggle { border: 1.5px solid #1a1010 !important; }
+
+/* Switch Sin TACC / Común */
+[data-theme="retro"] .cat-tipo-switch {
+  border: 2px solid #1a1010 !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+}
+[data-theme="retro"] .cat-tipo-switch button.sel-sin { background: #48b030 !important; }
+[data-theme="retro"] .cat-tipo-switch button.sel-com { background: #4090d0 !important; }
+
+/* Btn exportar/importar xlsx */
+[data-theme="retro"] .btn-xlsx {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 8px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  background: #fff !important;
+}
+[data-theme="retro"] .btn-xlsx-import { border-color: #48b030 !important; color: #48b030 !important; }
+
+/* Archivados */
+[data-theme="retro"] .archivados-section {
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+}
+[data-theme="retro"] .archivados-header {
+  background: #f0d020 !important;
+  border-bottom: 2px solid #1a1010 !important;
+}
+[data-theme="retro"] .archivados-titulo {
+  color: #1a1010 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .arch-item { border-bottom: 1.5px solid #1a1010 !important; }
+[data-theme="retro"] .arch-fecha {
+  background: #7dd4f0 !important;
+  color: #1a1010 !important;
+  border: 1.5px solid #1a1010 !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .btn-arch-restaurar {
+  border: 2px solid #48b030 !important;
+  color: #48b030 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  font-weight: 900 !important;
+  border-radius: 8px !important;
+}
+[data-theme="retro"] .btn-arch-eliminar {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+}
+
+/* Clientes frecuentes */
+[data-theme="retro"] .clientes-section,
+[data-theme="retro"] .frec-section {
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+}
+[data-theme="retro"] .clientes-header {
+  background: #f0d020 !important;
+  border-bottom: 2px solid #1a1010 !important;
+}
+[data-theme="retro"] .clientes-titulo {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .cliente-fila,
+[data-theme="retro"] .frec-item {
+  border-bottom: 1.5px solid #1a1010 !important;
+}
+[data-theme="retro"] .cliente-nom,
+[data-theme="retro"] .frec-nom {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .frec-star { color: #f07820 !important; }
+[data-theme="retro"] .frec-edit-wrap { background: #fffbe8 !important; border-bottom: 1.5px solid #1a1010 !important; }
+[data-theme="retro"] .frec-edit-row input {
+  border: 2px solid #1a1010 !important;
+  border-radius: 8px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+}
+
+/* Día especial */
+[data-theme="retro"] .dia-especial-config {
+  background: #fef0e0 !important;
+  border-bottom: 2px solid #f07820 !important;
+  color: #f07820 !important;
+}
+[data-theme="retro"] .btn-dia-normal {
+  border: 2px solid #f07820 !important;
+  color: #f07820 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  border-radius: 20px !important;
+}
+
+/* CSV botones */
+[data-theme="retro"] .csv-btn {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 8px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  background: #fff !important;
+}
+[data-theme="retro"] .csv-btn.primary { border-color: #48b030 !important; color: #48b030 !important; }
+
+/* ══════════════════════════════════════
+   RETRO: CUBA EXPORTAR (cexp-)
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] .cexp-card {
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 3px 3px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+}
+[data-theme="retro"] .cexp-card-title {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .cexp-card-sub {
+  font-family: 'Nunito', sans-serif !important;
+  color: #7a6050 !important;
+}
+[data-theme="retro"] .cexp-icon-amber { background: #fef0e0 !important; border: 1.5px solid #1a1010 !important; }
+[data-theme="retro"] .cexp-icon-blue  { background: #d8f0fc !important; border: 1.5px solid #1a1010 !important; }
+[data-theme="retro"] .cexp-icon-teal  { background: #e0f8d8 !important; border: 1.5px solid #1a1010 !important; }
+
+[data-theme="retro"] .cexp-divider { background: #1a1010 !important; }
+
+[data-theme="retro"] .cexp-btn {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  border-radius: 9px !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  transition: box-shadow .1s, transform .1s !important;
+}
+[data-theme="retro"] .cexp-btn:hover {
+  box-shadow: 1px 1px 0 #1a1010 !important;
+  transform: translate(1px,1px) !important;
+}
+[data-theme="retro"] .cexp-btn-primary {
+  background: #48b030 !important;
+  color: #fff !important;
+  border-color: #1a1010 !important;
+  box-shadow: 3px 3px 0 #1a1010 !important;
+}
+[data-theme="retro"] .cexp-btn-outline {
+  background: #fff !important;
+  color: #1a1010 !important;
+  border-color: #1a1010 !important;
+}
+[data-theme="retro"] .cexp-btn-ghost {
+  background: #fff !important;
+  color: #1a1010 !important;
+  border-color: #1a1010 !important;
+}
+
+[data-theme="retro"] .cexp-dias-select {
+  border: 2px solid #1a1010 !important;
+  border-radius: 8px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  background: #fff !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: HORARIOS / LOCAL (inline styles usan CSS vars)
+   Ajuste de variables para que los inline styles queden bien
+   ══════════════════════════════════════ */
+
+/* Las filas de horarios usan var(--border) y var(--paper) via inline style.
+   Con --bg:#fffbe8 y --border:#1a1010 ya se ven correctas.
+   Solo necesitamos que los time inputs tengan el look cartoon */
+
+[data-theme="retro"] #cfg-horarios-wrap input[type="time"],
+[data-theme="retro"] #cfg-horarios-wrap input[type="text"] {
+  border: 2px solid #1a1010 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  color: #1a1010 !important;
+}
+
+[data-theme="retro"] #cfg-horarios-wrap > div[style] {
+  /* filas de días */
+  border-radius: 8px !important;
+}
+
+/* Card del local activo */
+[data-theme="retro"] #cfg-local-actual > div {
+  border: 2.5px solid #8040c0 !important;
+  box-shadow: 3px 3px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  background: #f0e8fc !important;
+}
+
+/* Títulos itálicos de config local */
+[data-theme="retro"] #cfg-horarios-wrap div[style*="Lora"],
+[data-theme="retro"] #cfgpanel-local div[style*="Lora"] {
+  font-family: 'Nunito', sans-serif !important;
+  font-style: normal !important;
+  font-weight: 900 !important;
+  color: #8040c0 !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: VENTAS — header sticky fix
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] .vg-head-top {
+  background: #f0d020 !important;
+  border-bottom: 2.5px solid #1a1010 !important;
+}
+[data-theme="retro"] .vg-head-sub {
+  background: #fef0e0 !important;
+  border-bottom: 2px solid #1a1010 !important;
+}
+[data-theme="retro"] .vg-head-grupo {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #3a2010 !important;
+}
+[data-theme="retro"] .vg-head-acc { color: #f07820 !important; }
+[data-theme="retro"] .vg-head-talle { color: #3a2010 !important; font-weight: 700 !important; }
+[data-theme="retro"] .vg-head-grupo.vg-head-acc .vg-head-talle { color: #f07820 !important; }
+
+/* ══════════════════════════════════════
+   RETRO: CUBA PEDIR — encargo cards
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] .cuba-encargo {
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 3px 3px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  margin-bottom: 8px !important;
+}
+[data-theme="retro"] .cuba-enc-nombre {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .cuba-enc-hora {
+  color: #f07820 !important;
+  font-weight: 900 !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: AESTHETIC — tipografía y colores
+   (inline styles usan var() que ya están bien,
+    solo forzamos font en el contenedor)
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] #cfgpanel-aesthetic {
+  font-family: 'Nunito', sans-serif !important;
+}
+[data-theme="retro"] #cfgpanel-aesthetic div[style*="Lora"] {
+  font-family: 'Nunito', sans-serif !important;
+  font-style: normal !important;
+  font-weight: 900 !important;
+  color: #8040c0 !important;
+}
+[data-theme="retro"] #cfgpanel-aesthetic div[style*="ink-light"] {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+}
+[data-theme="retro"] #cfgpanel-aesthetic div[style*="uppercase"] {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #3a2010 !important;
+}
+[data-theme="retro"] #cfgpanel-aesthetic div[style*="italic"] {
+  font-family: 'Nunito', sans-serif !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  color: #7a6050 !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: ARCHIVOS — botones inline style
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] #cfgpanel-archivos {
+  font-family: 'Nunito', sans-serif !important;
+}
+[data-theme="retro"] #cfgpanel-archivos button {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 9px !important;
+  background: #fff !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] #cfgpanel-archivos button:hover {
+  box-shadow: 1px 1px 0 #1a1010 !important;
+  transform: translate(1px,1px) !important;
+}
+[data-theme="retro"] #cfgpanel-archivos button[style*="green"] {
+  border-color: #48b030 !important;
+  color: #48b030 !important;
+}
+[data-theme="retro"] #cfgpanel-archivos div[style*="Lora"] {
+  font-family: 'Nunito', sans-serif !important;
+  font-style: normal !important;
+  font-weight: 900 !important;
+  color: #8040c0 !important;
+}
+[data-theme="retro"] #cfgpanel-archivos div[style*="uppercase"],
+[data-theme="retro"] #cfgpanel-archivos div[style*="font-weight:600"] {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #3a2010 !important;
+}
+[data-theme="retro"] #cfgpanel-archivos div[style*="1px;background"] {
+  background: #1a1010 !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: LV-ITEM fix cartoon (pedidos cuba)
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] .lv-item {
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 8px !important;
+  margin-bottom: 4px !important;
+}
+[data-theme="retro"] .lv-chk {
+  border: 2.5px solid #1a1010 !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  box-shadow: 1px 1px 0 #1a1010 !important;
+}
+[data-theme="retro"] .lv-chk.on {
+  background: #48b030 !important;
+  border-color: #1a1010 !important;
+  color: #fff !important;
+}
+[data-theme="retro"] .lv-item-nom {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .lv-item-talle {
+  background: #fff !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 1px 1px 0 #1a1010 !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .lv-item-cant {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #8040c0 !important;
+  background: #f0e8fc !important;
+  border: 1.5px solid #1a1010 !important;
+  border-radius: 20px !important;
+  padding: 1px 8px !important;
+}
+
+/* Lista con gap en vez de border del contenedor */
+[data-theme="retro"] .lv-lista {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  padding: 8px !important;
+  background: transparent !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: VENTAS — fix sticky sub offset
+   ══════════════════════════════════════ */
+
+[data-theme="retro"] .vg-head-sub {
+  top: 36px !important;
+}
+
+/* Tabla con borde cartoon — NO overflow:hidden para no romper sticky */
+[data-theme="retro"] .vg-tabla {
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 3px 3px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  overflow: visible !important;
+}
+
+/* ══════════════════════════════════════
+   RETRO: MOBILE — bottom tab bar
+   ══════════════════════════════════════ */
+
+@media (orientation: portrait), (max-width: 767px) {
+
+  /* ── Bottom tab bar ── */
+  [data-theme="retro"] .tabs {
+    background: #f0d020 !important;
+    border-top: 3.5px solid #1a1010 !important;
+    box-shadow: 0 -4px 0 #1a1010 !important;
+  }
+
+  [data-theme="retro"] .tab {
+    font-family: 'Nunito', sans-serif !important;
+    font-weight: 800 !important;
+    font-size: .62rem !important;
+    color: #5a3010 !important;
+    border-top: 3.5px solid transparent !important;
+    transition: background .1s !important;
+  }
+
+  [data-theme="retro"] .tab.active {
+    color: #8040c0 !important;
+    border-top-color: #8040c0 !important;
+    background: rgba(128,64,192,0.12) !important;
+    font-weight: 900 !important;
+  }
+
+  [data-theme="retro"] .tab:active {
+    background: rgba(240,120,32,0.18) !important;
+  }
+
+  [data-theme="retro"] .tab .tab-icon {
+    color: #5a3010 !important;
+    width: 1.4rem !important;
+    height: 1.4rem !important;
+  }
+
+  [data-theme="retro"] .tab.active .tab-icon {
+    color: #8040c0 !important;
+  }
+
+  /* ── FAB circle ── */
+  [data-theme="retro"] .tab-fab-circle {
+    background: #8040c0 !important;
+    border: 3px solid #1a1010 !important;
+    box-shadow: 3px 3px 0 #1a1010 !important;
+    color: #fff !important;
+    transition: box-shadow .1s, transform .1s !important;
+  }
+
+  [data-theme="retro"] .tab-fab-circle:active {
+    box-shadow: 1px 1px 0 #1a1010 !important;
+    transform: translate(2px,2px) scale(0.95) !important;
+  }
+
+  /* ── Mobile header ── */
+  [data-theme="retro"] .header {
+    background: linear-gradient(135deg,#8040c0,#5a18a0) !important;
+    border-bottom: 3.5px solid #1a1010 !important;
+    box-shadow: 0 4px 0 #1a1010 !important;
+  }
+
+  [data-theme="retro"] .header-logo {
+    font-family: 'Nunito', sans-serif !important;
+    font-style: normal !important;
+    font-weight: 900 !important;
+    color: #fff !important;
+    letter-spacing: -.01em !important;
+  }
+
+  /* ── Topbar amarilla (buscador) ── */
+  [data-theme="retro"] .po-topbar {
+    background: #f0d020 !important;
+    border-bottom: 3px solid #1a1010 !important;
+  }
+
+  [data-theme="retro"] .po-search-wrap {
+    background: #fff !important;
+    border: 2.5px solid #1a1010 !important;
+    box-shadow: 2px 2px 0 #1a1010 !important;
+    border-radius: 12px !important;
+  }
+
+  /* ── Botones topbar mobile ── */
+  [data-theme="retro"] .po-btn-sm,
+  [data-theme="retro"] .po-btn-todos {
+    border: 2px solid #1a1010 !important;
+    box-shadow: 2px 2px 0 #1a1010 !important;
+    font-family: 'Nunito', sans-serif !important;
+    font-weight: 900 !important;
+    border-radius: 20px !important;
+  }
+
+  [data-theme="retro"] .po-btn-todos.active {
+    background: #f07820 !important;
+    color: #fff !important;
+  }
+
+  /* ── Day tabs mobile ── */
+  [data-theme="retro"] .po-day-tabs {
+    background: #8040c0 !important;
+    border-bottom: 3px solid #1a1010 !important;
+  }
+
+  [data-theme="retro"] .po-day-tab {
+    color: rgba(255,255,255,0.65) !important;
+    font-family: 'Nunito', sans-serif !important;
+    font-weight: 900 !important;
+  }
+
+  [data-theme="retro"] .po-day-tab.active {
+    color: #f0d020 !important;
+    border-bottom-color: #f0d020 !important;
+  }
+
+  [data-theme="retro"] .po-day-tab .po-tab-count {
+    background: rgba(255,255,255,0.25) !important;
+    color: #fff !important;
+    border: 1.5px solid rgba(255,255,255,0.5) !important;
+    font-weight: 900 !important;
+  }
+
+  [data-theme="retro"] .po-day-tab.active .po-tab-count {
+    background: #f0d020 !important;
+    color: #1a1010 !important;
+    border-color: #1a1010 !important;
+  }
+}
+
+/* ══════════════════════════════════════
+   RETRO: NUEVO PEDIDO
+   ══════════════════════════════════════ */
+
+/* Fondo general */
+[data-theme="retro"] #tab-np-page {
+  background: #fffbe8 !important;
+}
+
+/* Header */
+[data-theme="retro"] #tab-np-page .modal-np-header {
+  background: #f0d020 !important;
+  border-bottom: 3px solid #1a1010 !important;
+  box-shadow: 0 3px 0 #1a1010 !important;
+}
+[data-theme="retro"] #tab-np-page .modal-np-header h3 {
+  font-family: 'Nunito', sans-serif !important;
+  font-style: normal !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+
+/* Botón guardar */
+[data-theme="retro"] #tab-np-page .np-btn-guardar-header {
+  font-family: 'Nunito', sans-serif !important;
+  font-style: normal !important;
+  font-weight: 900 !important;
+  background: #8040c0 !important;
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 3px 3px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  transition: box-shadow .1s, transform .1s !important;
+}
+[data-theme="retro"] #tab-np-page .np-btn-guardar-header:hover {
+  opacity: 1 !important;
+  transform: translate(-1px,-1px) !important;
+  box-shadow: 4px 4px 0 #1a1010 !important;
+}
+
+/* Botón cerrar X */
+[data-theme="retro"] #tab-np-page .modal-np-close {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] #tab-np-page .modal-np-close:hover {
+  background: #fef0e0 !important;
+  border-color: #f07820 !important;
+  color: #f07820 !important;
+  box-shadow: 1px 1px 0 #1a1010 !important;
+}
+
+/* Columnas */
+[data-theme="retro"] #tab-np-page .np-col-left {
+  background: #fff !important;
+  border-right: 2.5px solid #1a1010 !important;
+}
+[data-theme="retro"] #tab-np-page .np-col-right {
+  background: #fffbe8 !important;
+}
+
+/* Filas de campos */
+[data-theme="retro"] #tab-np-page .np-fila {
+  border-bottom: 1.5px solid #1a1010 !important;
+}
+[data-theme="retro"] #tab-np-page .np-fila-label {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #7a6050 !important;
+}
+
+/* Toggle Cliente / Cuba */
+[data-theme="retro"] #tab-np-page .np-toggle-wrap {
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+[data-theme="retro"] #tab-np-page .np-toggle-opt {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #3a2010 !important;
+}
+[data-theme="retro"] #tab-np-page .np-toggle-opt.active-cliente {
+  background: #f07820 !important;
+  color: #fff !important;
+}
+[data-theme="retro"] #tab-np-page .np-toggle-opt.active-cuba {
+  background: #8040c0 !important;
+  color: #fff !important;
+}
+[data-theme="retro"] #tab-np-page .np-toggle-opt:not(.active-cliente):not(.active-cuba):hover {
+  background: #fef0e0 !important;
+  color: #f07820 !important;
+}
+
+/* Inputs */
+[data-theme="retro"] #tab-np-page .np-fila-content input[type="text"],
+[data-theme="retro"] #tab-np-page .np-fila-content input[type="tel"],
+[data-theme="retro"] #tab-np-page .np-fila-content input[type="number"] {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+}
+[data-theme="retro"] #tab-np-page .np-fila-content input:focus {
+  border-color: #f07820 !important;
+  outline: none !important;
+}
+
+/* Pills día */
+[data-theme="retro"] #tab-np-page .np-dia-pill {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  color: #1a1010 !important;
+  transition: box-shadow .1s, transform .1s !important;
+}
+[data-theme="retro"] #tab-np-page .np-dia-pill:hover {
+  background: #fef0e0 !important;
+  box-shadow: 1px 1px 0 #1a1010 !important;
+  transform: translate(1px,1px) !important;
+}
+[data-theme="retro"] #tab-np-page .np-dia-pill.sel,
+[data-theme="retro"] #tab-np-page .np-dia-pill.active {
+  background: #f07820 !important;
+  border-color: #1a1010 !important;
+  color: #fff !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+}
+
+/* Buscador de productos */
+[data-theme="retro"] #tab-np-page .np-col-right .np-search-prod-wrap {
+  background: #f0d020 !important;
+  border-bottom: 2.5px solid #1a1010 !important;
+}
+[data-theme="retro"] #tab-np-page .np-search-prod-input,
+[data-theme="retro"] #tab-np-page input[placeholder*="producto"],
+[data-theme="retro"] #tab-np-page input[placeholder*="rogel"] {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+}
+
+/* Selector de horario */
+[data-theme="retro"] #tab-np-page .time-picker-btn {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] #tab-np-page .time-picker-btn:hover {
+  border-color: #f07820 !important;
+  color: #f07820 !important;
+}
+
+/* Footer total */
+[data-theme="retro"] #tab-np-page .np-total-footer {
+  background: #f0d020 !important;
+  border-top: 2.5px solid #1a1010 !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+}
+
+/* Botón cancelar */
+[data-theme="retro"] #tab-np-page a[onclick*="cancelar"],
+[data-theme="retro"] #tab-np-page .np-cancelar,
+[data-theme="retro"] #tab-np-page button[onclick*="cancelar"] {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  color: #7a6050 !important;
+}
+
+/* Calendario popover */
+[data-theme="retro"] #np-cal-popover {
+  border: 2.5px solid #1a1010 !important;
+  box-shadow: 4px 4px 0 #1a1010 !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+}
+[data-theme="retro"] .np-cal-header {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #1a1010 !important;
+}
+[data-theme="retro"] .np-cal-nav {
+  border: 2px solid #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
+  border-radius: 8px !important;
+}
+[data-theme="retro"] .np-cal-nav:hover {
+  border-color: #f07820 !important;
+  color: #f07820 !important;
+}
+[data-theme="retro"] .np-cal-dow {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900 !important;
+  color: #7a6050 !important;
+}
+[data-theme="retro"] .np-cal-day {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  border-radius: 6px !important;
+}
+[data-theme="retro"] .np-cal-day:hover:not(.past):not(.empty) {
+  background: #fef0e0 !important;
+  color: #f07820 !important;
+}
+[data-theme="retro"] .np-cal-day.today {
+  border-color: #f07820 !important;
+  color: #f07820 !important;
+  font-weight: 900 !important;
+}
+[data-theme="retro"] .np-cal-day.selected {
+  background: #8040c0 !important;
+  color: #fff !important;
+  border-color: #1a1010 !important;
+  box-shadow: 2px 2px 0 #1a1010 !important;
 }

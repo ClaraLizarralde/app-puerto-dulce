@@ -1397,10 +1397,12 @@ function renderDayTabs() {
   const scroll = document.createElement("div");
   scroll.className = "po-day-tabs-scroll";
 
+  const _diaNombres = ["dia-domingo","dia-lunes","dia-martes","dia-miercoles","dia-jueves","dia-viernes","dia-sabado"];
   keys.forEach(k => {
     const cnt = datos.dias[k]?.pedidos?.length || 0;
     const btn = document.createElement("button");
-    btn.className = "po-day-tab" + (_poTabDia === k ? " active" : "");
+    const diaSemana = k.length === 10 ? _diaNombres[new Date(k + "T12:00:00").getDay()] : "";
+    btn.className = "po-day-tab" + (diaSemana ? " " + diaSemana : "") + (_poTabDia === k ? " active" : "");
     btn.innerHTML = `${_poDayTabLabel(k)} <span class="po-tab-count">${cnt}</span>`;
     btn.onclick = () => {
       _poTabDia = k;
@@ -1500,9 +1502,7 @@ function renderPedidosTable() {
           <td onclick="event.stopPropagation();toggleListoPedido('${p.id}')">
             <div class="po-row-check${(estado === "listo" || estado === "entregado") ? " on" : ""}">✓</div>
           </td>
-          <td style="width:22px;padding-right:6px!important;">
-            <span class="po-expand-arrow">▶</span>
-          </td>
+          <td style="width:0;padding:0!important;"></td>
           <td class="po-td-id">#${p._pid || "—"}</td>
           <td class="po-td-hora">
             ${esc(p.hora_entrega || "--:--")}${p.fuera_horario ? ' <span title="Fuera de horario" style="font-size:.6rem">🌙</span>' : ""}
@@ -1521,11 +1521,11 @@ function renderPedidosTable() {
           <td onclick="event.stopPropagation()">
             <div class="po-row-actions">
               ${estado !== "entregado"
-          ? `<button class="po-btn-action ret" onclick="setEstado('${p.id}','entregado')">Retirado</button>`
-          : `<button class="po-btn-action undo" onclick="setEstado('${p.id}','listo')">↩ Deshacer</button>`
+          ? `<button class="po-btn-action ret" onclick="event.stopPropagation();setEstado('${p.id}','entregado')">Retirado</button>`
+          : `<button class="po-btn-action undo" onclick="event.stopPropagation();setEstado('${p.id}','listo')">↩ Deshacer</button>`
         }
-              <button class="po-btn-vermobile" onclick="event.stopPropagation();poToggleExpand('${p.id}')">
-                ${isExp ? "ver menos" : "ver más"}
+              <button class="po-btn-expand" onclick="event.stopPropagation();poToggleExpand('${p.id}')">
+                <span class="po-expand-arrow">▶</span>
               </button>
             </div>
           </td>

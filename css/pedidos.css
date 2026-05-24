@@ -135,97 +135,77 @@
   color: var(--accent);
 }
 
-/* ── DAY TABS — estilo solapita Chrome ── */
+/* ── DAY TABS — pills por día ── */
 .po-day-tabs {
-  background: var(--bg); /* fondo del strip, más oscuro que el paper */
+  background: var(--paper);
   display: flex;
-  align-items: flex-end;
-  padding: 6px 10px 0;
-  overflow: hidden;
-  position: relative;
-}
-.po-day-tabs::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 1px;
-  background: var(--border);
-  z-index: 0;
-  pointer-events: none;
+  align-items: center;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border);
 }
 
 .po-day-tabs-scroll {
   display: flex;
-  align-items: flex-end;
-  gap: 2px;
+  align-items: center;
+  gap: 3px;
   overflow-x: auto;
   scrollbar-width: none;
   flex: 1;
-  padding-bottom: 0;
 }
 .po-day-tabs-scroll::-webkit-scrollbar { display: none; }
 
 .po-day-tab {
-  position: relative;
-  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: 5px;
   font-family: 'Outfit', sans-serif;
-  font-size: .62rem;
+  font-size: .6rem;
   font-weight: 700;
-  letter-spacing: .06em;
+  letter-spacing: .05em;
   text-transform: uppercase;
-  padding: 7px 14px 8px;
-  border: 1px solid transparent;
-  border-bottom: none;
-  border-radius: 8px 8px 0 0;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1.5px solid transparent;
   background: transparent;
   color: var(--ink-light);
   cursor: pointer;
   white-space: nowrap;
-  transition: color .12s, background .12s;
+  transition: all .15s;
   flex-shrink: 0;
-  margin-bottom: 0;
 }
 .po-day-tab:hover {
+  background: var(--bg);
   color: var(--ink-mid);
-  background: rgba(255,255,255,.04);
 }
 
-/* Tab activa — efecto Chrome */
-.po-day-tab.active {
-  z-index: 3;
-  color: var(--ink);
-  background: var(--paper);
-  border-color: var(--border);
-  border-bottom-color: var(--paper); /* rompe la línea del strip */
-  margin-bottom: -1px;              /* solapa el ::after del contenedor */
-}
+/* Inactiva — color propio del día */
+.po-day-tab.dia-lunes     { color: var(--dia-lunes); }
+.po-day-tab.dia-martes    { color: var(--dia-martes); }
+.po-day-tab.dia-miercoles { color: var(--dia-miercoles); }
+.po-day-tab.dia-jueves    { color: var(--dia-jueves); }
+.po-day-tab.dia-viernes   { color: var(--dia-viernes); }
+.po-day-tab.dia-sabado    { color: var(--dia-sabado); }
+.po-day-tab.dia-domingo   { color: var(--dia-domingo); }
 
-/* Anti-radius — curva invertida esquinas inferiores */
-.po-day-tab.active::before,
-.po-day-tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  width: 10px;
-  height: 10px;
-  background: var(--bg); /* color del strip */
-  pointer-events: none;
-  z-index: 2;
-}
-.po-day-tab.active::before {
-  left: -10px;
-  mask-image: radial-gradient(circle at 100% 0%, transparent 70%, black 72%);
-  -webkit-mask-image: radial-gradient(circle at 100% 0%, transparent 70%, black 72%);
-}
-.po-day-tab.active::after {
-  right: -10px;
-  mask-image: radial-gradient(circle at 0% 0%, transparent 70%, black 72%);
-  -webkit-mask-image: radial-gradient(circle at 0% 0%, transparent 70%, black 72%);
-}
+.po-day-tab.dia-lunes:hover     { background: var(--dia-lunes-soft); }
+.po-day-tab.dia-martes:hover    { background: var(--dia-martes-soft); }
+.po-day-tab.dia-miercoles:hover { background: var(--dia-miercoles-soft); }
+.po-day-tab.dia-jueves:hover    { background: var(--dia-jueves-soft); }
+.po-day-tab.dia-viernes:hover   { background: var(--dia-viernes-soft); }
+.po-day-tab.dia-sabado:hover    { background: var(--dia-sabado-soft); }
+.po-day-tab.dia-domingo:hover   { background: var(--dia-domingo-soft); }
 
+/* Activa — sólido con color del día */
+.po-day-tab.active                   { background: var(--bg); color: var(--ink-light); border-color: var(--border); }
+.po-day-tab.active.dia-lunes         { background: var(--dia-lunes);     color: var(--dia-lunes-text);     border-color: var(--dia-lunes); }
+.po-day-tab.active.dia-martes        { background: var(--dia-martes);    color: var(--dia-martes-text);    border-color: var(--dia-martes); }
+.po-day-tab.active.dia-miercoles     { background: var(--dia-miercoles); color: var(--dia-miercoles-text); border-color: var(--dia-miercoles); }
+.po-day-tab.active.dia-jueves        { background: var(--dia-jueves);    color: var(--dia-jueves-text);    border-color: var(--dia-jueves); }
+.po-day-tab.active.dia-viernes       { background: var(--dia-viernes);   color: var(--dia-viernes-text);   border-color: var(--dia-viernes); }
+.po-day-tab.active.dia-sabado        { background: var(--dia-sabado);    color: var(--dia-sabado-text);    border-color: var(--dia-sabado); }
+.po-day-tab.active.dia-domingo       { background: var(--dia-domingo);   color: var(--dia-domingo-text);   border-color: var(--dia-domingo); }
+
+/* Contador */
 .po-day-tab .po-tab-count {
   font-size: .5rem;
   font-weight: 700;
@@ -236,25 +216,24 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255,255,255,.08);
-  color: var(--ink-light);
+  background: rgba(0,0,0,.1);
+  color: inherit;
+  opacity: .75;
 }
 .po-day-tab.active .po-tab-count {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: rgba(0,0,0,.18);
+  opacity: 1;
 }
 
 .po-day-tab-add {
   font-size: .95rem;
-  padding: 6px 10px 8px;
+  padding: 5px 8px;
   color: var(--ink-light);
   cursor: pointer;
   background: none;
   border: none;
   transition: color .15s;
   flex-shrink: 0;
-  align-self: center;
-  margin-bottom: 4px;
 }
 .po-day-tab-add:hover { color: var(--accent); }
 /* ── FILTER ROW ── */
@@ -516,14 +495,10 @@
 /* acciones inline */
 .po-row-actions {
   display: flex;
-  gap: 5px;
+  gap: 8px;
   justify-content: flex-end;
   align-items: center;
-  opacity: 0;
-  transition: opacity .15s;
 }
-.po-tr:hover .po-row-actions,
-.po-expanded .po-row-actions { opacity: 1; }
 
 .po-btn-action {
   font-family: 'Outfit', sans-serif;
@@ -539,19 +514,25 @@
   white-space: nowrap;
 }
 .po-btn-action:hover { border-color: var(--ink-mid); color: var(--ink); }
-.po-btn-action.ret { border-color: var(--green); color: var(--green); }
-.po-btn-action.ret:hover { background: var(--green-soft); }
+.po-btn-action.ret {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--paper);
+  font-weight: 700;
+  padding: 5px 13px;
+}
+.po-btn-action.ret:hover { opacity: .85; }
 .po-btn-action.undo { color: var(--ink-light); }
 
 .po-btn-expand {
-  width: 22px; height: 22px;
+  width: 26px; height: 26px;
   border-radius: 3px;
   border: 1.5px solid var(--border);
   background: transparent;
   color: var(--ink-light);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: .62rem;
+  font-size: .58rem;
   transition: all .12s;
   flex-shrink: 0;
 }
@@ -586,9 +567,12 @@
   padding: 14px 0 18px;
   border-top: 1px solid var(--border);
   display: grid;
-  grid-template-columns: 1fr 260px;
+  grid-template-columns: 1fr 300px;
   gap: 18px;
 }
+
+/* ── po-exp-cliente oculto en desktop (info ya visible en la fila) ── */
+.po-exp-cliente { display: none; }
 
 /* ── IZQUIERDA: productos ── */
 .po-exp-left { display: flex; flex-direction: column; gap: 8px; grid-column: 1; }
@@ -650,19 +634,6 @@
   min-width: 0;
   grid-column: 2;
   grid-row: 1 / -1;
-}
-
-/* Cliente */
-.po-exp-cliente { display: flex; flex-direction: column; gap: 2px; grid-column: 1; }
-.po-exp-cliente-nombre {
-  font-size: .88rem;
-  font-weight: 600;
-  color: var(--ink);
-  line-height: 1.2;
-}
-.po-exp-cliente-tel {
-  font-size: .68rem;
-  color: var(--ink-light);
 }
 
 /* Info rows (día, hora) */
