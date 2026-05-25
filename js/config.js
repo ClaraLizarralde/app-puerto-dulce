@@ -501,9 +501,15 @@ function renderHorariosEditor() {
   const corteHoy = (datos.cortePedidosHoy || {})[localId] || "14:00";
 
   let html = `
-    <div style="font-family:'Lora',serif;font-style:italic;font-size:.95rem;color:var(--accent);margin:18px 0 4px;">🕐 Horarios del local</div>
-    <div style="font-size:.68rem;color:var(--ink-light);margin-bottom:12px;">Los slots del selector de hora se generan automáticamente a partir de estos rangos.</div>
-    <div style="display:flex;flex-direction:column;gap:6px;" id="horarios-dias-list">`;
+    <div class="hl-section-card" style="margin-top:16px;">
+      <div class="hl-section-head">
+        <span class="hl-section-ico">🕐</span>
+        <div class="hl-section-text">
+          <div class="hl-section-titulo">Horarios del local</div>
+          <div class="hl-section-sub">Los slots de hora se generan automáticamente a partir de estos rangos.</div>
+        </div>
+      </div>
+      <div class="hl-dias-list" id="horarios-dias-list">`;
 
   for (let d = 0; d < 7; d++) {
     const rango = horLocal[d];
@@ -511,45 +517,49 @@ function renderHorariosEditor() {
     const open = rango ? rango.open : "09:00";
     const close = rango ? rango.close : "18:00";
     html += `
-      <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--paper);${cerrado ? "opacity:.6" : ""};" id="hor-row-${d}">
-        <div style="font-size:.78rem;font-weight:600;color:var(--ink);width:72px;flex-shrink:0;">${DIAS_NOMBRES[d]}</div>
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;flex-shrink:0;">
-          <input type="checkbox" ${cerrado ? "" : "checked"} onchange="toggleDiaCerrado(${d},this.checked)"
-            style="accent-color:var(--accent);width:14px;height:14px;">
-          <span style="font-size:.7rem;color:var(--ink-mid);">Abierto</span>
+      <div class="hl-dia-row${cerrado ? ' hl-dia-row--off' : ''}" id="hor-row-${d}">
+        <span class="hl-dia-nom">${DIAS_NOMBRES[d]}</span>
+        <label class="hl-dia-check">
+          <input type="checkbox" ${cerrado ? "" : "checked"} onchange="toggleDiaCerrado(${d},this.checked)">
+          <span class="hl-dia-check-lbl">Abierto</span>
         </label>
-        <div id="hor-inputs-${d}" style="display:flex;align-items:center;gap:5px;flex:1;${cerrado ? "opacity:.3;pointer-events:none" : ""}">
-          <input type="time" value="${open}" step="900"
-            onchange="actualizarHorario(${d},'open',this.value)"
-            style="font-family:'Outfit',sans-serif;font-size:.78rem;padding:4px 7px;border:1.5px solid var(--border);border-radius:6px;background:var(--bg);color:var(--ink);flex:1;min-width:0;">
-          <span style="font-size:.72rem;color:var(--ink-light);flex-shrink:0;">→</span>
-          <input type="time" value="${close}" step="900"
-            onchange="actualizarHorario(${d},'close',this.value)"
-            style="font-family:'Outfit',sans-serif;font-size:.78rem;padding:4px 7px;border:1.5px solid var(--border);border-radius:6px;background:var(--bg);color:var(--ink);flex:1;min-width:0;">
+        <div class="hl-dia-times${cerrado ? ' hl-dia-times--off' : ''}" id="hor-inputs-${d}">
+          <input class="hl-time-inp" type="time" value="${open}" step="900" onchange="actualizarHorario(${d},'open',this.value)">
+          <span class="hl-dia-arrow">→</span>
+          <input class="hl-time-inp" type="time" value="${close}" step="900" onchange="actualizarHorario(${d},'close',this.value)">
         </div>
-        ${cerrado ? `<span style="font-size:.7rem;color:var(--ink-light);font-style:italic;flex:1;">Cerrado</span>` : ""}
+        ${cerrado ? '<span class="hl-dia-cerrado">Cerrado</span>' : ''}
       </div>`;
   }
 
   html += `</div>
-    <div style="margin-top:14px;">
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:.88rem;color:var(--accent);margin-bottom:4px;">⏰ Corte de pedidos para hoy</div>
-      <div style="font-size:.68rem;color:var(--ink-light);margin-bottom:8px;">Hasta qué hora se pueden tomar pedidos para el mismo día.</div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <input type="time" value="${corteHoy}" step="900"
-          onchange="actualizarCorteHoy(this.value)"
-          style="font-family:'Outfit',sans-serif;font-size:.82rem;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--ink);">
-        <span style="font-size:.7rem;color:var(--ink-light);">Los pedidos para hoy se pueden cargar hasta este horario.</span>
+    </div>
+
+    <div class="hl-section-card">
+      <div class="hl-section-head">
+        <span class="hl-section-ico">✂️</span>
+        <div class="hl-section-text">
+          <div class="hl-section-titulo">Corte de pedidos para hoy</div>
+          <div class="hl-section-sub">Hasta qué hora se pueden tomar pedidos para el mismo día.</div>
+        </div>
+      </div>
+      <div class="hl-single-row">
+        <input class="hl-time-inp" type="time" value="${corteHoy}" step="900" onchange="actualizarCorteHoy(this.value)">
+        <span class="hl-single-hint">Los pedidos para hoy se pueden cargar hasta este horario.</span>
       </div>
     </div>
-    <div style="margin-top:14px;">
-      <div style="font-family:'Lora',serif;font-style:italic;font-size:.88rem;color:var(--cuba-ink,var(--accent));margin-bottom:4px;">🏪 Hora de llegada de Cuba</div>
-      <div style="font-size:.68rem;color:var(--ink-light);margin-bottom:8px;">Hora a la que Cuba trae los productos Con TACC. Los pedidos para antes de esta hora se agrupan en el día anterior en "Pedir a Cuba".</div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <input type="time" value="${datos.horaLlegadaCuba || "16:00"}" step="900"
-          onchange="actualizarHoraLlegadaCuba(this.value)"
-          style="font-family:'Outfit',sans-serif;font-size:.82rem;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--ink);">
-        <span style="font-size:.7rem;color:var(--ink-light);">Actualmente: <strong>${datos.horaLlegadaCuba || "16:00"}</strong></span>
+
+    <div class="hl-section-card">
+      <div class="hl-section-head">
+        <span class="hl-section-ico">🏪</span>
+        <div class="hl-section-text">
+          <div class="hl-section-titulo" style="color:var(--cuba-ink,var(--accent));">Hora de llegada de Cuba</div>
+          <div class="hl-section-sub">Hora a la que Cuba trae productos Con TACC. Los pedidos anteriores van al día previo.</div>
+        </div>
+      </div>
+      <div class="hl-single-row">
+        <input class="hl-time-inp" type="time" value="${datos.horaLlegadaCuba || "16:00"}" step="900" onchange="actualizarHoraLlegadaCuba(this.value)">
+        <span class="hl-single-hint">Actualmente: <strong>${datos.horaLlegadaCuba || "16:00"}</strong></span>
       </div>
     </div>`;
 
@@ -660,73 +670,112 @@ function setDiaMovidoCampo(diaKey, campo, valor) {
   renderCuba();
 }
 
-// Renderiza el panel multi-día de días movidos en configuración local
+// Agrega un día movido desde el picker de fecha
+function agregarDiaMovido(fechaStr) {
+  if (!fechaStr) return;
+  const hoyKey = fechaKey(new Date());
+  if (fechaStr < hoyKey) return; // no permitir pasados
+  if (!datos.dias[fechaStr]) datos.dias[fechaStr] = { pedidos: [] };
+  const dd = datos.dias[fechaStr];
+  dd.especial = true;
+  if (!dd.corteHora) dd.corteHora = "15:00";
+  guardar();
+  renderCfgDiaEspecial();
+  // limpiar picker
+  const picker = document.getElementById("cfg-dm-picker");
+  if (picker) picker.value = "";
+  const prodTab = document.getElementById("tab-produccion");
+  if (prodTab && prodTab.classList.contains("active")) renderProduccion();
+  renderCuba();
+  renderDiaBanner();
+}
+
+// Quita el flag especial de un día movido (sin borrar sus pedidos)
+function quitarDiaMovido(diaKey) {
+  if (!datos.dias[diaKey]) return;
+  datos.dias[diaKey].especial = false;
+  guardar();
+  renderCfgDiaEspecial();
+  const prodTab = document.getElementById("tab-produccion");
+  if (prodTab && prodTab.classList.contains("active")) renderProduccion();
+  renderCuba();
+  renderDiaBanner();
+}
+
+// Abre/cierra el panel de edición de una card de día movido
+function _toggleDmEdit(diaKey) {
+  const panel = document.getElementById("dm-edit-" + diaKey);
+  if (!panel) return;
+  panel.classList.toggle("open");
+}
+
+// Guarda los cambios del panel de edición y vuelve a modo lectura
+function _guardarDmEdit(diaKey) {
+  const nombreInp = document.getElementById("dm-edit-nombre-" + diaKey);
+  const corteInp  = document.getElementById("dm-edit-corte-" + diaKey);
+  if (!nombreInp || !corteInp) return;
+  const nombre = nombreInp.value.trim();
+  const corte  = corteInp.value || "15:00";
+  setDiaMovidoCampo(diaKey, "nombreEspecial", nombre);
+  setDiaMovidoCampo(diaKey, "corteHora", corte);
+  // setDiaMovidoCampo ya llama a renderCfgDiaEspecial, así que no hace falta más
+}
+
+// Renderiza el panel de días movidos con picker de fecha
 function renderCfgDiaEspecial() {
   const wrap = document.getElementById("cfg-dia-especial-panel");
   if (!wrap) return;
 
   const hoyKey = fechaKey(new Date());
 
-  // Solo días presentes o futuros que existan en datos.dias
-  const diasDisp = Object.keys(datos.dias)
-    .filter(k => k >= hoyKey)
+  // Días movidos activos (presentes o futuros)
+  const activos = Object.keys(datos.dias)
+    .filter(k => k >= hoyKey && (datos.dias[k] || {}).especial)
     .sort();
 
-  // Explicación de tandas (solo se muestra una vez arriba)
-  const explicacion = `
-    <div class="cfg-dm-explicacion">
-      <div class="cfg-dm-exp-item"><span>🟠</span><span><strong>Tanda 1:</strong> pedidos de clientes del mismo día + Cuba hasta el horario de corte.</span></div>
-      <div class="cfg-dm-exp-item"><span>🔵</span><span><strong>Tanda 2:</strong> pedidos del día siguiente hasta las 14hs + Cuba después del corte.</span></div>
-    </div>`;
+  const cantActivos = activos.length;
 
-  // Filas de días
-  const filasHTML = diasDisp.map(diaKey => {
+  // Cards de días movidos activos
+  const cardsHTML = activos.map(diaKey => {
     const dd = datos.dias[diaKey] || {};
-    const on = dd.especial || false;
-    const corte = dd.corteHora || "15:00";
+    const corte  = dd.corteHora    || "15:00";
     const nombre = dd.nombreEspecial || "";
     const labelDia = _cfgLabelDia(diaKey);
+    const sinNombre = !nombre;
 
     return `
-      <div class="cfg-dm-fila${on ? " on" : ""}">
-        <div class="cfg-dm-fila-top">
-          <div class="cfg-dm-fila-label">${labelDia}</div>
-          <label class="cfg-dm-toggle" title="${on ? "Desactivar" : "Activar"} día movido">
-            <input type="checkbox" ${on ? "checked" : ""}
-              onchange="toggleDiaMovido('${diaKey}')">
-            <span class="cfg-dm-toggle-track">
-              <span class="cfg-dm-toggle-thumb"></span>
-            </span>
-          </label>
+      <div class="dm-card">
+        <div class="dm-card-top">
+          <div class="dm-card-fecha">${labelDia}</div>
+          <button class="dm-card-btn-edit" onclick="_toggleDmEdit('${diaKey}')">✏ Editar</button>
+          <button class="dm-card-btn-quitar" onclick="quitarDiaMovido('${diaKey}')" title="Quitar día movido">✕</button>
         </div>
-        ${on ? `
-        <div class="cfg-dm-fila-campos">
-          <div class="cfg-dm-campo-row">
-            <label class="cfg-dm-campo-lbl">Nombre</label>
-            <input class="cfg-dm-campo-inp" type="text"
-              value="${esc(nombre)}"
-              placeholder="Día de la madre…"
-              onchange="setDiaMovidoCampo('${diaKey}','nombreEspecial',this.value)">
+        <div class="dm-card-body">
+          <div class="dm-card-nombre ${sinNombre ? "vacio" : ""}">${sinNombre ? "Sin nombre…" : esc(nombre)}</div>
+          <div class="dm-tanda-row">
+            <span class="dm-tanda-badge dm-tanda-1">hasta ${esc(corte)}</span>
+            <span class="dm-tanda-arr">→</span>
+            <span class="dm-tanda-badge dm-tanda-2">después de ${esc(corte)}</span>
           </div>
-          <div class="cfg-dm-campo-row">
-            <label class="cfg-dm-campo-lbl">Corte</label>
-            <input class="cfg-dm-campo-inp cfg-dm-campo-time" type="time"
-              value="${esc(corte)}"
-              onchange="setDiaMovidoCampo('${diaKey}','corteHora',this.value)">
-            <span class="cfg-dm-campo-hint">divide las tandas</span>
+        </div>
+        <div class="dm-edit-panel" id="dm-edit-${diaKey}">
+          <div class="dm-edit-campo">
+            <label class="dm-edit-lbl">Nombre</label>
+            <input class="dm-edit-inp" type="text" id="dm-edit-nombre-${diaKey}"
+              value="${esc(nombre)}" placeholder="ej: Día de la madre…">
           </div>
-          <div class="cfg-dm-preview-tandas">
-            <span class="cfg-desp-tanda-badge tanda-badge-1">🟠 hasta ${esc(corte)}</span>
-            <span class="cfg-dm-arrow">→</span>
-            <span class="cfg-desp-tanda-badge tanda-badge-2">🔵 después de ${esc(corte)}</span>
+          <div class="dm-edit-campo">
+            <label class="dm-edit-lbl">Corte</label>
+            <input class="dm-edit-inp dm-edit-inp-time" type="time" id="dm-edit-corte-${diaKey}"
+              value="${esc(corte)}">
+            <span class="dm-edit-hint">divide las tandas</span>
           </div>
-        </div>` : ""}
+          <div class="dm-edit-footer">
+            <button class="dm-btn-guardar" onclick="_guardarDmEdit('${diaKey}')">✓ Guardar</button>
+          </div>
+        </div>
       </div>`;
   }).join("");
-
-  const sinDias = !diasDisp.length
-    ? `<div class="cfg-dm-vacio">No hay días cargados aún. Agregá días en la pestaña <strong>Pedidos</strong> primero.</div>`
-    : "";
 
   wrap.innerHTML = `
     <div class="cfg-desp-wrap">
@@ -734,17 +783,36 @@ function renderCfgDiaEspecial() {
         <span class="cfg-desp-ico">⚡</span>
         <div style="flex:1;">
           <div class="cfg-desp-titulo">Días movidos</div>
-          <div class="cfg-desp-sub">Activá los días que tienen producción en dos tandas.</div>
+          <div class="cfg-desp-sub">Producción dividida en dos tandas.</div>
         </div>
-        ${diasDisp.filter(k => (datos.dias[k] || {}).especial).length > 0
-          ? `<div class="cfg-desp-estado on"><span class="cfg-desp-estado-dot"></span>${diasDisp.filter(k => (datos.dias[k]||{}).especial).length} activo${diasDisp.filter(k=>(datos.dias[k]||{}).especial).length>1?"s":""}</div>`
+        ${cantActivos > 0
+          ? `<div class="cfg-desp-estado on"><span class="cfg-desp-estado-dot"></span>${cantActivos} activo${cantActivos > 1 ? "s" : ""}</div>`
           : `<div class="cfg-desp-estado off"><span class="cfg-desp-estado-dot"></span>Ninguno</div>`
         }
       </div>
-      ${explicacion}
+
+      <div class="cfg-dm-explicacion">
+        <div class="cfg-dm-exp-item"><span>🟠</span><span><strong>Tanda 1:</strong> pedidos del mismo día + Cuba hasta el corte.</span></div>
+        <div class="cfg-dm-exp-item"><span>🔵</span><span><strong>Tanda 2:</strong> pedidos del día siguiente hasta las 14hs + Cuba después del corte.</span></div>
+      </div>
+
+      <div class="cfg-dm-picker-wrap">
+        <label class="cfg-dm-picker-lbl">Agregar día movido</label>
+        <div class="cfg-dm-picker-row">
+          <input id="cfg-dm-picker" type="date"
+            class="cfg-dm-campo-inp"
+            min="${hoyKey}"
+            style="max-width:180px;"
+            onchange="agregarDiaMovido(this.value)">
+          <span class="cfg-dm-campo-hint">elegí cualquier fecha</span>
+        </div>
+      </div>
+
       <div class="cfg-dm-lista">
-        ${sinDias}
-        ${filasHTML}
+        ${cantActivos === 0
+          ? `<div class="cfg-dm-vacio">No hay días movidos activos. Elegí una fecha arriba para agregar.</div>`
+          : cardsHTML
+        }
       </div>
     </div>`;
 }

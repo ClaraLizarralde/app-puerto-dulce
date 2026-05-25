@@ -10,26 +10,30 @@
  * 
  * === EVENTOS GLOBALES ===
  * - beforeunload                  → Alerta al cerrar si hay cambios sin guardar
- * - click (autocomplete)          → Cierra autocompletado al hacer clic fuera
- * - setInterval(renderEstadoLocal) → Actualiza estado del local cada minuto
+ * - click (consolidado)           → Cierra autocompletado Y menú de usuario al hacer clic fuera
+ * - resize                        → Re-evalúa componentes mobile al rotar/redimensionar
+ * - setInterval(renderEstadoLocal) → Actualiza estado del local cada minuto (con guard typeof)
  * 
  * === INICIALIZACIÓN ===
  * - renderDiasNav(), renderAll(), renderCatalogo(), renderArchivadosGlobal()
  * 
  * === UI DE USUARIO ===
  * - actualizarUIUsuario()         → Actualiza nombre y rol del usuario en toda la UI
- * - toggleUsuarioMenu(btnId)      → Abre/cierra menú de usuario (posiciona según botón)
+ *                                   (llama syncHamUsuarioNombre() internamente)
+ * - toggleUsuarioMenu(btnId)      → Abre/cierra menú de usuario (posiciona con CSS custom props)
  * - abrirModalCambioUsuario()     → Abre modal para cambiar usuario (reutiliza bienvenida)
  * 
  * === MOBILE: MENÚ HAMBURGUESA ===
  * - initMobileUsuarioEnHam()      → Agrega botón de usuario en menú hamburguesa (mobile)
  * - syncHamUsuarioNombre()        → Sincroniza nombre de usuario en item de hamburguesa
+ *                                   (llamada desde actualizarUIUsuario)
  * 
  * === MOBILE: FILTROS ===
  * - initFiltroToggleMobile()      → Agrega botón toggle para mostrar/ocultar filtros en mobile
  * 
- * === DOMContentLoaded ===
+ * === DOMContentLoaded / resize ===
  * - Inicializa componentes mobile y UI de usuario
+ * - Re-inicializa en resize para cubrir rotación de dispositivo
  * 
  * ================================================================
  */
@@ -79,15 +83,12 @@ window.addEventListener("beforeunload", e => {
   }
 });
 
-// Cierra el autocompletado al hacer clic fuera del contenedor
-document.addEventListener("click", e => {
-  if (!e.target.closest(".autocomplete-wrap")) {
-    document.getElementById("autocomplete-lista").classList.remove("visible");
-  }
-});
+// (listener de click consolidado más abajo, junto al cierre del menú de usuario)
 
-// Actualiza el estado del local cada minuto
-setInterval(renderEstadoLocal, 60000);
+// Actualiza el estado del local cada minuto (guard: evita error si pedidos.js no cargó)
+if (typeof renderEstadoLocal === "function") {
+  setInterval(renderEstadoLocal, 60000);
+}
 
 // Inicializaciones principales
 renderDiasNav();
@@ -115,37 +116,46 @@ function actualizarUIUsuario() {
 
   const mobLabel = document.getElementById("mob-panel-usuario-nombre");
   if (mobLabel) mobLabel.textContent = nombre;
+
+  syncHamUsuarioNombre();
 }
 
 // Abre/cierra menú de usuario, posicionándolo según el botón que lo activó
-
-  function toggleUsuarioMenu(btnId) {
+// La posición se aplica con custom properties CSS (--menu-*) en lugar de !important,
+// evitando conflictos de especificidad con la hoja de estilos.
+function toggleUsuarioMenu(btnId) {
   const menu = document.getElementById("usuario-menu");
   const btn = document.getElementById(btnId);
   const rect = btn.getBoundingClientRect();
 
   if (btnId === "btn-usuario") {
-    menu.style.setProperty("left", (rect.right + 8) + "px", "important");
-    menu.style.setProperty("right", "auto", "important");
-    menu.style.setProperty("top", "auto", "important");
-    menu.style.setProperty("bottom", (window.innerHeight - rect.bottom) + "px", "important");
-    menu.style.setProperty("width", "200px", "important");
+    menu.style.setProperty("--menu-left",   (rect.right + 8) + "px");
+    menu.style.setProperty("--menu-right",  "auto");
+    menu.style.setProperty("--menu-top",    "auto");
+    menu.style.setProperty("--menu-bottom", (window.innerHeight - rect.bottom) + "px");
+    menu.dataset.menuAnchor = "sidebar";
   } else {
-    menu.style.setProperty("left", "auto", "important");
-    menu.style.setProperty("right", (window.innerWidth - rect.right) + "px", "important");
-    menu.style.setProperty("top", (rect.bottom + 8) + "px", "important");
-    menu.style.setProperty("bottom", "auto", "important");
-    menu.style.setProperty("width", "200px", "important");
+    menu.style.setProperty("--menu-left",   "auto");
+    menu.style.setProperty("--menu-right",  (window.innerWidth - rect.right) + "px");
+    menu.style.setProperty("--menu-top",    (rect.bottom + 8) + "px");
+    menu.style.setProperty("--menu-bottom", "auto");
+    menu.dataset.menuAnchor = "header";
   }
 
   menu.classList.toggle("hidden");
   menu.style.display = menu.classList.contains("hidden") ? "none" : "block";
 }
 
-// Cierra menú al hacer clic fuera
+// ── Listener de click global consolidado ──
+// Cierra autocompletado y menú de usuario al hacer clic fuera de sus contenedores
 document.addEventListener("click", e => {
+  if (!e.target.closest(".autocomplete-wrap")) {
+    const lista = document.getElementById("autocomplete-lista");
+    if (lista) lista.classList.remove("visible");
+  }
   if (!e.target.closest(".btn-usuario") && !e.target.closest(".usuario-menu")) {
-    document.getElementById("usuario-menu").classList.add("hidden");
+    const menu = document.getElementById("usuario-menu");
+    if (menu) menu.classList.add("hidden");
   }
 });
 
@@ -220,5 +230,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initFiltroToggleMobile();
 });
 
-// Si el nombre de usuario se setea después del DOMContentLoaded,
-// llamar syncHamUsuarioNombre() desde donde se actualice el nombre.
+// Re-evalúa componentes mobile al rotar el dispositivo o redimensionar la ventana
+window.addEventListener("resize", () => {
+  initMobileUsuarioEnHam();
+  initFiltroToggleMobile();
+});

@@ -97,63 +97,6 @@
 .lop-v .lop-line{height:2px;border-radius:1px;background:var(--border);}
 
 
-/* ═════════════6═════════════════════════
-CONFIGURACION - DIA ESPECIAL
-   ══════════════════════════════════════ */
-
-.dia-especial-config{
-  background:var(--amber-soft);
-  border-bottom:1.5px solid var(--amber);
-  padding:7px 14px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:0.72rem;
-  color:var(--amber);
-  flex-wrap:wrap;
-}
-.dia-especial-config .dec-label{
-  font-weight:600;
-  white-space:nowrap;
-  font-size:.62rem;
-  letter-spacing:.04em;
-}
-.dia-especial-config input[type=text]{
-  font-family:'Outfit',sans-serif;
-  font-size:0.78rem;
-  border:none;
-  border-bottom:1.5px solid var(--amber);
-  background:transparent;color:var(--amber);
-  padding:2px 4px;outline:none;
-  width:130px;
-}
-.dia-especial-config input[type=text]::placeholder{opacity:.5;}
-.dia-especial-config input[type=time]{
-  font-family:'Outfit',sans-serif;
-  font-size:0.78rem;
-  border:none;
-  border-bottom:1.5px solid var(--amber);
-  background:transparent;color:var(--amber);
-  padding:2px 4px;outline:none;
-  width:72px;
-}
-.btn-dia-normal{
-  font-family:'Outfit',sans-serif;
-  font-size:0.6rem;font-weight:600;
-  padding:3px 9px;
-  border-radius:10px;
-  border:1.5px solid var(--amber);
-  background:transparent;
-  color:var(--amber);
-  cursor:pointer;
-  margin-left:auto;
-  white-space:nowrap;
-}
-#cfgpanel-local .btn-dia-especial,
-#cfgpanel-local .btn-dia-normal{
-  width:100%;
-}
-.dec-sep{width:1px;height:16px;background:rgba(184,122,42,.3);margin:0 2px;flex-shrink:0;}
 
 /* ══════════════════════════════════════
    CONFIGURACION - CATÁLOGO
@@ -361,33 +304,99 @@ CONFIGURACION - DIA ESPECIAL
   text-align:center;
 }
 .csv-btn.primary{border-color:var(--green);color:var(--green);}
-/* ══════════════════════════════════════
-   CONFIGURACION - DIA ESPECIAL (panel cfg rediseñado)
-   ══════════════════════════════════════ */
+
+
+cat > /mnt/user-data/outputs/configuracion.css << 'CSSEOF'
+/* ═══════════════════════════════════════════════════════════
+   CONFIGURACION - DIA ESPECIAL (panel inline / barra config)
+   ══════════════════════════════════════════════════════════ */
+
+.dia-especial-config{
+  background:var(--amber-soft);
+  border-bottom:1.5px solid var(--amber);
+  padding:7px 14px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:0.72rem;
+  color:var(--amber);
+  flex-wrap:wrap;
+}
+.dia-especial-config .dec-label{
+  font-weight:600;
+  white-space:nowrap;
+  font-size:.62rem;
+  letter-spacing:.04em;
+}
+.dia-especial-config input[type=text]{
+  font-family:'Outfit',sans-serif;
+  font-size:0.78rem;
+  border:none;
+  border-bottom:1.5px solid var(--amber);
+  background:transparent;color:var(--amber);
+  padding:2px 4px;outline:none;
+  width:130px;
+}
+.dia-especial-config input[type=text]::placeholder{opacity:.5;}
+.dia-especial-config input[type=time]{
+  font-family:'Outfit',sans-serif;
+  font-size:0.78rem;
+  border:none;
+  border-bottom:1.5px solid var(--amber);
+  background:transparent;color:var(--amber);
+  padding:2px 4px;outline:none;
+  width:72px;
+}
+.btn-dia-normal{
+  font-family:'Outfit',sans-serif;
+  font-size:0.6rem;font-weight:600;
+  padding:3px 9px;
+  border-radius:10px;
+  border:1.5px solid var(--amber);
+  background:transparent;
+  color:var(--amber);
+  cursor:pointer;
+  margin-left:auto;
+  white-space:nowrap;
+}
+#cfgpanel-local .btn-dia-especial,
+#cfgpanel-local .btn-dia-normal{
+  width:100%;
+}
+.dec-sep{width:1px;height:16px;background:rgba(184,122,42,.3);margin:0 2px;flex-shrink:0;}
+
+
+/* ══════════════════════════════════════════════════════════
+   DÍA ESPECIAL — wrap principal rediseñado
+   ══════════════════════════════════════════════════════════ */
 
 .cfg-desp-wrap {
-  margin: 18px 0 20px;
-  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   overflow: hidden;
-  border: 1.5px solid var(--border);
+  background: var(--paper);
+  margin-bottom: 16px;
 }
 
-/* ── Cabecera ── */
 .cfg-desp-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 13px 16px;
-  background: var(--paper);
-  border-bottom: 1.5px solid var(--border);
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card, var(--paper));
 }
+
 .cfg-desp-ico { font-size: 1.1rem; flex-shrink: 0; }
+
 .cfg-desp-titulo {
   flex: 1;
   font-size: .82rem;
   font-weight: 700;
   color: var(--ink);
+  line-height: 1.2;
 }
+
 .cfg-desp-sub {
   font-size: .65rem;
   color: var(--ink-light);
@@ -395,37 +404,38 @@ CONFIGURACION - DIA ESPECIAL
   margin-top: 1px;
 }
 
-/* ── Pill de estado ── */
 .cfg-desp-estado {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   font-size: .68rem;
   font-weight: 600;
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: 20px;
   white-space: nowrap;
   flex-shrink: 0;
 }
+.cfg-desp-estado.on {
+  background: rgba(239,159,39,.15);
+  color: var(--amber, #b45309);
+  border: 1px solid rgba(239,159,39,.35);
+}
 .cfg-desp-estado.off {
   background: var(--bg);
-  border: 1.5px solid var(--border);
   color: var(--ink-light);
-}
-.cfg-desp-estado.on {
-  background: color-mix(in srgb, var(--amber, #f59e0b) 15%, transparent);
-  border: 1.5px solid var(--amber, #f59e0b);
-  color: var(--amber, #b45309);
+  border: 1px solid var(--border);
 }
 .cfg-desp-estado-dot {
-  width: 7px; height: 7px;
+  width: 6px; height: 6px;
   border-radius: 50%;
+  background: currentColor;
   flex-shrink: 0;
 }
-.cfg-desp-estado.off .cfg-desp-estado-dot { background: var(--border); }
-.cfg-desp-estado.on  .cfg-desp-estado-dot { background: var(--amber, #f59e0b); box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber,#f59e0b) 30%, transparent); }
+.cfg-desp-estado.on .cfg-desp-estado-dot {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber,#f59e0b) 30%, transparent);
+}
 
-/* ── Cuerpo cuando está OFF ── */
+/* Cuerpo OFF */
 .cfg-desp-body-off {
   padding: 14px 16px;
   background: var(--bg);
@@ -450,11 +460,7 @@ CONFIGURACION - DIA ESPECIAL
   color: var(--ink-mid);
   line-height: 1.4;
 }
-.cfg-desp-tanda-ico {
-  font-size: .85rem;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
+.cfg-desp-tanda-ico { font-size: .85rem; flex-shrink: 0; margin-top: 1px; }
 .cfg-desp-tanda-txt strong { color: var(--ink); font-weight: 600; }
 
 .btn-activar-desp {
@@ -476,11 +482,10 @@ CONFIGURACION - DIA ESPECIAL
   border-style: solid;
 }
 
-/* ── Cuerpo cuando está ON ── */
+/* Cuerpo ON */
 .cfg-desp-body-on {
   padding: 14px 16px;
   background: color-mix(in srgb, var(--amber, #f59e0b) 6%, var(--bg));
-  border-top: none;
 }
 
 .cfg-desp-campos {
@@ -515,7 +520,9 @@ CONFIGURACION - DIA ESPECIAL
   outline: none;
   min-width: 0;
 }
-.cfg-desp-campo-input:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber,#f59e0b) 25%, transparent); }
+.cfg-desp-campo-input:focus {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber,#f59e0b) 25%, transparent);
+}
 .cfg-desp-campo-hint {
   font-size: .62rem;
   color: var(--ink-light);
@@ -523,54 +530,53 @@ CONFIGURACION - DIA ESPECIAL
   flex-shrink: 0;
 }
 
-/* Visualización de tandas cuando está activo */
 .cfg-desp-preview {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
-  padding: 10px 12px;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding: 8px 10px;
   border-radius: var(--radius-sm);
   background: var(--paper);
   border: 1px solid var(--border);
 }
 .cfg-desp-preview-titulo {
-  font-size: .6rem;
+  font-size: .57rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .08em;
   color: var(--ink-light);
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 .cfg-desp-tanda-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: .72rem;
+  gap: 7px;
+  font-size: .68rem;
   color: var(--ink-mid);
-  padding: 5px 0;
+  padding: 4px 0;
   border-bottom: 1px solid var(--border);
   line-height: 1.4;
 }
 .cfg-desp-tanda-row:last-child { border-bottom: none; }
 .cfg-desp-tanda-badge {
-  font-size: .58rem;
+  font-size: .56rem;
   font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 8px;
+  padding: 2px 6px;
+  border-radius: 7px;
   flex-shrink: 0;
   white-space: nowrap;
 }
-.tanda-badge-1 { background: color-mix(in srgb, var(--amber,#f59e0b) 20%, transparent); color: var(--amber, #b45309); border: 1px solid var(--amber,#f59e0b); }
-.tanda-badge-2 { background: color-mix(in srgb, #2563eb 12%, transparent); color: #2563eb; border: 1px solid #2563eb; }
+.tanda-badge-1 { background: color-mix(in srgb, var(--amber,#f59e0b) 18%, transparent); color: var(--amber, #b45309); border: 1px solid var(--amber,#f59e0b); }
+.tanda-badge-2 { background: color-mix(in srgb, #2563eb 10%, transparent); color: #2563eb; border: 1px solid #2563eb; }
 
 .btn-desactivar-desp {
   width: 100%;
   font-family: 'Outfit', sans-serif;
-  font-size: .75rem;
+  font-size: .72rem;
   font-weight: 500;
-  padding: 9px;
-  border: 1.5px solid var(--border);
+  padding: 8px;
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--ink-light);
@@ -580,68 +586,147 @@ CONFIGURACION - DIA ESPECIAL
 .btn-desactivar-desp:hover {
   border-color: var(--red, #ef4444);
   color: var(--red, #ef4444);
-  background: color-mix(in srgb, var(--red,#ef4444) 6%, transparent);
+  background: color-mix(in srgb, var(--red,#ef4444) 5%, transparent);
 }
 
-/* ══════════════════════════════════════
-   CONFIGURACION - DÍAS MOVIDOS (multi-día)
-   ══════════════════════════════════════ */
 
-/* Lista de días */
-.cfg-dm-lista {
+/* ══════════════════════════════════════════════════════════
+   DÍAS MOVIDOS — Cards (generadas por JS con .dm-card)
+   ══════════════════════════════════════════════════════════ */
+
+/* Wrapper externo que envuelve todo el bloque de días movidos */
+.cfg-dm-wrap,
+#cfg-horarios-wrap > *:first-child {
+  margin-bottom: 8px;
+}
+
+/* Header de sección "Días movidos" */
+.cfg-dm-header {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.cfg-dm-header-ico { font-size: 1rem; }
+.cfg-dm-header-titulo {
+  flex: 1;
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: .9rem;
+  color: var(--accent);
+}
+
+/* Pill "2 activos" */
+.cfg-dm-count-pill {
+  font-size: .62rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: rgba(239,159,39,.15);
+  color: var(--amber, #b45309);
+  border: 1px solid rgba(239,159,39,.3);
+  white-space: nowrap;
 }
 
 /* Explicación de tandas */
 .cfg-dm-explicacion {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 10px 16px;
+  gap: 4px;
+  padding: 9px 12px;
   background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
 .cfg-dm-exp-item {
   display: flex;
-  gap: 8px;
-  font-size: .7rem;
+  gap: 7px;
+  font-size: .68rem;
   color: var(--ink-light);
   line-height: 1.4;
   align-items: flex-start;
 }
 .cfg-dm-exp-item strong { color: var(--ink-mid); }
 
-/* Fila de día */
-.cfg-dm-fila {
-  border-bottom: 1px solid var(--border);
-  transition: background .15s;
-}
-.cfg-dm-fila:last-child { border-bottom: none; }
-.cfg-dm-fila.on {
-  background: color-mix(in srgb, var(--amber,#f59e0b) 5%, var(--paper));
-}
-
-.cfg-dm-fila-top {
+/* Picker de fecha */
+.cfg-dm-picker-wrap {
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 16px;
+}
+.cfg-dm-picker-lbl {
+  font-size: .6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--ink-light);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.cfg-dm-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+/* Lista de días */
+.cfg-dm-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cfg-dm-vacio {
+  padding: 14px;
+  font-size: .72rem;
+  color: var(--ink-light);
+  font-style: italic;
+  text-align: center;
+  background: var(--bg);
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+}
+
+/* Fila de día con toggle */
+.cfg-dm-fila {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  overflow: hidden;
+  transition: background .15s, border-color .15s;
+}
+.cfg-dm-fila.on {
+  background: color-mix(in srgb, var(--amber,#f59e0b) 5%, var(--paper));
+  border-color: rgba(239,159,39,.35);
+}
+.cfg-dm-fila-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
 }
 .cfg-dm-fila-label {
   flex: 1;
-  font-size: .82rem;
+  font-size: .8rem;
   font-weight: 600;
   color: var(--ink);
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
 }
 .cfg-dm-hoy-badge {
-  font-size: .55rem;
+  font-size: .5rem;
   font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 8px;
+  padding: 1px 5px;
+  border-radius: 6px;
   background: var(--accent-soft);
   color: var(--accent);
   letter-spacing: .05em;
@@ -649,20 +734,12 @@ CONFIGURACION - DIA ESPECIAL
 }
 
 /* Toggle switch */
-.cfg-dm-toggle {
-  position: relative;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.cfg-dm-toggle input {
-  position: absolute;
-  opacity: 0;
-  width: 0; height: 0;
-}
+.cfg-dm-toggle { position: relative; cursor: pointer; flex-shrink: 0; }
+.cfg-dm-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
 .cfg-dm-toggle-track {
   display: block;
-  width: 40px; height: 22px;
-  border-radius: 11px;
+  width: 36px; height: 20px;
+  border-radius: 10px;
   background: var(--border);
   border: 1.5px solid var(--border);
   position: relative;
@@ -674,36 +751,36 @@ CONFIGURACION - DIA ESPECIAL
 }
 .cfg-dm-toggle-thumb {
   position: absolute;
-  width: 16px; height: 16px;
+  width: 14px; height: 14px;
   border-radius: 50%;
   background: #fff;
   top: 1px; left: 1px;
   transition: left .18s;
   box-shadow: 0 1px 3px rgba(0,0,0,.2);
 }
-.cfg-dm-toggle input:checked ~ .cfg-dm-toggle-track .cfg-dm-toggle-thumb {
-  left: 19px;
-}
+.cfg-dm-toggle input:checked ~ .cfg-dm-toggle-track .cfg-dm-toggle-thumb { left: 17px; }
 
-/* Campos expandibles cuando está ON */
+/* Campos expandibles */
 .cfg-dm-fila-campos {
-  padding: 0 16px 12px;
+  padding: 0 12px 10px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
 }
 .cfg-dm-campo-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
 }
 .cfg-dm-campo-lbl {
-  font-size: .63rem;
+  font-size: .6rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: .07em;
   color: var(--ink-light);
-  width: 52px;
+  width: 50px;
   flex-shrink: 0;
 }
 .cfg-dm-campo-inp {
@@ -712,7 +789,7 @@ CONFIGURACION - DIA ESPECIAL
   flex: 1;
   padding: 6px 9px;
   border: 1.5px solid var(--amber, #f59e0b);
-  border-radius: var(--radius-sm);
+  border-radius: 7px;
   background: var(--paper);
   color: var(--ink);
   outline: none;
@@ -720,9 +797,9 @@ CONFIGURACION - DIA ESPECIAL
   transition: box-shadow .15s;
 }
 .cfg-dm-campo-inp:focus {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber,#f59e0b) 25%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--amber,#f59e0b) 22%, transparent);
 }
-.cfg-dm-campo-time { max-width: 110px; flex: none; }
+.cfg-dm-campo-time { max-width: 105px; flex: none; }
 .cfg-dm-campo-hint {
   font-size: .6rem;
   color: var(--ink-light);
@@ -730,24 +807,445 @@ CONFIGURACION - DIA ESPECIAL
   flex-shrink: 0;
 }
 
-/* Preview de tandas inline */
+/* Preview tandas inline */
 .cfg-dm-preview-tandas {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   flex-wrap: wrap;
   padding-top: 2px;
 }
-.cfg-dm-arrow {
-  font-size: .7rem;
+.cfg-dm-arrow { font-size: .68rem; color: var(--ink-light); }
+
+/* Botón quitar */
+.cfg-dm-btn-quitar {
+  font-family: 'Outfit', sans-serif;
+  font-size: .68rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: transparent;
   color: var(--ink-light);
+  cursor: pointer;
+  transition: all .12s;
+  flex-shrink: 0;
+}
+.cfg-dm-btn-quitar:hover {
+  border-color: var(--red, #ef4444);
+  color: var(--red, #ef4444);
+  background: color-mix(in srgb, var(--red,#ef4444) 5%, transparent);
 }
 
-/* Vacío */
-.cfg-dm-vacio {
-  padding: 16px;
-  font-size: .75rem;
+
+/* ══════════════════════════════════════════════════════════
+   DÍAS MOVIDOS — Cards legacy (generadas por config.js)
+   ══════════════════════════════════════════════════════════ */
+
+.dm-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+  overflow: hidden;
+  margin-bottom: 7px;
+  transition: box-shadow .15s;
+}
+.dm-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.dm-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card, var(--bg));
+}
+.dm-card-fecha {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.dm-card-btn-edit {
+  font-size: 10.5px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ink-mid);
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  transition: background .12s, border-color .12s;
+}
+.dm-card-btn-edit:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.dm-card-btn-quitar {
+  width: 26px; height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ink-light);
+  cursor: pointer;
+  font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .12s;
+  flex-shrink: 0;
+}
+.dm-card-btn-quitar:hover {
+  border-color: var(--red, #ef4444);
+  color: var(--red, #ef4444);
+  background: color-mix(in srgb, var(--red,#ef4444) 6%, transparent);
+}
+.dm-card-body { padding: 10px 12px 12px; }
+.dm-card-nombre {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 7px;
+}
+.dm-card-nombre.vacio {
   color: var(--ink-light);
   font-style: italic;
-  text-align: center;
+  font-weight: 400;
+}
+.dm-tanda-row { display: flex; align-items: center; gap: 6px; }
+.dm-tanda-badge {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+.dm-tanda-1 {
+  background: rgba(239,159,39,.14);
+  color: #c47a10;
+  border: 1px solid rgba(239,159,39,.3);
+}
+.dm-tanda-2 {
+  background: rgba(55,138,221,.12);
+  color: #185FA5;
+  border: 1px solid rgba(55,138,221,.28);
+}
+.dm-tanda-arr { font-size: 12px; color: var(--ink-light); }
+
+/* Panel edición dentro de card */
+.dm-edit-panel {
+  display: none;
+  border-top: 1px solid var(--border);
+  padding: 12px;
+  background: var(--bg);
+}
+.dm-edit-panel.open { display: block; }
+.dm-edit-campo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.dm-edit-lbl {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--ink-mid);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  width: 44px;
+  flex-shrink: 0;
+}
+.dm-edit-inp {
+  flex: 1;
+  font-size: 12.5px;
+  padding: 6px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Outfit', sans-serif;
+  outline: none;
+  transition: border-color .12s;
+}
+.dm-edit-inp:focus { border-color: var(--accent); }
+.dm-edit-inp-time { max-width: 110px; flex: none; }
+.dm-edit-hint { font-size: 10px; color: var(--ink-light); }
+.dm-edit-footer { display: flex; justify-content: flex-end; margin-top: 6px; }
+.dm-btn-guardar {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  transition: opacity .12s;
+}
+.dm-btn-guardar:hover { opacity: .88; }
+
+
+/* ══════════════════════════════════════
+   HORARIOS DEL LOCAL — nuevo diseño
+   ══════════════════════════════════════ */
+
+/* ── Card contenedora ── */
+.hl-section-card {
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+/* ── Header de sección ── */
+.hl-section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.hl-section-ico { font-size: 1rem; flex-shrink: 0; }
+.hl-section-text { flex: 1; min-width: 0; }
+.hl-section-titulo {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: .88rem;
+  color: var(--accent);
+  line-height: 1.3;
+}
+.hl-section-sub {
+  font-size: .62rem;
+  color: var(--ink-light);
+  margin-top: 1px;
+  line-height: 1.4;
+}
+
+/* ── Lista de días ── */
+.hl-dias-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Fila de día: grid con columnas de tamaño fijo ── */
+.hl-dia-row {
+  display: grid;
+  grid-template-columns: 80px 80px auto;
+  align-items: center;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  transition: background .12s;
+  gap: 0;
+}
+.hl-dia-row:last-child { border-bottom: none; }
+.hl-dia-row:hover { background: color-mix(in srgb, var(--accent) 4%, transparent); }
+.hl-dia-row--off { opacity: .5; }
+
+/* ── Nombre del día ── */
+.hl-dia-nom {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ── Checkbox "Abierto" ── */
+.hl-dia-check {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  user-select: none;
+}
+.hl-dia-check input[type=checkbox] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.hl-dia-check-lbl {
+  font-size: .7rem;
+  color: var(--ink-mid);
+  white-space: nowrap;
+}
+
+/* ── Contenedor de inputs de hora ── */
+.hl-dia-times {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hl-dia-times--off {
+  opacity: .25;
+  pointer-events: none;
+}
+
+/* ── Input de hora — tamaño fijo ── */
+.hl-time-inp {
+  font-family: 'Outfit', sans-serif !important;
+  font-size: .8rem !important;
+  font-weight: 500 !important;
+  padding: 5px 6px !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 7px !important;
+  background: var(--bg) !important;
+  color: var(--ink) !important;
+  outline: none !important;
+  width: 88px !important;
+  max-width: 88px !important;
+  min-width: 88px !important;
+  flex: none !important;
+  box-sizing: border-box !important;
+  transition: border-color .15s, box-shadow .15s !important;
+}
+.hl-time-inp:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 20%, transparent) !important;
+}
+.hl-time-inp:disabled {
+  opacity: .3 !important;
+  cursor: not-allowed !important;
+}
+
+.hl-dia-arrow {
+  font-size: .72rem;
+  color: var(--ink-light);
+  flex-shrink: 0;
+}
+.hl-dia-cerrado {
+  font-size: .68rem;
+  color: var(--ink-light);
+  font-style: italic;
+  grid-column: 3;
+}
+
+/* ── Fila única (corte / cuba) ── */
+.hl-single-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+}
+.hl-single-hint {
+  font-size: .68rem;
+  color: var(--ink-light);
+  flex: 1;
+  line-height: 1.45;
+}
+
+
+/* ══════════════════════════════════════
+   LOCAL — section headers, cards & layout mejorado
+   ══════════════════════════════════════ */
+
+/* Card de sección con fondo y borde sutil */
+.cfg-local-section-card {
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.cfg-local-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px 9px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.cfg-local-section-ico { font-size: .95rem; flex-shrink: 0; }
+.cfg-local-section-titulo {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: .9rem;
+  color: var(--accent);
+  flex: 1;
+}
+.cfg-local-section-sub {
+  font-size: .63rem;
+  color: var(--ink-light);
+  margin-top: 1px;
+  line-height: 1.4;
+}
+
+/* Horarios dias-list dentro de card */
+#horarios-dias-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0 !important;
+}
+
+/* Local card selector */
+.local-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  cursor: pointer;
+  transition: all .15s;
+  margin-bottom: 6px;
+}
+.local-card:hover { border-color: var(--accent); background: var(--accent-soft); }
+.local-card.activo {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+.local-card-ico { font-size: 1.05rem; flex-shrink: 0; }
+.local-card-info { flex: 1; min-width: 0; }
+.local-card-nombre {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.local-card-id { font-size: .63rem; color: var(--ink-light); margin-top: 2px; }
+
+/* Hint/descripción bajo los títulos de sección en panel local */
+#cfgpanel-local .cfg-section-hint {
+  font-size: .68rem;
+  color: var(--ink-light);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+/* Corte y Cuba: row compacto con tiempo fijo */
+.horario-single-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+}
+.horario-single-row input[type=time] {
+  font-family: 'Outfit', sans-serif;
+  font-size: .84rem;
+  font-weight: 500;
+  padding: 7px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  outline: none;
+  width: 100px;
+  flex-shrink: 0;
+  transition: border-color .15s;
+}
+.horario-single-row input[type=time]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.horario-single-hint {
+  font-size: .68rem;
+  color: var(--ink-light);
+  flex: 1;
+  line-height: 1.45;
 }
