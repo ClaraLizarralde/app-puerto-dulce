@@ -113,6 +113,22 @@ function abrirMobPanel(key, tabEl) {
 //              al ítem seleccionado dentro del panel.
 // ────────────────────────────────────────────────────────────────
 function mobPanelPick(parent, id) {
+  // Si el nuevo pedido está abierto, interceptar igual que showTab
+  const npPage = document.getElementById('tab-np-page');
+  if (npPage && npPage.style.display === 'flex') {
+    if (typeof _npTieneDatos === 'function' && _npTieneDatos()) {
+      _npAbrirWarnSalir(() => {
+        _npCerrarSinGuardar();
+        cerrarMobPanel();
+        mobPanelPick(parent, id);
+      });
+    } else {
+      _npCerrarSinGuardar();
+      cerrarMobPanel();
+      mobPanelPick(parent, id);
+    }
+    return;
+  }
   cerrarMobPanel();
 
   if (parent === 'cuba') {
@@ -147,6 +163,23 @@ function mobPanelPick(parent, id) {
 //              y abre paneles flotantes en móvil para produccion/cuba.
 // ────────────────────────────────────────────────────────────────
 function showTab(id, el) {
+  // Si el nuevo pedido está abierto, interceptar la navegación
+  const npPage = document.getElementById('tab-np-page');
+  if (npPage && npPage.style.display === 'flex') {
+    if (typeof _npTieneDatos === 'function' && _npTieneDatos()) {
+      // Tiene datos → mostrar warning, navegar solo si confirma
+      _npAbrirWarnSalir(() => {
+        _npCerrarSinGuardar();
+        showTab(id, el);
+      });
+    } else {
+      // Sin datos → cerrar directo y navegar
+      _npCerrarSinGuardar();
+      showTab(id, el);
+    }
+    return;
+  }
+
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-' + id)?.classList.add('active');

@@ -822,15 +822,16 @@ body {
     background: var(--accent-soft);
     color: var(--accent);
   }
+/* Tab colapsada — desktop */
+.tabs.collapsed .tab { justify-content: center; padding: 0; gap: 0; }
+.tabs.collapsed .tab .tab-label { display: none; }
 
-  /* Tab colapsada — desktop */
-  .tabs.collapsed .tab { justify-content: center; padding: 0; font-size: 0; gap: 0; }
-
-  /* Tab colapsada — tablet landscape */
-  @media (max-width: 1024px) and (orientation: landscape) {
-    .tabs:not(.expanded) .tab { justify-content: center; padding: 0; font-size: 0; gap: 0; }
-    .tabs.expanded .tab { justify-content: flex-start; padding: 0 10px 0 16px; font-size: .74rem; font-weight: 600; gap: 9px; }
-  }
+/* Tab colapsada — tablet landscape */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .tabs:not(.expanded) .tab { justify-content: center; padding: 0; gap: 0; }
+  .tabs:not(.expanded) .tab .tab-label { display: none; }
+  .tabs.expanded .tab { justify-content: flex-start; padding: 0 10px 0 16px; font-size: .74rem; font-weight: 600; gap: 9px; }
+}
 
   /* ── Tooltips sidebar colapsada — desktop ── */
   .tabs.collapsed .tab { position: relative; }
