@@ -93,7 +93,7 @@ setInterval(renderEstadoLocal, 60000);
 renderDiasNav();
 renderAll();
 renderCatalogo();
-renderArchivadosGlobal();
+actualizarContadorArchivadosGlobal();
 
 // ── UI DE USUARIO ──
 // Actualiza nombre y rol del usuario en toda la UI

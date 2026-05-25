@@ -170,28 +170,48 @@ function renderEncargos() {
   }
   vacio.style.display = "none";
 
+  // Determina en qué fecha hay que pedir a Cuba un pedido.
+  // En día especial: Cuba 15 (hora <= corteEspecial) → día anterior (tanda 1)
+  //                  Cuba 18 (hora > corteEspecial)  → mismo día (tanda 2)
+  // En día normal: si hora < HORA_CUBA → día anterior; si no → mismo día.
   function diaPedidoACuba(diaEntregaKey, horaEntrega) {
     const hora = horaEntrega || "99:99";
+    const dData = datos.dias[diaEntregaKey] || {};
+    if (dData.especial) {
+      const corteEsp = dData.corteHora || "15:00";
+      if (hora <= corteEsp) {
+        // Tanda 1: se pide el día anterior
+        const [y, m, d] = diaEntregaKey.split("-").map(Number);
+        const prev = new Date(y, m - 1, d);
+        prev.setDate(prev.getDate() - 1);
+        return { key: fechaKey(prev), tanda: 1, corteEsp };
+      }
+      return { key: diaEntregaKey, tanda: 2, corteEsp };
+    }
+    // Día normal
     if (hora < HORA_CUBA) {
       const [y, m, d] = diaEntregaKey.split("-").map(Number);
       const prev = new Date(y, m - 1, d);
       prev.setDate(prev.getDate() - 1);
-      return fechaKey(prev);
+      return { key: fechaKey(prev), tanda: null, corteEsp: null };
     }
-    return diaEntregaKey;
+    return { key: diaEntregaKey, tanda: null, corteEsp: null };
   }
 
+  // Agrupar por {diaKey + tanda} para poder mostrar subencabezados en día especial
   const porDiaPedido = {};
   pedidosConTacc.forEach(p => {
-    const cuandoPedir = diaPedidoACuba(p._diaKey, p.hora_entrega);
-    if (!porDiaPedido[cuandoPedir]) porDiaPedido[cuandoPedir] = [];
-    porDiaPedido[cuandoPedir].push(p);
+    const { key, tanda, corteEsp } = diaPedidoACuba(p._diaKey, p.hora_entrega);
+    const groupKey = tanda !== null ? `${key}__t${tanda}` : key;
+    if (!porDiaPedido[groupKey]) porDiaPedido[groupKey] = { key, tanda, corteEsp, pedidos: [] };
+    porDiaPedido[groupKey].pedidos.push(p);
   });
 
-  const diasOrdenados = Object.keys(porDiaPedido).sort();
+  const gruposOrdenados = Object.keys(porDiaPedido).sort();
 
-  diasOrdenados.forEach(dPedirKey => {
-    const pedidos = porDiaPedido[dPedirKey].sort((a, b) => (a.hora_entrega || "99:99").localeCompare(b.hora_entrega || "99:99"));
+  gruposOrdenados.forEach((gKey, idx) => {
+    const { key: dPedirKey, tanda, corteEsp, pedidos } = porDiaPedido[gKey];
+    pedidos.sort((a, b) => (a.hora_entrega || "99:99").localeCompare(b.hora_entrega || "99:99"));
 
     let tituloTxt;
     if (dPedirKey === hoyKey) tituloTxt = "Pedir HOY a Cuba";
@@ -201,6 +221,11 @@ function renderEncargos() {
       const f = new Date(dPedirKey + "T12:00:00");
       tituloTxt = "Pedir el " + DIAS_FULL[f.getDay()] + " " + f.getDate() + " " + MESES[f.getMonth()];
     }
+
+    // En día especial, agregar subtítulo de tanda
+    let tandaLabel = "";
+    if (tanda === 1 && corteEsp) tandaLabel = ` <span style="font-size:.6rem;color:var(--amber);font-weight:700;">🟠 Tanda 1 (hasta las ${corteEsp})</span>`;
+    if (tanda === 2 && corteEsp) tandaLabel = ` <span style="font-size:.6rem;color:var(--blue,#2563eb);font-weight:700;">🔵 Tanda 2 (después de las ${corteEsp})</span>`;
 
     const diasEntrega = [...new Set(pedidos.map(p => p._diaKey))].sort();
     const subtxt = diasEntrega.map(dk => {
@@ -220,9 +245,9 @@ function renderEncargos() {
       color:${esUrgente ? "var(--red)" : esHoy ? "var(--accent)" : "var(--ink-light)"};
       padding:10px 0 4px;
       border-bottom:1.5px solid ${esUrgente ? "var(--red)" : esHoy ? "var(--accent)" : "var(--border)"};
-      margin-bottom:6px;margin-top:${dPedirKey === diasOrdenados[0] ? "0" : "16px"};
+      margin-bottom:6px;margin-top:${idx === 0 ? "0" : "16px"};
     `;
-    header.innerHTML = `${esUrgente ? "⚠️ " : ""}${tituloTxt}
+    header.innerHTML = `${esUrgente ? "⚠️ " : ""}${tituloTxt}${tandaLabel}
       <span style="font-size:.6rem;font-weight:400;text-transform:none;letter-spacing:0;opacity:.7;font-style:italic;">
         para entregas: ${subtxt}
       </span>`;
@@ -335,7 +360,8 @@ function renderCubaResumen() {
   const dd = diaData();
   const especial = dd.especial || false;
   const corte = dd.corteHora || "15:00";
-  const pedidosCuba = getPedidos().filter(p => esCuba(p.cliente));
+  // Usar pedidos del día activo (diaActual), no solo el "día data" del buscador
+  const pedidosCuba = (datos.dias[diaActual]?.pedidos || []).filter(p => esCuba(p.cliente) && p.estado !== "entregado");
 
   function acumular(pedidos) {
     const totales = {};

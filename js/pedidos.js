@@ -2,104 +2,106 @@
  * ================================================================
  * ÍNDICE DE FUNCIONES (PEDIDOS.JS)
  * ================================================================
- * 
+ *
  * === ESTADO Y RENDER GENERAL ===
- * - renderEstadoLocal()           → Actualiza la UI con estado del local (abierto/cerrando/cerrado)
- * - showTab(id, el)               → Cambia de tab principal (pedidos, producción, cuba, config)
- * - renderAll()                   → Refresca toda la interfaz (pedidos, stats, banner, etc.)
- * 
+ * - renderEstadoLocal()               → Actualiza la UI con estado del local (abierto/cerrando/cerrado)
+ * - renderAll()                       → Refresca toda la interfaz (pedidos, stats, banner, etc.)
+ *
  * === BANNER DÍA PRINCIPAL ===
- * - renderDiaBanner()             → Muestra el banner del día actual con fecha, estado especial
- * - toggleDiaEspecial()           → Activa modo día especial
- * - confirmarDiaNormal()          → Confirma volver a día normal (modal)
+ * - renderDiaBanner()                 → Muestra el banner del día actual con fecha, estado especial
+ * - toggleDiaEspecial()               → Activa modo día especial
+ * - confirmarDiaNormal()              → Confirma volver a día normal (modal)
  * - setDiaEspecialCampo(campo, valor) → Cambia nombre o corte horario de día especial
- * 
+ *
  * === NAVEGACIÓN DE DÍAS ===
- * - renderDiasNav()               → Renderiza pestañas de navegación por días
- * - agregarDia()                  → Agrega un nuevo día al sistema
- * 
+ * - setDiaActivo(k)                   → Cambia el día activo (sincroniza diaActual y _poTabDia)
+ * - renderDiasNav()                   → Renderiza pestañas de navegación por días (vista legacy)
+ * - agregarDia()                      → Agrega un nuevo día al sistema
+ *
  * === ESTADÍSTICAS ===
- * - renderStats()                 → Calcula y muestra total de pedidos, tortas y otros productos
- * 
+ * - renderStats()                     → Calcula y muestra total de pedidos, tortas y otros productos
+ *
  * === BÚSQUEDA Y AUTOCOMPLETADO ===
- * - onBuscadorInput()             → Autocompleta clientes al escribir en buscador
+ * - onBuscadorInput()                 → Autocompleta clientes al escribir en buscador
  * - seleccionarAutocompletado(clienteId) → Selecciona cliente desde autocompletado
- * 
+ *
  * === FILTROS ===
- * - setFiltro(f, el)              → Filtra pedidos por estado (pendientes, listos, Cuba, etc.)
- * - setFiltroDia(tipo, el)        → Filtra pedidos por día (hoy, mañana, otro)
- * - setFiltroDiaKey(k)            → Cambia clave de día para filtro "otro"
- * 
+ * - setFiltro(f, el)                  → Filtra pedidos por estado (pendientes, listos, Cuba, etc.)
+ * - setFiltroDia(tipo, el)            → Filtra pedidos por día (hoy, mañana, otro)
+ * - setFiltroDiaKey(k)                → Cambia clave de día para filtro "otro"
+ *
  * === OBTENCIÓN DE PEDIDOS FILTRADOS ===
- * - getPedidosFiltradosDeDia(diaKey) → Retorna pedidos de un día aplicando filtros activos
- * - getPedidosFiltrados()         → Alias para pedidos del día actual
- * 
- * === RENDER DE PEDIDOS (VISTA PLANILLA) ===
- * - buildDiaBanner(diaKey)        → Construye banner separador de día en la planilla
- * - renderPedidos()               → Renderiza la lista completa de pedidos (versión planilla)
- * - calcularTotalPedido(p)        → Calcula el total monetario de un pedido
- * - buildPanel(p)                 → Construye panel de edición de pedido (vista expandida)
- * 
+ * - getPedidosFiltradosDeDia(diaKey)  → Retorna pedidos de un día aplicando filtros activos
+ * - getPedidosFiltrados()             → Alias para pedidos del día actual
+ *
+ * === RENDER DE PEDIDOS (VISTA PLANILLA LEGACY) ===
+ * - buildDiaBanner(diaKey)            → Construye banner separador de día en la planilla
+ * - calcularTotalPedido(p)            → Calcula el total monetario de un pedido
+ * - buildPanel(p)                     → Construye panel de edición de pedido (vista expandida)
+ *
  * === AUTOCOMPLETADO CLIENTE EN PANEL ===
- * - onClienteInput(pedidoId, valor) → Sugiere clientes al escribir en panel edición
+ * - onClienteInput(pedidoId, valor)   → Sugiere clientes al escribir en panel edición
  * - aplicarClientePanel(pedidoId, clienteId) → Aplica cliente seleccionado al pedido
- * 
+ *
  * === ACCIONES SOBRE PEDIDOS ===
- * - marcarDiaEspecialPedido(id)   → Marca un pedido como "día especial"
- * - confirmarDesmarcarEspecial(id) → Confirma quitar marca de día especial
- * - updatePedido(id, campo, valor) → Actualiza campo genérico de un pedido
- * - updateClienteInput(id, valor) → Actualiza nombre de cliente en pedido
- * - setEstado(id, estado)         → Cambia estado del pedido (pendiente/prod/listo/entregado)
- * - toggleListoPedido(id)         → Alterna estado entre listo/pendiente
- * - validarPedido(p)              → Valida que el pedido tenga datos mínimos
- * - guardarCerrar(id)             → Guarda cambios y cierra panel de edición
- * - confirmarEliminar(id)         → Elimina pedido con confirmación
- * 
+ * - marcarDiaEspecialPedido(id)       → Marca un pedido como "día especial"
+ * - confirmarDesmarcarEspecial(id)    → Confirma quitar marca de día especial
+ * - updatePedido(id, campo, valor)    → Actualiza campo genérico de un pedido
+ * - updateClienteInput(id, valor)     → Actualiza nombre de cliente en pedido
+ * - setEstado(id, estado)             → Cambia estado del pedido (pendiente/prod/listo/entregado)
+ * - toggleListoPedido(id)             → Alterna estado entre listo/pendiente
+ * - validarPedido(p)                  → Valida que el pedido tenga datos mínimos
+ * - guardarCerrar(id)                 → Guarda cambios y cierra panel de edición
+ * - confirmarEliminar(id)             → Elimina pedido con confirmación
+ *
  * === ARCHIVADOS ===
- * - archivarRetirados()           → Mueve pedidos retirados a archivados
- * - toggleArchivadosLista()       → Muestra/oculta lista de archivados del día
- * - toggleArchivadosGlobal()      → Muestra/oculta lista global de archivados
- * - renderArchivadosContent(wrapperId, global) → Renderiza contenido de archivados
- * - renderArchivadosSeccion()     → Muestra sección de archivados del día
- * - renderArchivadosGlobal()      → Actualiza contador global de archivados
- * 
+ * - archivarRetirados()               → Mueve pedidos retirados a archivados
+ * - toggleArchivadosLista()           → Muestra/oculta lista de archivados del día
+ * - toggleArchivadosGlobal()          → Muestra/oculta lista global de archivados
+ * - renderArchivadosContent(wrapperId, global) → Renderiza contenido de archivados (local o global)
+ * - renderArchivadosSeccion()         → Muestra sección de archivados del día actual
+ * - actualizarContadorArchivadosGlobal() → Actualiza solo el contador global de archivados
+ *
  * === PEDIDOS PENDIENTES DE DÍAS ANTERIORES ===
- * - chequearPendientesAyer()      → Muestra toast si hay pedidos sin revisar de días pasados
- * - cerrarBannerPendientes()      → Cierra el toast de pendientes
- * 
+ * - chequearPendientesAyer()          → Muestra toast si hay pedidos sin revisar de días pasados
+ * - cerrarBannerPendientes()          → Cierra el toast de pendientes
+ *
  * === MANEJO DE PRODUCTOS (dentro de pedido) ===
- * - ajustarCantidad(pedidoId, rId, delta) → Ajusta cantidad de producto (+/-)
+ * - ajustarCantidad(pedidoId, rId, delta)     → Ajusta cantidad de producto (+/-)
  * - setProdCampo(pedidoId, rId, campo, valor) → Actualiza campo de producto
- * - toggleNotaProd(pedidoId, rId) → Muestra/oculta textarea de nota por producto
- * - toggleNotaGeneral(pedidoId)   → Muestra/oculta nota general del pedido
- * - actualizarBotonNota(pedidoId, valor) → Actualiza texto del botón de nota
- * - toggleProdListo(pedidoId, rId) → Marca/desmarca producto como listo
- * - toggleTaccChk(pedidoId, rId, campo) → Alterna checkbox de producto (pedido_cuba/separado_cuba)
- * - setTamano(pedidoId, rId, tam) → Cambia talle del producto (Chico/Mediano/Grande/Libre)
- * - setTamanoLibre(pedidoId, rId, valor) → Cambia talle libre (texto)
- * - eliminarProducto(pedidoId, rId) → Elimina producto del pedido
- * - agregarProducto(pedidoId)     → Abre selector para agregar producto
- * - buildProdEdit(pedidoId, r, idx) → Construye HTML de fila de producto en edición
- * 
+ * - toggleNotaProd(pedidoId, rId)             → Muestra/oculta textarea de nota por producto
+ * - toggleNotaGeneral(pedidoId)               → Muestra/oculta nota general del pedido
+ * - actualizarBotonNota(pedidoId, valor)      → Actualiza texto del botón de nota
+ * - toggleProdListo(pedidoId, rId)            → Marca/desmarca producto como listo
+ * - toggleTaccChk(pedidoId, rId, campo)       → Alterna checkbox de producto (pedido_cuba/separado_cuba)
+ * - setTamano(pedidoId, rId, tam)             → Cambia talle del producto (Chico/Mediano/Grande/Libre)
+ * - setTamanoLibre(pedidoId, rId, valor)      → Cambia talle libre (texto)
+ * - eliminarProducto(pedidoId, rId)           → Elimina producto del pedido
+ * - agregarProducto(pedidoId)                 → Abre selector para agregar producto
+ * - buildProdEdit(pedidoId, r, idx)           → Construye HTML de fila de producto en edición
+ *
  * === MOVER PEDIDOS ENTRE DÍAS ===
- * - buildMoverOpts(pedidoId)      → Construye opciones de días para mover pedido
+ * - buildMoverOpts(pedidoId)          → Construye opciones de días para mover pedido
  * - moverPedido(pedidoId, diaDestino) → Mueve pedido a otro día
- * 
- * === BACK-OFFICE: NUEVA TABLA DE PEDIDOS ===
- * - asignarIds()                  → Asigna IDs ascendentes (_pid) a pedidos sin ID
- * - _poFechaKey(d)                → Convierte fecha a string YYYY-MM-DD
- * - _poDayTabLabel(k)             → Genera etiqueta corta para pestaña de día
- * - _poDaySepLabel(k)             → Genera etiqueta larga para separador de día
- * - _poFormatTs(ts)               → Formatea timestamp a DD/MM HH:MM
- * - _poGetDiaDePedido(id)         → Retorna la clave del día donde está un pedido
- * - toggleVistaArchivados()       → Alterna entre vista pedidos activos / archivados
- * - actualizarContadorArchivados() → Actualiza contador de archivados en UI
- * - renderTablaArchivados(tbody)  → Renderiza tabla de pedidos archivados
- * - renderDayTabs()               → Renderiza pestañas de navegación por días (nuevo diseño)
- * - renderPedidosTable()          → Renderiza tabla principal de pedidos (reemplaza renderPedidos)
- * - poToggleExpand(id)            → Expande/colapsa fila con detalles del pedido
- * - initPedidosBO()               → Inicializa el back-office de pedidos (asigna IDs, renderiza)
- * 
+ *
+ * === BACK-OFFICE: TABLA DE PEDIDOS ===
+ * - asignarIds()                      → Asigna IDs ascendentes (_pid) a pedidos sin ID
+ * - _poDayTabLabel(k)                 → Genera etiqueta corta para pestaña de día
+ * - _poDaySepLabel(k)                 → Genera etiqueta larga para separador de día
+ * - _poFormatTs(ts)                   → Formatea timestamp a DD/MM HH:MM
+ * - _poGetDiaDePedido(id)             → Retorna la clave del día donde está un pedido
+ * - setOrden(v)                       → Cambia el criterio de ordenamiento de pedidos
+ * - sortPedidos(ps)                   → Ordena array de pedidos según _poOrden
+ * - toggleVistaArchivados()           → Alterna entre vista pedidos activos / archivados
+ * - actualizarContadorArchivados()    → Actualiza contador de archivados en la tabla
+ * - renderTablaArchivados(tbody)      → Renderiza tabla de pedidos archivados
+ * - renderDayTabs()                   → Renderiza pestañas de navegación por días
+ * - setTabTodos()                     → Activa la vista "Todos los días"
+ * - renderPedidos()                   → Punto de entrada principal: renderiza tabs + tabla
+ * - renderPedidosTable()              → Renderiza el contenido de la tabla de pedidos
+ * - poToggleExpand(id)                → Expande/colapsa fila con detalles del pedido
+ * - initPedidosBO()                   → Inicializa el back-office de pedidos
+ *
  * ================================================================
  */
 
@@ -120,9 +122,6 @@ function renderEstadoLocal() {
   });
 }
 
-// ── TABS ──
-
-
 // Refresca toda la interfaz
 function renderAll() {
   renderPedidos();
@@ -134,6 +133,15 @@ function renderAll() {
   if (cubaTab && cubaTab.classList.contains("active")) renderCuba();
   const prodTab = document.getElementById("tab-produccion");
   if (prodTab && prodTab.classList.contains("active")) renderProduccion();
+}
+
+// ── NAVEGACIÓN DE DÍAS ──
+// Fuente de verdad única para cambiar el día activo.
+// Siempre usar esta función en lugar de asignar diaActual y _poTabDia por separado.
+function setDiaActivo(k) {
+  diaActual = k;
+  _poTabDia = k;
+  _poExpandedId = null;
 }
 
 // ── BANNER DÍA ──
@@ -219,39 +227,8 @@ function setDiaEspecialCampo(campo, valor) {
   renderCuba();
 }
 
-// ── ARCHIVO DÍAS PASADOS ──
-// Renderiza lista global de archivados
-function renderArchivadosGlobalContent() {
-  const wrap = document.getElementById("archivados-global-lista");
-  if (!wrap) return;
-  if (!datos.archivados.length) {
-    wrap.innerHTML = '<div class="vacio" style="padding:14px;">Sin archivados.</div>';
-    return;
-  }
-  const ordenados = [...datos.archivados].sort((a, b) => (b._archivadoTs || 0) - (a._archivadoTs || 0));
-  wrap.innerHTML = ordenados.map(a => {
-    const prods = (a.productos || []).map(r => {
-      const nom = r.tipo === "catalogo" ? r.nombre : r.libre;
-      const _cantN = Number(r.cantidad);
-      const cant = isNaN(_cantN) ? 1 : _cantN;
-      return `${nom} x${cant}`;
-    }).join(", ");
-    return `<div class="arch-item">
-      <div class="arch-item-top">
-        <span class="arch-fecha">${a._nomDia || ""} ${(a._fecha || "").slice(8)}/${(a._fecha || "").slice(5, 7)}</span>
-        <span class="arch-nombre">${esc(a.cliente_input || a.cliente || "Sin nombre")}</span>
-        <span class="arch-hora">${a.hora_entrega || "--:--"}</span>
-      </div>
-      <div class="arch-prods">${esc(prods) || "(sin productos)"}</div>
-      <div style="display:flex;gap:6px;margin-top:6px;">
-        <button onclick="restaurarArchivado('${a.id}')" style="font-family:'Outfit',sans-serif;font-size:.65rem;font-weight:500;padding:4px 10px;border:1.5px solid var(--green);border-radius:6px;background:transparent;color:var(--green);cursor:pointer;">↩ Restaurar</button>
-        <button onclick="eliminarArchivado('${a.id}')" style="font-family:'Outfit',sans-serif;font-size:.65rem;font-weight:500;padding:4px 10px;border:1.5px solid var(--border);border-radius:6px;background:transparent;color:var(--ink-light);cursor:pointer;">✕ Eliminar</button>
-      </div>
-    </div>`;
-  }).join("");
-}
-
-// Renderiza pestañas de navegación por días
+// ── NAVEGACIÓN POR DÍAS (legacy) ──
+// Renderiza pestañas de navegación por días en la vista de banner
 function renderDiasNav() {
   const nav = document.getElementById("dias-nav");
   if (!nav) return;
@@ -268,8 +245,7 @@ function renderDiasNav() {
     const dot = `<span class="dia-dot" style="background:${DIA_DOTS[dow]}"></span>`;
     btn.innerHTML = `<span class="dia-num">${d}</span>${dot}${DIAS_S[dow]} ${MESES[m - 1]}`;
     btn.onclick = () => {
-      diaActual = k;
-      _expandido = null;
+      setDiaActivo(k);
       const tabPedidos = document.querySelector(".tab");
       if (tabPedidos) showTab("pedidos", tabPedidos);
       renderDiasNav();
@@ -297,7 +273,7 @@ function agregarDia() {
   base.setDate(base.getDate() + 1);
   const nuevo = fechaKey(base);
   if (!datos.dias[nuevo]) datos.dias[nuevo] = { pedidos: [], ventas: [] };
-  diaActual = nuevo;
+  setDiaActivo(nuevo);
   guardar();
   renderDiasNav();
   renderAll();
@@ -319,6 +295,7 @@ function renderStats() {
     const cat = datos.catalogo.find(c => c.nombre === r.nombre);
     return !(cat && cat.tiene_talle);
   }).reduce((ss, r) => ss + (() => { const _n = Number(r.cantidad); return isNaN(_n) ? 1 : _n; })(), 0), 0);
+
   const elFcP = document.getElementById("fc-pedidos");
   if (elFcP) elFcP.textContent = fcPedidos;
   const elFcT = document.getElementById("fc-tortas");
@@ -372,7 +349,7 @@ function setFiltro(f, el) {
   filtro = f;
   document.querySelectorAll(".po-filter-row .po-chip").forEach(b => b.classList.remove("active"));
   if (el) el.classList.add("active");
-  renderDayTabs(); // ← actualiza contadores en tabs
+  renderDayTabs();
   renderPedidosTable();
 }
 
@@ -414,7 +391,7 @@ function setFiltroDiaKey(k) {
   renderPedidos();
 }
 
-// ── PEDIDOS ──
+// ── OBTENCIÓN DE PEDIDOS FILTRADOS ──
 // Retorna pedidos de un día aplicando filtros activos
 function getPedidosFiltradosDeDia(diaKey) {
   if (filtroDia !== "todos") {
@@ -444,17 +421,16 @@ function getPedidosFiltradosDeDia(diaKey) {
   if (filtro === "noRetirados") ps = ps.filter(p => p.estado !== "entregado");
   if (filtro === "cuba") ps = ps.filter(p => esCuba(p.cliente));
   if (filtro === "sinTacc") ps = ps.filter(p => (p.productos || []).some(r => r.tacc === "s"));
+  // "clientes" filtra todo lo que NO es Cuba (pedidos de clientes externos)
   if (filtro === "clientes") ps = ps.filter(p => !esCuba(p.cliente));
-  // Vista día específico: más nuevo arriba (por timestamp de carga)
-  // Vista "Todos": también por timestamp descendente dentro de cada día
- return sortPedidos(ps);
+  return sortPedidos(ps);
 }
 
 function getPedidosFiltrados() {
   return getPedidosFiltradosDeDia(diaActual);
 }
 
-// ── BANNER DE DÍA DIVISOR ──
+// ── BANNER DE DÍA DIVISOR (vista planilla legacy) ──
 function buildDiaBanner(diaKey) {
   const hoy = fechaKey(new Date());
   const [y, m, d] = diaKey.split("-").map(Number);
@@ -492,132 +468,6 @@ function buildDiaBanner(diaKey) {
     </div>
   `;
   return div;
-}
-
-// Renderiza la lista completa de pedidos (versión planilla)
-function renderPedidos() {
-  renderStats();
-  const wrap = document.getElementById("planilla-wrap");
-  const vacio = document.getElementById("vacio-pedidos");
-  wrap.innerHTML = "";
-
-  const hoy = fechaKey(new Date());
-  const diasKeys = Object.keys(datos.dias)
-    .filter(k => k >= hoy || k === diaActual)
-    .sort();
-
-  const q = (document.getElementById("buscador").value || "").toLowerCase().trim();
-  const hayFiltroActivo = filtro !== "todos" || q;
-  let diasAMostrar;
-  if (hayFiltroActivo) {
-    diasAMostrar = Object.keys(datos.dias).sort().filter(k => {
-      return getPedidosFiltradosDeDia(k).length > 0;
-    });
-  } else {
-    diasAMostrar = diasKeys;
-  }
-
-  if (!diasAMostrar.length) {
-    vacio.style.display = "";
-    wrap.style.display = "none";
-    return;
-  }
-  vacio.style.display = "none";
-  wrap.style.display = "";
-
-  let hayAlgo = false;
-  diasAMostrar.forEach(diaKey => {
-    const ps = getPedidosFiltradosDeDia(diaKey);
-    if (!hayFiltroActivo || ps.length > 0) {
-      wrap.appendChild(buildDiaBanner(diaKey));
-      hayAlgo = true;
-    }
-    if (ps.length === 0) {
-      if (!hayFiltroActivo) {
-        const empty = document.createElement("div");
-        empty.className = "planilla planilla-vacia";
-        empty.innerHTML = `<div class="vacio" style="padding:14px 12px;font-size:.78rem;">Sin pedidos para este día.</div>`;
-        wrap.appendChild(empty);
-      }
-      return;
-    }
-
-    const planilla = document.createElement("div");
-    planilla.className = "planilla";
-    planilla.dataset.diaKey = diaKey;
-
-    ps.forEach(p => {
-      const isCuba = esCuba(p.cliente);
-      const estado = p.estado || "pendiente";
-      const esEspecial = p.dia_especial || false;
-
-      const row = document.createElement("div");
-      let rowClass = "pedido-row";
-      if (isCuba) rowClass += " cuba";
-      if (estado === "entregado") rowClass += " retirado";
-      if (esEspecial) rowClass += " dia-especial-row";
-      row.className = rowClass;
-      row.dataset.id = p.id;
-
-      
-
-      const prodsHTML = (p.productos || []).map(r => {
-        const nom = r.tipo === "catalogo" ? r.nombre : r.libre;
-        const tam = r.tamano ? " · " + r.tamano : "";
-        const _cantN = Number(r.cantidad);
-        const cant = isNaN(_cantN) ? 1 : _cantN;
-        const pill = r.tacc === "s" ? '<span class="tacc-pill s">ST</span>' : '<span class="tacc-pill c">C</span>';
-        const cubaPedidoChk = r.tacc === "c"
-          ? `<div onclick="event.stopPropagation();toggleCubaPedido('${p.id}','${r.id}')" title="${r.pedido_cuba ? "Pedido a Cuba ✓" : "Pedir a Cuba"}" style="width:16px;height:16px;border-radius:50%;border:2px solid ${r.pedido_cuba ? "var(--accent)" : "var(--border)"};background:${r.pedido_cuba ? "var(--accent)" : "transparent"};display:flex;align-items:center;justify-content:center;font-size:8px;color:${r.pedido_cuba ? "#fff" : "transparent"};flex-shrink:0;cursor:pointer;transition:all .15s;">✓</div>`
-          : "";
-        const notaProdLine = r.nota_prod ? `<div style="font-size:.68rem;color:var(--ink-light);font-style:italic;padding-left:22px;margin-top:1px;">↳ ${esc(r.nota_prod)}</div>` : "";
-        return `<div class="row-prod-line">
-        <div style="width:14px;height:14px;border-radius:3px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;cursor:pointer;${r.listo ? "background:var(--green-mid);border-color:var(--green-mid);color:#fff;" : "color:transparent;"}" onclick="event.stopPropagation();toggleProdListo('${p.id}','${r.id}')">✓</div>
-        ${pill}<span style="${r.listo ? "color:var(--green-mid);font-weight:500;" : ""}">${r.listo ? "✓ " : ""}${esc(nom)}${tam} x${cant}</span>
-        ${cubaPedidoChk}
-      </div>${notaProdLine}`;
-      }).join("");
-
-      const estadoBadge = {
-        pendiente: '<span class="badge-estado pendiente">Pendiente</span>',
-        prod: '<span class="badge-estado prod">En prod.</span>',
-        listo: '<span class="badge-estado listo">Listo</span>',
-        entregado: '<span class="badge-estado entregado">Retirado</span>',
-      }[estado] || "";
-
-      const totalPedido = calcularTotalPedido(p);
-      const totalStr = totalPedido > 0 ? `<span style="font-size:.65rem;color:var(--green);font-weight:500;margin-left:4px;">$${totalPedido.toLocaleString("es-AR")}</span>` : "";
-      const notaIcon = p.notas ? '<span style="font-size:.75rem;color:var(--amber);margin-left:2px;" title="' + esc(p.notas) + '">📝</span>' : "";
-
-      row.innerHTML = `
-      <div class="row-top">
-        <div class="row-check${p.estado === "listo" || p.estado === "entregado" ? " on" : ""}" onclick="toggleListoPedido('${p.id}')">✓</div>
-        <div class="row-hora">${p.hora_entrega || "--:--"}${p.fuera_horario ? '<span title="Fuera de horario" style="font-size:.6rem;margin-left:2px;vertical-align:middle;">🌙</span>' : ""}</div>
-        <div class="row-nombre${isCuba ? " cuba" : ""}">
-          ${esEspecial ? '<span class="badge-especial">⚡</span> ' : ""}${(() => { const nombreMostrar = p.cliente_input || p.cliente || "Sin nombre"; const esFrecuente = !isCuba && datos.clientes.some(c => c.frecuente && c.nombre.toLowerCase() === (nombreMostrar).toLowerCase()); return (esFrecuente ? '<span style="font-size:.75rem;" title="Cliente frecuente">⭐</span> ' : "") + esc(nombreMostrar); })()}${totalStr}${notaIcon}
-        </div>
-        <div class="row-badges">${estadoBadge}${p.pagado ? '<span style="font-size:.7rem">💲</span>' : ""}</div>
-        ${estado !== "entregado"
-          ? `<div onclick="setEstado('${p.id}','entregado')" style="font-size:.58rem;font-weight:600;padding:3px 8px;border-radius:10px;border:1px solid var(--ink-light);color:var(--ink-light);background:transparent;cursor:pointer;flex-shrink:0;white-space:nowrap;">Retirado</div>`
-          : `<div onclick="setEstado('${p.id}','listo')" style="font-size:.58rem;font-weight:600;padding:3px 8px;border-radius:10px;border:1px solid var(--green);color:var(--green);background:var(--green-soft);cursor:pointer;flex-shrink:0;white-space:nowrap;">↩ Deshacer</div>`
-        }
-        <div onclick="abrirModalNP_edicion('${p.id}')" title="Ver pedido" style="font-size:1.1rem;color:var(--accent);margin-left:2px;font-weight:700;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--accent-soft);flex-shrink:0;cursor:pointer;">＋</div>
-      </div>
-      <div class="row-prods">${prodsHTML}</div>
-      ${p.creado ? `<div class="pedido-ts">cargado ${(() => { const d = new Date(p.creado); const h = String(d.getHours()).padStart(2, "0"); const m = String(d.getMinutes()).padStart(2, "0"); const dd = String(d.getDate()).padStart(2, "0"); const mm = String(d.getMonth() + 1).padStart(2, "0"); return dd + "/" + mm + " " + h + ":" + m; })()}</div>` : ""}
-    `;
-      planilla.appendChild(row);
-    });
-
-    wrap.appendChild(planilla);
-    
-  });
-
-  if (!hayAlgo) {
-    vacio.style.display = "";
-    wrap.style.display = "none";
-  }
- 
 }
 
 // Calcula el total monetario de un pedido
@@ -795,8 +645,8 @@ function setEstado(id, estado) {
   if (estado === "entregado") {
     const diaKey = _poGetDiaDePedido(id);
     const [y, m, d] = diaKey.split("-").map(Number);
-    const nomDia = _PO_DIAS_FULL[new Date(y, m - 1, d).getDay()];
-    // Fix: evitar duplicados si el pedido ya estaba archivado
+    const nomDia = DIAS_FULL[new Date(y, m - 1, d).getDay()];
+    // Verificar ANTES del push para evitar duplicados
     const yaArchivado = datos.archivados.some(a => a.id === id);
     if (!yaArchivado) {
       datos.archivados.push({
@@ -862,7 +712,7 @@ function confirmarEliminar(id) {
   }, "danger");
 }
 
-// ── ARCHIVAR ──
+// ── ARCHIVADOS ──
 function archivarRetirados() {
   const hoy = fechaKey(new Date());
   const diasVisibles = Object.keys(datos.dias).filter(k => k >= hoy || k === diaActual).sort();
@@ -904,11 +754,15 @@ function toggleArchivadosLista() {
 function toggleArchivadosGlobal() {
   const lista = document.getElementById("archivados-global-lista");
   lista.classList.toggle("open");
-  if (lista.classList.contains("open")) renderArchivadosGlobalContent();
+  if (lista.classList.contains("open")) renderArchivadosContent("archivados-global-lista", true);
 }
 
+// Renderiza contenido de archivados — unificada para uso local y global.
+// global=false → solo archivados del día actual
+// global=true  → todos los archivados (con botones Restaurar/Eliminar)
 function renderArchivadosContent(wrapperId, global) {
   const wrap = document.getElementById(wrapperId);
+  if (!wrap) return;
   const fuente = global ? datos.archivados : datos.archivados.filter(a => a._fecha === diaActual);
   if (!fuente.length) {
     wrap.innerHTML = '<div class="vacio" style="padding:14px;">Sin archivados.</div>';
@@ -918,21 +772,27 @@ function renderArchivadosContent(wrapperId, global) {
   wrap.innerHTML = ordenados.map(a => {
     const prods = (a.productos || []).map(r => {
       const nom = r.tipo === "catalogo" ? r.nombre : r.libre;
-      const _cantN = Number(r.cantidad);
-      const cant = isNaN(_cantN) ? 1 : _cantN;
+      const cant = Number(r.cantidad) || 1;
       return `${nom} x${cant}`;
     }).join(", ");
+    const botonesGlobal = global ? `
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <button onclick="restaurarArchivado('${a.id}')" style="font-family:'Outfit',sans-serif;font-size:.65rem;font-weight:500;padding:4px 10px;border:1.5px solid var(--green);border-radius:6px;background:transparent;color:var(--green);cursor:pointer;">↩ Restaurar</button>
+        <button onclick="eliminarArchivado('${a.id}')" style="font-family:'Outfit',sans-serif;font-size:.65rem;font-weight:500;padding:4px 10px;border:1.5px solid var(--border);border-radius:6px;background:transparent;color:var(--ink-light);cursor:pointer;">✕ Eliminar</button>
+      </div>` : "";
     return `<div class="arch-item">
       <div class="arch-item-top">
         ${global ? `<span class="arch-fecha">${a._nomDia || ""} ${(a._fecha || "").slice(8)}/${(a._fecha || "").slice(5, 7)}</span>` : ""}
-     <span class="arch-nombre">${esc(a.cliente_input || a.cliente || "Sin nombre")}</span>
+        <span class="arch-nombre">${esc(a.cliente_input || a.cliente || "Sin nombre")}</span>
         <span class="arch-hora">${a.hora_entrega || "--:--"}</span>
       </div>
       <div class="arch-prods">${esc(prods) || "(sin productos)"}</div>
+      ${botonesGlobal}
     </div>`;
   }).join("");
 }
 
+// Muestra/oculta la sección de archivados del día actual y actualiza su contador
 function renderArchivadosSeccion() {
   const delDia = datos.archivados.filter(a => a._fecha === diaActual);
   const sec = document.getElementById("archivados-section");
@@ -940,13 +800,14 @@ function renderArchivadosSeccion() {
   document.getElementById("archivados-count").textContent = delDia.length + " archivado(s)";
 }
 
-function renderArchivadosGlobal() {
+// Actualiza solo el contador global de archivados (no renderiza la lista)
+function actualizarContadorArchivadosGlobal() {
   const total = datos.archivados.length;
   const countEl = document.getElementById("archivados-global-count");
   if (countEl) countEl.textContent = total + " total";
 }
 
-// ── PENDIENTES DE DÍAS ANTERIORES ──
+// ── PEDIDOS PENDIENTES DE DÍAS ANTERIORES ──
 function chequearPendientesAyer() {
   const hoy = fechaKey(new Date());
   const diasPasados = Object.keys(datos.dias).filter(k => k < hoy);
@@ -992,7 +853,8 @@ function ajustarCantidad(pedidoId, rId, delta) {
   if (!p) return;
   const r = p.productos.find(x => x.id === rId);
   if (!r) return;
-  r.cantidad = Math.max(1, (() => { const _n = Number(r.cantidad); return isNaN(_n) ? 1 : _n; })() + delta);
+  const cantActual = Number(r.cantidad);
+  r.cantidad = Math.max(1, (isNaN(cantActual) ? 1 : cantActual) + delta);
   guardar();
   renderPedidos();
 }
@@ -1126,7 +988,7 @@ function buildProdEdit(pedidoId, r, idx) {
     </div>`;
   }
 
-let tamHTML = "";
+  let tamHTML = "";
   if (tieneTalle) {
     const libreActivo = r._tamLibre || (!!(r.tamano) && !TAMANIOS.includes(r.tamano));
     const tamBtns = TAMANIOS.map(t =>
@@ -1134,16 +996,15 @@ let tamHTML = "";
                onclick="setTamano('${pedidoId}','${r.id}','${t}')">${t}</button>`
     ).join("");
 
-    // Input de precio: solo visible cuando talle es Libre o producto es libre
-    const mostrarPrecioLibre = libreActivo || r.tipo === 'libre';
+    const mostrarPrecioLibre = libreActivo || r.tipo === "libre";
     const precioLibreHtml = mostrarPrecioLibre ? `
       <div class="np-prod-precio-libre">
         <label>Precio</label>
         <input type="number" class="np-precio-libre-input"
           placeholder="ej: 15000" min="0"
-          value="${r._precioLibre || ''}"
+          value="${r._precioLibre || ""}"
           oninput="setProdCampo('${pedidoId}','${r.id}','_precioLibre',parseFloat(this.value)||0);_npActualizarTotal()">
-      </div>` : '';
+      </div>` : "";
 
     tamHTML = `
       <div class="campo"><label>Tamaño</label>
@@ -1214,7 +1075,7 @@ function moverPedido(pedidoId, diaDestino) {
 }
 
 /* ══════════════════════════════════════
-   PEDIDOS — NUEVO DISEÑO BACK-OFFICE
+   PEDIDOS — BACK-OFFICE (TABLA)
    ══════════════════════════════════════ */
 
 // ── IDs ASCENDENTES ──
@@ -1229,28 +1090,25 @@ function asignarIds() {
 }
 
 // ── HELPERS ──
-const _PO_DIAS_S = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-const _PO_DIAS_FULL = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-const _PO_MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-
-function _poFechaKey(d) { return d.toISOString().slice(0, 10); }
+// Nota: se usan las constantes globales DIAS_S, DIAS_FULL, MESES y fechaKey()
+// que ya existen en el proyecto — no se duplican aquí.
 
 function _poDayTabLabel(k) {
   const [y, m, d] = k.split("-").map(Number);
   const dow = new Date(y, m - 1, d).getDay();
-  const hoy = _poFechaKey(new Date());
-  const man = _poFechaKey(new Date(Date.now() + 86400000));
-  if (k === hoy) return `HOY · ${_PO_DIAS_S[dow]} ${d}`;
-  if (k === man) return `MÑ · ${_PO_DIAS_S[dow]} ${d}`;
-  return `${_PO_DIAS_S[dow].toUpperCase()} ${d}`;
+  const hoy = fechaKey(new Date());
+  const man = fechaKey(new Date(Date.now() + 86400000));
+  if (k === hoy) return `HOY · ${DIAS_S[dow]} ${d}`;
+  if (k === man) return `MÑ · ${DIAS_S[dow]} ${d}`;
+  return `${DIAS_S[dow].toUpperCase()} ${d}`;
 }
 
 function _poDaySepLabel(k) {
   const [y, m, d] = k.split("-").map(Number);
   const dow = new Date(y, m - 1, d).getDay();
-  const hoy = _poFechaKey(new Date());
-  const tag = k === hoy ? " · HOY" : k === _poFechaKey(new Date(Date.now() + 86400000)) ? " · MAÑANA" : "";
-  return `${_PO_DIAS_FULL[dow].toUpperCase()} ${d} DE ${_PO_MESES[m - 1].toUpperCase()}${tag}`;
+  const hoy = fechaKey(new Date());
+  const tag = k === hoy ? " · HOY" : k === fechaKey(new Date(Date.now() + 86400000)) ? " · MAÑANA" : "";
+  return `${DIAS_FULL[dow].toUpperCase()} ${d} DE ${MESES[m - 1].toUpperCase()}${tag}`;
 }
 
 function _poFormatTs(ts) {
@@ -1262,12 +1120,13 @@ function _poFormatTs(ts) {
 function _poGetDiaDePedido(id) {
   return getFechaDePedido(id);
 }
-let _poTabDia = _poFechaKey(new Date());
+
+let _poTabDia = fechaKey(new Date());
 let _poExpandedId = null;
 let _vistaArchivados = false;
-
 let _poOrden = "creacion_desc";
 
+// ── ORDENAMIENTO ──
 function setOrden(v) {
   _poOrden = v;
   renderPedidosTable();
@@ -1281,8 +1140,6 @@ function sortPedidos(ps) {
         return (a.hora_entrega || "99:99").localeCompare(b.hora_entrega || "99:99");
       case "hora_entrega_desc":
         return (b.hora_entrega || "00:00").localeCompare(a.hora_entrega || "00:00");
-      case "entrega_asc":
-        return (a.hora_entrega || "99:99").localeCompare(b.hora_entrega || "99:99");
       case "total_desc":
         return calcularTotalPedido(b) - calcularTotalPedido(a);
       case "apellido": {
@@ -1298,6 +1155,8 @@ function sortPedidos(ps) {
     }
   });
 }
+
+// ── VISTA ARCHIVADOS ──
 function toggleVistaArchivados() {
   _vistaArchivados = !_vistaArchivados;
   const btn = document.getElementById("btn-ver-archivados");
@@ -1305,6 +1164,7 @@ function toggleVistaArchivados() {
   renderPedidosTable();
 }
 
+// Actualiza el contador de archivados en la tabla (columna de acciones)
 function actualizarContadorArchivados() {
   const el = document.getElementById("po-arch-cnt");
   if (el) el.textContent = datos.archivados.length;
@@ -1374,26 +1234,24 @@ function renderTablaArchivados(tbody) {
   tbody.innerHTML = html;
 }
 
-// ── RENDER DAY TABS ──
+// ── DAY TABS ──
 function renderDayTabs() {
   const bar = document.getElementById("po-day-tabs");
   if (!bar) return;
 
-  const hoy = _poFechaKey(new Date());
+  const hoy = fechaKey(new Date());
   const keys = Object.keys(datos.dias)
     .filter(k => k >= hoy || k === diaActual)
     .sort();
 
   bar.innerHTML = "";
 
-  // Actualizar el botón TODOS en topbar
   const totalTodos = keys.reduce((s, k) => s + (datos.dias[k]?.pedidos?.length || 0), 0);
   const btnTodosEl = document.getElementById("btn-todos-global");
   const todosCount = document.getElementById("po-todos-count");
   if (todosCount) todosCount.textContent = totalTodos;
   if (btnTodosEl) btnTodosEl.classList.toggle("active", _poTabDia === null);
 
-  // Scroll container (sin flechas, sin btnTodos)
   const scroll = document.createElement("div");
   scroll.className = "po-day-tabs-scroll";
 
@@ -1405,8 +1263,7 @@ function renderDayTabs() {
     btn.className = "po-day-tab" + (diaSemana ? " " + diaSemana : "") + (_poTabDia === k ? " active" : "");
     btn.innerHTML = `${_poDayTabLabel(k)} <span class="po-tab-count">${cnt}</span>`;
     btn.onclick = () => {
-      _poTabDia = k;
-      diaActual = k;
+      setDiaActivo(k);
       renderDayTabs();
       renderPedidosTable();
     };
@@ -1428,7 +1285,7 @@ function renderDayTabs() {
   }, 50);
 }
 
-// Nueva función para el botón TODOS de la topbar
+// Activa la vista "Todos los días" desde el botón de la topbar
 function setTabTodos() {
   _poTabDia = null;
   renderDayTabs();
@@ -1441,13 +1298,12 @@ function renderPedidosTable() {
   renderStats();
 
   const tbody = document.getElementById("pedidos-tbody");
-  if (!tbody) { renderPedidos(); return; }
+  if (!tbody) return;
 
   actualizarContadorArchivados();
   if (_vistaArchivados) { renderTablaArchivados(tbody); return; }
 
-  const hoy = _poFechaKey(new Date());
-  // Vista "Todos": días en orden ascendente (próximos primero); dentro de cada día, pedidos más nuevos arriba
+  const hoy = fechaKey(new Date());
   const diasAMostrar = _poTabDia !== null
     ? [_poTabDia]
     : Object.keys(datos.dias).filter(k => k >= hoy || k === diaActual).sort();
@@ -1459,13 +1315,10 @@ function renderPedidosTable() {
     : diasAMostrar;
 
   let html = "";
-  let totalPedidos = 0, totalTortas = 0, totalOtros = 0;
   const mostrarSep = _poTabDia === null;
 
   diasFinales.forEach(diaKey => {
     const ps = getPedidosFiltradosDeDia(diaKey);
-    const cntDia = datos.dias[diaKey]?.pedidos?.length || 0;
-
 
     if (!ps.length) {
       if (!hayFiltro) {
@@ -1474,8 +1327,17 @@ function renderPedidosTable() {
       return;
     }
 
+    if (mostrarSep) {
+      html += `<tr class="po-tr-day-sep"><td colspan="9">
+        <div class="po-day-sep-inner">
+          <span class="po-day-sep-label">${_poDaySepLabel(diaKey)}</span>
+          <span class="po-day-sep-line"></span>
+          <span class="po-day-sep-count">${ps.length} pedido${ps.length !== 1 ? "s" : ""}</span>
+        </div>
+      </td></tr>`;
+    }
+
     ps.forEach(p => {
-      totalPedidos++;
       const isCuba = esCuba(p.cliente);
       const estado = p.estado || "pendiente";
       const total = calcularTotalPedido(p);
@@ -1487,11 +1349,9 @@ function renderPedidosTable() {
         const nom = r.tipo === "catalogo" ? r.nombre : r.libre;
         const cant = Number(r.cantidad) || 1;
         const isST = r.tacc === "s";
-        const cat = datos.catalogo.find(c => c.nombre === r.nombre && c.tiene_talle);
-        if (cat) totalTortas += cant; else totalOtros += cant;
         return `<span class="po-prod-pill${isST ? " st" : ""}">${esc(nom)} ×${cant}</span>`;
       }).join("");
-      
+
       const estadoLabels = { pendiente: "Pendiente", listo: "Listo", entregado: "Retirado", suspendido: "Suspendido" };
       const notaIcon = p.notas ? `<span title="${esc(p.notas)}" style="font-size:.7rem;margin-left:3px;">📝</span>` : "";
       const pagadoBadge = p.pagado ? `<span class="po-pagado-badge">✓ PAGADO</span>` : "";
@@ -1521,9 +1381,9 @@ function renderPedidosTable() {
           <td onclick="event.stopPropagation()">
             <div class="po-row-actions">
               ${estado !== "entregado"
-          ? `<button class="po-btn-action ret" onclick="event.stopPropagation();setEstado('${p.id}','entregado')">Retirado</button>`
-          : `<button class="po-btn-action undo" onclick="event.stopPropagation();setEstado('${p.id}','listo')">↩ Deshacer</button>`
-        }
+                ? `<button class="po-btn-action ret" onclick="event.stopPropagation();setEstado('${p.id}','entregado')">Retirado</button>`
+                : `<button class="po-btn-action undo" onclick="event.stopPropagation();setEstado('${p.id}','listo')">↩ Deshacer</button>`
+              }
               <button class="po-btn-expand" onclick="event.stopPropagation();poToggleExpand('${p.id}')">
                 <span class="po-expand-arrow">▶</span>
               </button>
@@ -1531,19 +1391,16 @@ function renderPedidosTable() {
           </td>
         </tr>`;
 
-        const expProds = (p.productos || []).map(r => {
+      const expProds = (p.productos || []).map(r => {
         const nom = r.tipo === "catalogo" ? r.nombre : r.libre;
         const cant = Number(r.cantidad) || 1;
         const tam = r.tamano ? ` · ${r.tamano}` : "";
         const isST = r.tacc === "s";
-
-        // Círculo de "pedido a Cuba" (solo para productos comunes)
         const cubaPedidoChk = r.tacc === "c"
           ? `<div onclick="event.stopPropagation();toggleCubaPedido('${p.id}','${r.id}')"
                 title="${r.pedido_cuba ? "Pedido a Cuba ✓" : "Pedir a Cuba"}"
                 style="width:14px;height:14px;border-radius:50%;border:1.5px solid ${r.pedido_cuba ? "var(--accent)" : "var(--border)"};background:${r.pedido_cuba ? "var(--amber)" : "transparent"};display:flex;align-items:center;justify-content:center;font-size:7px;color:${r.pedido_cuba ? "#fff" : "transparent"};flex-shrink:0;cursor:pointer;transition:all .15s;">✓</div>`
           : "";
-
         return `
           <div>
             <div class="po-exp-prod-row">
@@ -1559,7 +1416,7 @@ function renderPedidosTable() {
 
       const diaDePedido = _poGetDiaDePedido(p.id);
 
-     html += `
+      html += `
         <tr class="po-tr-expanded${isExp ? " open" : ""}" data-expanded-id="${p.id}">
           <td class="po-expanded-cell" colspan="9">
             <div class="po-expanded-inner">
@@ -1579,7 +1436,6 @@ function renderPedidosTable() {
               <!-- 3: info (fecha/hora/pago/estado/botones) -->
               <div class="po-exp-right">
 
-                <!-- Día + hora -->
                 <div class="po-exp-info-row">
                   <span class="po-exp-info-label">📅</span>
                   <span class="po-exp-info-val">${_poDaySepLabel(diaDePedido)}</span>
@@ -1589,7 +1445,6 @@ function renderPedidosTable() {
                   <span class="po-exp-info-val">${esc(p.hora_entrega)}</span>
                 </div>` : ""}
 
-                <!-- Total + pago -->
                 ${total > 0 ? `<div class="po-exp-total-row">
                   <span class="po-exp-total-num">$${total.toLocaleString("es-AR")}</span>
                   ${p.pagado
@@ -1604,7 +1459,6 @@ function renderPedidosTable() {
                   </div>` : ""}
                 </div>` : ""}
 
-                <!-- Estado -->
                 <div class="po-exp-estado-wrap">
                   <select class="po-exp-estado-select po-exp-estado-${estado}"
                     onchange="event.stopPropagation();setEstado('${p.id}',this.value)"
@@ -1616,23 +1470,20 @@ function renderPedidosTable() {
                   </select>
                 </div>
 
-                <!-- Nota -->
                 ${p.notas ? `<div class="po-exp-nota-pill">📝 ${esc(p.notas)}</div>` : ""}
 
-                <!-- Botones -->
                 <div class="po-exp-actions">
                   <button class="po-btn-exp primary" onclick="event.stopPropagation();abrirModalNP_edicion('${p.id}')">✏️ Editar</button>
                   <button class="po-btn-exp danger"  onclick="event.stopPropagation();confirmarEliminar('${p.id}')">🗑 Eliminar</button>
                 </div>
 
-                <!-- Watermark -->
                 <div class="po-exp-watermark">
                   #${p._pid || "—"} · ${p.creado ? _poFormatTs(p.creado) : "sin fecha"}${p._creadoPor ? ` · ${esc(p._creadoPor)}` : ""}
                 </div>
 
               </div>
 
-              <!-- 4: fila final mobile: total | badge estado | [Retirado] [ver menos] -->
+              <!-- 4: fila final mobile -->
               <div class="po-exp-bottom-row">
                 <span class="po-td-total">${totalStr}</span>
                 <span class="po-estado-badge ${estado}">${estadoLabels[estado] || estado}</span>
@@ -1661,20 +1512,19 @@ function poToggleExpand(id) {
   renderPedidosTable();
 }
 
-// ── OVERRIDE renderPedidos ──
-// Reemplaza la función original con la versión de la tabla nueva (back-office)
-renderPedidos = function () {
+// ── PUNTO DE ENTRADA PRINCIPAL ──
+// Refresca tabs de días + tabla. Es la función que el resto del código llama como "renderPedidos".
+function renderPedidos() {
   renderDayTabs();
   renderPedidosTable();
-};
+}
 
 // ── INIT ──
 function initPedidosBO() {
   asignarIds();
-  const hoy = _poFechaKey(new Date());
+  const hoy = fechaKey(new Date());
   if (datos.dias[hoy]) {
-    _poTabDia = hoy;
-    diaActual = hoy;
+    setDiaActivo(hoy);
   }
   renderDayTabs();
   renderPedidosTable();

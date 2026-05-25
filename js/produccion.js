@@ -107,12 +107,19 @@ function _prodEsHecho(pedidoId, prodId) {
    ══════════════════════════════════════ */
 
 function _prodBuildMap() {
-  // Reglas:
+  // Reglas día NORMAL:
   // - Pedidos de HOY → siempre en hoy (nunca se adelantan)
   //   · si hora <= corte → flag esHoyAnteCorte=true para warning visual
   // - Pedidos futuros con hora <= corte y día anterior abierto → día anterior
   //   · excepción: martes nunca se adelanta, tiene warning propio en sáb/dom
   // - Pedidos futuros con hora > corte, o día anterior cerrado → su propio día
+  //
+  // Reglas día ESPECIAL (dData.especial === true):
+  // - Tanda 1: pedidos de clientes del mismo día + pedidos de Cuba con hora <= corteHora
+  //   → se producen el día anterior (o hoy si es hoy), con flag tanda=1
+  // - Tanda 2: pedidos del día siguiente hasta las 14hs + pedidos de Cuba con hora > corteHora
+  //   → se producen en su propio día, con flag tanda=2
+  //
   // - Productos con r.listo=true → no aparecen
   const hoyKey = _prodFechaKey(new Date());
   const map = new Map();
@@ -126,6 +133,10 @@ function _prodBuildMap() {
     const [y, m, d] = diaEntregaKey.split("-").map(Number);
     const dowEntrega = new Date(y, m - 1, d).getDay();
     const esHoy = diaEntregaKey === hoyKey;
+    const especial = dData.especial || false;
+    const corteEspecialStr = dData.corteHora || "15:00";
+    const [ceH, ceM] = corteEspecialStr.split(":").map(Number);
+    const corteEspecialMin = ceH * 60 + ceM;
 
     (dData.pedidos || []).forEach(p => {
       if (p.estado === "entregado" || p.estado === "listo") return;
@@ -133,32 +144,81 @@ function _prodBuildMap() {
         if (r.tacc !== "s") return;
         if (r.listo) return;
 
-        const [hh, mm] = p.hora_entrega.split(":").map(Number);
+        // Protección contra hora_entrega nula o mal formada
+        const horaRaw = p.hora_entrega || "00:00";
+        const partes = horaRaw.split(":");
+        const hh = parseInt(partes[0]) || 0;
+        const mm = parseInt(partes[1]) || 0;
         const horaMin = hh * 60 + mm;
         const corte   = _prodCorteMin(diaEntregaKey);
 
-        if (esHoy) {
-          // Pedidos de hoy: siempre en hoy, con flag si es antes del corte
-          _addItem(hoyKey, {
-            pedido: p, producto: r, diaEntrega: diaEntregaKey,
-            esHoyAnteCorte: horaMin <= corte,
-          });
-        } else if (horaMin <= corte && dowEntrega !== 2) {
-          // Futuro antes del corte y no es martes → intenta adelantar
-          const f = new Date(y, m - 1, d);
-          f.setDate(f.getDate() - 1);
-          const diaAnteriorKey = _prodFechaKey(f);
-          const dowAnterior = f.getDay();
+        if (especial) {
+          // ── MODO DÍA ESPECIAL ──
+          // Tanda 1: pedidos del MISMO día (cliente) o Cuba hasta el corte especial
+          // → van al día anterior (o hoy si ya es hoy), marcados tanda=1
+          // Tanda 2: pedidos de clientes del día siguiente hasta las 14hs,
+          //          o Cuba después del corte especial → van en su propio día, tanda=2
 
-          if (_prodDiaAbierto(dowAnterior)) {
-            _addItem(diaAnteriorKey, { pedido: p, producto: r, diaEntrega: diaEntregaKey });
+          const esCubaP = esCuba(p.cliente);
+
+          if (esCubaP) {
+            // Cuba se divide por corteEspecial: <= corte → tanda 1, > corte → tanda 2
+            if (horaMin <= corteEspecialMin) {
+              // Tanda 1: producir antes del corte → va al día anterior
+              if (esHoy) {
+                _addItem(hoyKey, { pedido: p, producto: r, diaEntrega: diaEntregaKey, tanda: 1, esHoyAnteCorte: true });
+              } else {
+                const prev = new Date(y, m - 1, d);
+                prev.setDate(prev.getDate() - 1);
+                const prevKey = _prodFechaKey(prev);
+                _addItem(_prodDiaAbierto(prev.getDay()) ? prevKey : diaEntregaKey,
+                  { pedido: p, producto: r, diaEntrega: diaEntregaKey, tanda: 1 });
+              }
+            } else {
+              // Tanda 2: producir después del corte → queda en su propio día
+              _addItem(diaEntregaKey, { pedido: p, producto: r, diaEntrega: diaEntregaKey, tanda: 2 });
+            }
           } else {
-            // Día anterior cerrado (ej: lunes) → queda en su propio día
+            // Clientes normales en día especial → siempre tanda 1 (producir antes del corte)
+            if (esHoy) {
+              _addItem(hoyKey, { pedido: p, producto: r, diaEntrega: diaEntregaKey, tanda: 1, esHoyAnteCorte: horaMin <= corte });
+            } else {
+              const prev = new Date(y, m - 1, d);
+              prev.setDate(prev.getDate() - 1);
+              const prevKey = _prodFechaKey(prev);
+              _addItem(_prodDiaAbierto(prev.getDay()) ? prevKey : diaEntregaKey,
+                { pedido: p, producto: r, diaEntrega: diaEntregaKey, tanda: 1 });
+            }
+          }
+
+        } else {
+          // ── MODO NORMAL ──
+          if (esHoy) {
+            // Pedidos de hoy: siempre en hoy, con flag si es antes del corte
+            _addItem(hoyKey, {
+              pedido: p, producto: r, diaEntrega: diaEntregaKey,
+              esHoyAnteCorte: horaMin <= corte,
+            });
+          } else if (horaMin <= corte && dowEntrega !== 2) {
+            // Futuro antes del corte y no es martes → intenta adelantar al día anterior
+            const f = new Date(y, m - 1, d);
+            f.setDate(f.getDate() - 1);
+            const diaAnteriorKey = _prodFechaKey(f);
+            const dowAnterior = f.getDay();
+
+            if (_prodDiaAbierto(dowAnterior)) {
+              // Si el día anterior es especial, este pedido va a Tanda 2
+              const dDataAnterior = datos.dias[diaAnteriorKey] || {};
+              const tandaAnterior = dDataAnterior.especial ? 2 : undefined;
+              _addItem(diaAnteriorKey, { pedido: p, producto: r, diaEntrega: diaEntregaKey, tanda: tandaAnterior });
+            } else {
+              // Día anterior cerrado (ej: lunes) → queda en su propio día
+              _addItem(diaEntregaKey, { pedido: p, producto: r, diaEntrega: diaEntregaKey });
+            }
+          } else {
+            // Hora > corte, o es martes → queda en su propio día
             _addItem(diaEntregaKey, { pedido: p, producto: r, diaEntrega: diaEntregaKey });
           }
-        } else {
-          // Hora > corte, o es martes → queda en su propio día
-          _addItem(diaEntregaKey, { pedido: p, producto: r, diaEntrega: diaEntregaKey });
         }
       });
     });
@@ -614,6 +674,56 @@ function _buildProdDia(diaKey, items) {
   const corteStr = ((datos.cortePedidosHoy || {})[datos.localId || "matienzo"]) || "14:00";
   let warningHTML = "";
 
+  // Detectar si alguno de los ítems de este día tiene día especial activo
+  // (los items de tanda=1 vienen del día siguiente que es especial, o del propio día si es hoy)
+  const tieneTandas = items.some(x => x.tanda === 1 || x.tanda === 2);
+
+  if (tieneTandas) {
+    // ── MODO DÍA ESPECIAL: mostrar en dos tandas ──
+    const itemsTanda1 = items.filter(x => x.tanda === 1 || x.tanda === undefined && !items.some(i => i.tanda));
+    const itemsTanda2 = items.filter(x => x.tanda === 2);
+
+    // Obtener el corteHora del día especial
+    // Los items de tanda 1 vienen de un diaEntrega que puede ser el siguiente
+    let corteEspecialStr = "15:00";
+    const diaEntregaEjemplo = itemsTanda1[0]?.diaEntrega || itemsTanda2[0]?.diaEntrega || diaKey;
+    const dDataEj = datos.dias[diaEntregaEjemplo] || {};
+    if (dDataEj.especial && dDataEj.corteHora) corteEspecialStr = dDataEj.corteHora;
+    // También checar el día siguiente si los items son del propio día
+    if (corteEspecialStr === "15:00") {
+      // buscar cualquier diaEntrega con especial
+      const diaEsp = [...new Set(items.map(x => x.diaEntrega))].find(k => (datos.dias[k] || {}).especial);
+      if (diaEsp) corteEspecialStr = datos.dias[diaEsp].corteHora || "15:00";
+    }
+
+    let html = `<div class="prod-dia-wrap">`;
+
+    if (itemsTanda1.length) {
+      html += `<div class="prod-tanda-header prod-tanda-1">
+        <span class="prod-tanda-ico">🟠</span>
+        <span class="prod-tanda-titulo">Tanda 1 &mdash; Clientes del d&iacute;a + Cuba hasta las ${esc(corteEspecialStr)}</span>
+      </div>`;
+      html += _buildCatHTML(_prodAgrupar(itemsTanda1), diaKey + "-t1", "dia", diaKey);
+    }
+
+    if (itemsTanda2.length) {
+      html += `<div class="prod-tanda-header prod-tanda-2" style="margin-top:18px;">
+        <span class="prod-tanda-ico">🔵</span>
+        <span class="prod-tanda-titulo">Tanda 2 &mdash; Pedidos del d&iacute;a siguiente hasta las 14hs + Cuba despu&eacute;s de las ${esc(corteEspecialStr)}</span>
+      </div>`;
+      html += _buildCatHTML(_prodAgrupar(itemsTanda2), diaKey + "-t2", "dia", diaKey);
+    }
+
+    if (!itemsTanda1.length && !itemsTanda2.length) {
+      html += `<div class="vacio" style="padding:24px 0;">Sin producci&oacute;n para este d&iacute;a.</div>`;
+    }
+
+    html += `</div>`;
+    return html;
+  }
+
+  // ── MODO NORMAL ──
+
   // ── Warning 1: pedidos de HOY antes del corte ──
   const hoyKey = _prodFechaKey(new Date());
   if (diaKey === hoyKey) {
@@ -624,7 +734,7 @@ function _buildProdDia(diaKey, items) {
         const tam     = producto.tamano ? ` ${producto.tamano}` : "";
         const cliente = pedido.cliente_input || pedido.cliente || "Sin nombre";
         return `<div class="prod-warning-martes-fila">
-          <span class="prod-warning-martes-hora">&#128336; ${esc(pedido.hora_entrega)}</span>
+          <span class="prod-warning-martes-hora">&#128336; ${esc(pedido.hora_entrega || "--:--")}</span>
           <span class="prod-warning-martes-prod">${esc(nom)}${esc(tam)}</span>
           <span class="prod-warning-martes-cli">${esc(cliente)}</span>
         </div>`;
@@ -645,7 +755,7 @@ function _buildProdDia(diaKey, items) {
         const tam     = producto.tamano ? ` ${producto.tamano}` : "";
         const cliente = pedido.cliente_input || pedido.cliente || "Sin nombre";
         return `<div class="prod-warning-martes-fila">
-          <span class="prod-warning-martes-hora">&#128336; ${esc(pedido.hora_entrega)}</span>
+          <span class="prod-warning-martes-hora">&#128336; ${esc(pedido.hora_entrega || "--:--")}</span>
           <span class="prod-warning-martes-prod">${esc(nom)}${esc(tam)}</span>
           <span class="prod-warning-martes-cli">${esc(cliente)}</span>
         </div>`;
@@ -1135,3 +1245,39 @@ function exportarResumenXLSX() {
   XLSX.utils.book_append_sheet(wbOut, ws, "Producción");
   XLSX.writeFile(wbOut, `produccion_${hoyKey.replace(/-/g,"")}.xlsx`);
 }
+
+/* ══════════════════════════════════════
+   ESTILOS INLINE para headers de tanda (día especial)
+   Se inyectan una sola vez en el <head>
+   ══════════════════════════════════════ */
+(function() {
+  if (document.getElementById("prod-tanda-styles")) return;
+  const s = document.createElement("style");
+  s.id = "prod-tanda-styles";
+  s.textContent = `
+    .prod-tanda-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm, 8px);
+      margin-bottom: 10px;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+    }
+    .prod-tanda-1 {
+      background: color-mix(in srgb, var(--amber, #f59e0b) 12%, transparent);
+      border: 1.5px solid var(--amber, #f59e0b);
+      color: var(--amber, #b45309);
+    }
+    .prod-tanda-2 {
+      background: color-mix(in srgb, #2563eb 10%, transparent);
+      border: 1.5px solid #2563eb;
+      color: #1d4ed8;
+    }
+    .prod-tanda-ico { font-size: 1rem; }
+    .prod-tanda-titulo { flex: 1; }
+  `;
+  document.head.appendChild(s);
+})();

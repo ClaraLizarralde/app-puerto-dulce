@@ -484,6 +484,7 @@ function renderCfgLocal() {
     renderEstadoLocal();
   }
   renderBotonesLocales("cfg-locales-lista", setLocal);
+  renderCfgDiaEspecial();
   renderHorariosEditor();
 }
 
@@ -618,3 +619,132 @@ function mostrarToastHorario() {
 
 // Hook para renderizar panel Local cuando se abre la subtab
 const _showCfgTabOrig = showCfgTab;
+// ── DÍAS MOVIDOS (panel configuración multi-día) ──
+
+const _DIAS_S_CFG = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+const _DIAS_FULL_CFG = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+const _MESES_CFG = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+
+function _cfgLabelDia(diaKey) {
+  const hoyKey = fechaKey(new Date());
+  const [y, m, d] = diaKey.split("-").map(Number);
+  const dow = new Date(y, m - 1, d).getDay();
+  const base = `${_DIAS_S_CFG[dow]} ${d} ${_MESES_CFG[m - 1]}`;
+  if (diaKey === hoyKey) return `${base} <span class="cfg-dm-hoy-badge">HOY</span>`;
+  return base;
+}
+
+// Activa/desactiva día movido para un diaKey específico (sin tocar diaActual)
+function toggleDiaMovido(diaKey) {
+  if (!datos.dias[diaKey]) return;
+  const dd = datos.dias[diaKey];
+  dd.especial = !dd.especial;
+  if (dd.especial && !dd.corteHora) dd.corteHora = "15:00";
+  guardar();
+  renderCfgDiaEspecial();
+  // Refrescar producción si está visible
+  const prodTab = document.getElementById("tab-produccion");
+  if (prodTab && prodTab.classList.contains("active")) renderProduccion();
+  renderCuba();
+  renderDiaBanner();
+}
+
+// Actualiza un campo del día movido sin cambiar diaActual
+function setDiaMovidoCampo(diaKey, campo, valor) {
+  if (!datos.dias[diaKey]) return;
+  datos.dias[diaKey][campo] = valor;
+  guardar();
+  renderCfgDiaEspecial();
+  const prodTab = document.getElementById("tab-produccion");
+  if (prodTab && prodTab.classList.contains("active")) renderProduccion();
+  renderCuba();
+}
+
+// Renderiza el panel multi-día de días movidos en configuración local
+function renderCfgDiaEspecial() {
+  const wrap = document.getElementById("cfg-dia-especial-panel");
+  if (!wrap) return;
+
+  const hoyKey = fechaKey(new Date());
+
+  // Solo días presentes o futuros que existan en datos.dias
+  const diasDisp = Object.keys(datos.dias)
+    .filter(k => k >= hoyKey)
+    .sort();
+
+  // Explicación de tandas (solo se muestra una vez arriba)
+  const explicacion = `
+    <div class="cfg-dm-explicacion">
+      <div class="cfg-dm-exp-item"><span>🟠</span><span><strong>Tanda 1:</strong> pedidos de clientes del mismo día + Cuba hasta el horario de corte.</span></div>
+      <div class="cfg-dm-exp-item"><span>🔵</span><span><strong>Tanda 2:</strong> pedidos del día siguiente hasta las 14hs + Cuba después del corte.</span></div>
+    </div>`;
+
+  // Filas de días
+  const filasHTML = diasDisp.map(diaKey => {
+    const dd = datos.dias[diaKey] || {};
+    const on = dd.especial || false;
+    const corte = dd.corteHora || "15:00";
+    const nombre = dd.nombreEspecial || "";
+    const labelDia = _cfgLabelDia(diaKey);
+
+    return `
+      <div class="cfg-dm-fila${on ? " on" : ""}">
+        <div class="cfg-dm-fila-top">
+          <div class="cfg-dm-fila-label">${labelDia}</div>
+          <label class="cfg-dm-toggle" title="${on ? "Desactivar" : "Activar"} día movido">
+            <input type="checkbox" ${on ? "checked" : ""}
+              onchange="toggleDiaMovido('${diaKey}')">
+            <span class="cfg-dm-toggle-track">
+              <span class="cfg-dm-toggle-thumb"></span>
+            </span>
+          </label>
+        </div>
+        ${on ? `
+        <div class="cfg-dm-fila-campos">
+          <div class="cfg-dm-campo-row">
+            <label class="cfg-dm-campo-lbl">Nombre</label>
+            <input class="cfg-dm-campo-inp" type="text"
+              value="${esc(nombre)}"
+              placeholder="Día de la madre…"
+              onchange="setDiaMovidoCampo('${diaKey}','nombreEspecial',this.value)">
+          </div>
+          <div class="cfg-dm-campo-row">
+            <label class="cfg-dm-campo-lbl">Corte</label>
+            <input class="cfg-dm-campo-inp cfg-dm-campo-time" type="time"
+              value="${esc(corte)}"
+              onchange="setDiaMovidoCampo('${diaKey}','corteHora',this.value)">
+            <span class="cfg-dm-campo-hint">divide las tandas</span>
+          </div>
+          <div class="cfg-dm-preview-tandas">
+            <span class="cfg-desp-tanda-badge tanda-badge-1">🟠 hasta ${esc(corte)}</span>
+            <span class="cfg-dm-arrow">→</span>
+            <span class="cfg-desp-tanda-badge tanda-badge-2">🔵 después de ${esc(corte)}</span>
+          </div>
+        </div>` : ""}
+      </div>`;
+  }).join("");
+
+  const sinDias = !diasDisp.length
+    ? `<div class="cfg-dm-vacio">No hay días cargados aún. Agregá días en la pestaña <strong>Pedidos</strong> primero.</div>`
+    : "";
+
+  wrap.innerHTML = `
+    <div class="cfg-desp-wrap">
+      <div class="cfg-desp-header">
+        <span class="cfg-desp-ico">⚡</span>
+        <div style="flex:1;">
+          <div class="cfg-desp-titulo">Días movidos</div>
+          <div class="cfg-desp-sub">Activá los días que tienen producción en dos tandas.</div>
+        </div>
+        ${diasDisp.filter(k => (datos.dias[k] || {}).especial).length > 0
+          ? `<div class="cfg-desp-estado on"><span class="cfg-desp-estado-dot"></span>${diasDisp.filter(k => (datos.dias[k]||{}).especial).length} activo${diasDisp.filter(k=>(datos.dias[k]||{}).especial).length>1?"s":""}</div>`
+          : `<div class="cfg-desp-estado off"><span class="cfg-desp-estado-dot"></span>Ninguno</div>`
+        }
+      </div>
+      ${explicacion}
+      <div class="cfg-dm-lista">
+        ${sinDias}
+        ${filasHTML}
+      </div>
+    </div>`;
+}
