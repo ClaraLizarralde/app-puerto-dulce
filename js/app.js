@@ -227,11 +227,10 @@ function initFiltroToggleMobile() {
 document.addEventListener("DOMContentLoaded", () => {
   initMobileUsuarioEnHam();
   actualizarUIUsuario();
-  initFiltroToggleMobile();
 });
 
 // Re-evalúa componentes mobile al rotar el dispositivo o redimensionar la ventana
 window.addEventListener("resize", () => {
   initMobileUsuarioEnHam();
-  initFiltroToggleMobile();
+
 });

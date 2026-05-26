@@ -612,7 +612,7 @@ body {
     border-top-color: var(--accent);
     background: transparent;
   }
-  .tab .tab-icon { margin-bottom: 3px; }
+.tab .tab-icon { margin-bottom: 3px; width: 1.5rem; height: 1.5rem; }
 
   .header { display: flex; }
   .btn-usuario        { display: none !important; }
