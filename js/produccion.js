@@ -1246,38 +1246,3 @@ function exportarResumenXLSX() {
   XLSX.writeFile(wbOut, `produccion_${hoyKey.replace(/-/g,"")}.xlsx`);
 }
 
-/* ══════════════════════════════════════
-   ESTILOS INLINE para headers de tanda (día especial)
-   Se inyectan una sola vez en el <head>
-   ══════════════════════════════════════ */
-(function() {
-  if (document.getElementById("prod-tanda-styles")) return;
-  const s = document.createElement("style");
-  s.id = "prod-tanda-styles";
-  s.textContent = `
-    .prod-tanda-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: var(--radius-sm, 8px);
-      margin-bottom: 10px;
-      font-size: .78rem;
-      font-weight: 700;
-      letter-spacing: .03em;
-    }
-    .prod-tanda-1 {
-      background: color-mix(in srgb, var(--amber, #f59e0b) 12%, transparent);
-      border: 1.5px solid var(--amber, #f59e0b);
-      color: var(--amber, #b45309);
-    }
-    .prod-tanda-2 {
-      background: color-mix(in srgb, #2563eb 10%, transparent);
-      border: 1.5px solid #2563eb;
-      color: #1d4ed8;
-    }
-    .prod-tanda-ico { font-size: 1rem; }
-    .prod-tanda-titulo { flex: 1; }
-  `;
-  document.head.appendChild(s);
-})();

@@ -36,7 +36,7 @@
  *
  * === RENDER DE PEDIDOS (VISTA PLANILLA LEGACY) ===
  * - buildDiaBanner(diaKey)            → Construye banner separador de día en la planilla
- * - calcularTotalPedido(p)            → Calcula el total monetario de un pedido
+ * - totalDePedido(p)            → Calcula el total monetario de un pedido
  * - buildPanel(p)                     → Construye panel de edición de pedido (vista expandida)
  *
  * === AUTOCOMPLETADO CLIENTE EN PANEL ===
@@ -470,10 +470,6 @@ function buildDiaBanner(diaKey) {
   return div;
 }
 
-// Calcula el total monetario de un pedido
-function calcularTotalPedido(p) {
-  return totalDePedido(p);
-}
 
 // Construye panel de edición de pedido (vista expandida)
 function buildPanel(p) {
@@ -489,7 +485,7 @@ function buildPanel(p) {
   const dd = diaData();
   const especial = dd.especial || false;
   const corte = dd.corteHora || "15:00";
-  const totalPedido = calcularTotalPedido(p);
+  const totalPedido = totalDePedido(p);
   const esEspecialPedido = p.dia_especial || false;
 
   return `
@@ -1141,7 +1137,7 @@ function sortPedidos(ps) {
       case "hora_entrega_desc":
         return (b.hora_entrega || "00:00").localeCompare(a.hora_entrega || "00:00");
       case "total_desc":
-        return calcularTotalPedido(b) - calcularTotalPedido(a);
+        return totalDePedido(b) - totalDePedido(a);
       case "apellido": {
         const na = (a.cliente_input || a.cliente || "").split(" ").pop();
         const nb = (b.cliente_input || b.cliente || "").split(" ").pop();
@@ -1205,7 +1201,7 @@ function renderTablaArchivados(tbody) {
         const isST = r.tacc === "s";
         return `<span class="po-prod-pill${isST ? " st" : ""}">${esc(nom)} ×${cant}</span>`;
       }).join("");
-      const total = calcularTotalPedido(a);
+      const total = totalDePedido(a);
       const totalStr = total > 0 ? `$${total.toLocaleString("es-AR")}` : "—";
 
       html += `
@@ -1340,7 +1336,7 @@ function renderPedidosTable() {
     ps.forEach(p => {
       const isCuba = esCuba(p.cliente);
       const estado = p.estado || "pendiente";
-      const total = calcularTotalPedido(p);
+      const total = totalDePedido(p);
       const totalStr = total > 0 ? `$${total.toLocaleString("es-AR")}` : "—";
       const isExp = _poExpandedId === p.id;
       const nombre = p.cliente_input || p.cliente || "Sin nombre";
@@ -1502,7 +1498,10 @@ function renderPedidosTable() {
     });
   });
 
-  tbody.innerHTML = html || `<tr class="po-empty-row"><td colspan="9">No hay pedidos.</td></tr>`;
+const msgVacio = filtro !== "todos"
+  ? `No hay pedidos con el filtro activo.`
+  : `No hay pedidos.`;
+tbody.innerHTML = html || `<tr class="po-empty-row"><td colspan="9">${msgVacio}</td></tr>`;
   renderArchivadosSeccion();
 }
 

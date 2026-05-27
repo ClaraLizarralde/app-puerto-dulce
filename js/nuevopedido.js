@@ -57,7 +57,7 @@
  * - npEliminarExtra(rId, ei)     → Elimina extra de producto
  * - npSetExtraDesc(rId, ei, val) → Setea descripción de extra
  * - npSetExtraPrecio(rId, ei, val) → Setea precio de extra
- * - calcTotalPedido(pedido)      → Calcula total del pedido
+ * - totalDePedido(pedido)      → Calcula total del pedido
  * - npRenderTotal()              → Muestra total y efectivo sugerido
  * 
  * === ESTADO / PAGO / NOTA ===
@@ -1108,12 +1108,11 @@ function npSetExtraPrecio(rId, ei, val) {
   npRenderTotal();
 }
 
-function calcTotalPedido(pedido) { return totalDePedido(pedido); }
 
 function npRenderTotal() {
   const wrap = document.getElementById('np-total-wrap');
   if (!wrap) return;
-  const total = calcTotalPedido(_npPedido);
+  const total = totalDePedido(_npPedido);
   if (!total) { wrap.style.display = 'none'; return; }
   wrap.style.display = '';
   const efectivo = Math.round(total * 0.9);
@@ -2679,7 +2678,7 @@ function guardarEdicion() {
   }
   _edPedido.productos.forEach(r => { delete r._tamLibre; });
   guardarPedido(_edPedido);
-  mostrarToastGuardado();
+mostrarToastGuardado("✅ Cambios guardados");
   cerrarModalEdicion();
   renderPedidos();
   const prodTab = document.getElementById("tab-produccion");

@@ -16,6 +16,7 @@
  * 
  * === INICIALIZACIÓN ===
  * - renderDiasNav(), renderAll(), renderCatalogo(), renderArchivadosGlobal()
+ *
  * 
  * === UI DE USUARIO ===
  * - actualizarUIUsuario()         → Actualiza nombre y rol del usuario en toda la UI
@@ -86,9 +87,9 @@ window.addEventListener("beforeunload", e => {
 // (listener de click consolidado más abajo, junto al cierre del menú de usuario)
 
 // Actualiza el estado del local cada minuto (guard: evita error si pedidos.js no cargó)
-if (typeof renderEstadoLocal === "function") {
+document.addEventListener("DOMContentLoaded", () => {
   setInterval(renderEstadoLocal, 60000);
-}
+});
 
 // Inicializaciones principales
 renderDiasNav();
@@ -186,7 +187,7 @@ function initMobileUsuarioEnHam() {
            A17.933 17.933 0 0 1 12 21.75
            c-2.676 0-5.216-.584-7.499-1.632Z"/>
     </svg>
-    <span class="usuario-nombre">—</span>`;
+    <span class="usuario-nombre" id="ham-usuario-nombre">—</span>`;
   btn.onclick = () => {
     cerrarMenuHamburguesa();
     toggleUsuarioMenu("btn-usuario-header");
@@ -226,6 +227,7 @@ function initFiltroToggleMobile() {
 // Inicializa componentes al cargar la página
 document.addEventListener("DOMContentLoaded", () => {
   initMobileUsuarioEnHam();
+  initFiltroToggleMobile();
   actualizarUIUsuario();
 });
 

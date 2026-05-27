@@ -36,8 +36,8 @@
 :root {
   --sidebar-expanded:  240px;
   --sidebar-collapsed:  64px;
-  --bottombar-height:   60px;
-  --fab-bottom:         84px;
+  --bottombar-height:   72xpx;
+  --fab-bottom:         96px;
 }
 
 
@@ -430,14 +430,20 @@ body {
   cursor: pointer;
   transition: all .15s;
   white-space: nowrap;
+  flex: 1;
+  flex-direction: column;
+  padding: 8px 2px;
+  border-top: 2.5px solid transparent;
+  border-left: none;
 }
 .tab.active { color: var(--accent); }
 
 .tab .tab-icon {
   display: block;
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.7rem;
+  height: 1.7rem;
   margin: 0 auto 3px;
+  margin-bottom: 3px;
 }
 
 @media (min-width: 768px) {

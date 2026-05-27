@@ -101,20 +101,7 @@
   });
 })();
 
-// Toggle visual Cliente ↔ Cuba (el JS real de npToggleCuba() sigue igual en pedidos.js)
-// Solo sincroniza el estado visual del botón nuevo
-const _origToggleCuba = window.npToggleCuba;
-window.npToggleCuba = function() {
-  _origToggleCuba && _origToggleCuba();
-  // Después del toggle, leer si quedó en modo cuba o no
-  requestAnimationFrame(() => {
-    const badge = document.getElementById('np-cuba-badge');
-    const esCuba = badge && badge.style.display !== 'none';
-    document.getElementById('np-btn-cuba')?.classList.toggle('active', esCuba);
-    document.getElementById('np-btn-cliente-toggle')?.classList.toggle('active', !esCuba);
-    document.getElementById('np-campo-tel').style.display = esCuba ? 'none' : 'flex';
-  });
-};
+
 
 function npModoCliente() {
   // Si estamos en Cuba, volver a cliente llamando el toggle original
