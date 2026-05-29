@@ -204,30 +204,10 @@ function syncHamUsuarioNombre() {
   if (span && fuente) span.textContent = fuente.textContent || "—";
 }
 
-// ── Mobile: toggle de filtros ──
-// Agrega botón toggle para mostrar/ocultar filtros en mobile
-function initFiltroToggleMobile() {
-  if (window.innerWidth >= 768) return;
-  const filterRow = document.querySelector(".po-filter-row");
-  if (!filterRow || document.getElementById("po-filter-toggle-btn")) return;
-
-  const btn = document.createElement("button");
-  btn.id = "po-filter-toggle-btn";
-  btn.className = "po-filter-toggle";
-  btn.innerHTML = `⚙ Filtros <span class="toggle-arrow">▾</span>`;
-  btn.onclick = () => {
-    const abierto = filterRow.classList.toggle("abierto");
-    btn.classList.toggle("activo", abierto);
-  };
-
-  filterRow.insertAdjacentElement("beforebegin", btn);
-}
-
 // ── Init ──
 // Inicializa componentes al cargar la página
 document.addEventListener("DOMContentLoaded", () => {
   initMobileUsuarioEnHam();
-  initFiltroToggleMobile();
   actualizarUIUsuario();
 });
 

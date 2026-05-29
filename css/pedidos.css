@@ -1357,8 +1357,6 @@
 
   .po-btn-arch  { flex-shrink: 0; }
   .po-arch-txt  { display: none; }
-  .po-btn-filtros,
-  .filtros-toggle { display: none; }
 
   /* ── FILTROS ── */
   .po-filter-row {
