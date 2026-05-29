@@ -808,6 +808,7 @@ body {
   /* ── Tabs en sidebar ── */
   .tab {
     flex: none;
+    flex-direction: row;
     width: 100%;
     min-height: 44px;
     padding: 0 10px 0 16px;
