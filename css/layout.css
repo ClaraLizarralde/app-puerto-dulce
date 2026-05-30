@@ -266,87 +266,8 @@ body {
 
 
 /* ══════════════════════════════════════
-   5. BANNER DÍA PRINCIPAL
+   5. BANNER DÍA PRINCIPAL — eliminado
    ══════════════════════════════════════ */
-
-.dia-principal-banner {
-  padding: 8px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 8px;
-  border-bottom: 2px solid rgba(0,0,0,0.1);
-  transition: background .2s;
-  flex-shrink: 0;
-}
-
-.dia-principal-banner .dpb-main  { display: flex; flex-direction: column; gap: 6px; }
-.dia-principal-banner .dpb-dayline { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
-
-.dia-principal-banner .dpb-dia {
-  font-family: 'Lora', serif;
-  font-size: 1.02rem;
-  font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: .01em;
-}
-.dia-principal-banner .dpb-fecha {
-  font-size: 0.74rem;
-  opacity: 0.75;
-}
-
-.dpb-pills { display: none; }
-@media (min-width: 768px) and (orientation: landscape),
-       (min-width: 1025px) {
-  .dpb-pills { display: flex; align-items: center; gap: 6px; margin-left: auto; }
-}
-
-.dia-principal-banner .dpb-right {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 6px;
-}
-
-.badge-hoy {
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: .1em;
-  padding: 3px 8px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.25);
-  text-transform: uppercase;
-  width: max-content;
-}
-
-.btn-dia-especial {
-  font-family: 'Outfit', sans-serif;
-  font-size: 0.6rem;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 20px;
-  border: 1.5px solid rgba(255,255,255,0.5);
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all .15s;
-  opacity: 0.8;
-}
-.btn-dia-especial.activo {
-  background: rgba(255,255,255,0.25);
-  border-color: rgba(255,255,255,0.8);
-  opacity: 1;
-}
-
-/* Colores por día — banner principal */
-.dpb-lunes    { background: var(--dia-lunes);    color: var(--dia-lunes-text);    }
-.dpb-martes   { background: var(--dia-martes);   color: var(--dia-martes-text);   }
-.dpb-miercoles{ background: var(--dia-miercoles);color: var(--dia-miercoles-text);}
-.dpb-jueves   { background: var(--dia-jueves);   color: var(--dia-jueves-text);   }
-.dpb-viernes  { background: var(--dia-viernes);  color: var(--dia-viernes-text);  }
-.dpb-sabado   { background: var(--dia-sabado);   color: var(--dia-sabado-text);   }
-.dpb-domingo  { background: var(--dia-domingo);  color: var(--dia-domingo-text);  }
 
 .dpb-counter { display: none !important; }
 
@@ -643,10 +564,7 @@ body {
 
   /* Móvil puro (< 768px): ocultar banner día y simplificar header */
   @media (max-width: 767px) {
-    .dia-principal-banner { display: none !important; }
     .header { padding: 10px 14px 8px; }
-    .sync-pill,
-    #local-status-pill,
     .btn-usuario-header { display: none !important; }
     .header-logo { font-size: 1.1rem; }
     .header-sub  { display: none; }
@@ -766,13 +684,20 @@ body {
   /* ── Cabecera sidebar ── */
   .tabs-side-head {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
     min-height: 48px;
     padding: 6px 8px 10px;
     border-bottom: 1px solid var(--border);
     margin-bottom: 8px;
     flex-shrink: 0;
+  }
+  .tabs-side-head-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
   }
   .tabs-side-logo { font-size: 1.25rem; }
   .tabs-side-brand {
@@ -794,9 +719,23 @@ body {
     text-transform: uppercase;
   }
 
+  .tabs-side-pills {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding-left: 2px;
+  }
+  .tabs.collapsed .tabs-side-pills { display: none; }
+
+  @media (max-width: 1024px) and (orientation: landscape) {
+    .tabs:not(.expanded) .tabs-side-pills { display: none; }
+  }
+
   /* Brand oculta cuando colapsada — desktop */
   .tabs.collapsed .tabs-side-head { justify-content: center; padding-left: 0; padding-right: 0; }
   .tabs.collapsed .tabs-side-brand { width: 0; opacity: 0; }
+  .tabs.collapsed .tabs-side-pills { display: none; }
 
   /* Brand oculta cuando no expandida — tablet landscape */
   @media (max-width: 1024px) and (orientation: landscape) {
@@ -968,16 +907,6 @@ body {
   @media (min-width: 1025px) {
     .modal-np { max-width: 520px; }
 
-    .dia-principal-banner { flex-direction: row; align-items: center; gap: 10px; }
-    .dia-principal-banner .dpb-main {
-      flex: 1;
-      flex-direction: row;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-    .dia-principal-banner .dpb-dayline { white-space: nowrap; flex-shrink: 0; }
-    .dia-principal-banner .dias-nav    { flex: 1; min-width: 0; }
 
     .pedidos-header-toolbar { display: flex; align-items: center; gap: 24px; margin-bottom: 12px; }
     #tab-pedidos .search-wrap { flex: 1; max-width: 400px; min-width: 240px; }

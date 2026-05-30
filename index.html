@@ -58,8 +58,17 @@
 
 <div class="tabs" id="main-tabs">
   <div class="tabs-side-head">
-    <span class="tabs-side-logo">🍰</span>
-    <span class="tabs-side-brand">Puerto dulce<span class="tabs-side-sub">sistema de pedidos</span></span>
+    <div class="tabs-side-head-top">
+      <span class="tabs-side-logo">🍰</span>
+      <span class="tabs-side-brand">Puerto dulce<span class="tabs-side-sub">sistema de pedidos</span></span>
+    </div>
+    <div class="tabs-side-pills">
+      <div class="sync-pill" id="sync-pill-banner">
+        <div class="sync-dot verde" id="sync-dot-banner"></div>
+        <span id="sync-txt-banner">Guardado</span>
+      </div>
+      <div id="local-status-pill-banner"></div>
+    </div>
   </div>
 <div class="tabs-list">
     <div class="tab active" data-title="Pedidos" onclick="showTab('pedidos',this)"><svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -183,23 +192,7 @@
   </button>
 </div>
 
-<!-- BANNER DÍA PRINCIPAL -->
-<div class="dia-principal-banner" id="dia-principal-banner">
-  <div class="dpb-main">
-    <div class="dpb-dayline">
-      <span class="dpb-dia" id="dpb-dia">—</span>
-      <span class="dpb-fecha" id="dpb-fecha">—</span>
-      <span class="badge-hoy" id="dpb-hoy-badge" style="display:none">HOY</span>
-    </div>
-  </div>
-  <div class="dpb-pills">
-    <div class="sync-pill" id="sync-pill-banner">
-      <div class="sync-dot verde" id="sync-dot-banner"></div>
-      <span id="sync-txt-banner">Guardado</span>
-    </div>
-    <div id="local-status-pill-banner"></div>
-  </div>
-</div>
+
 
 <div class="tab-contents" id="tab-contents">
 

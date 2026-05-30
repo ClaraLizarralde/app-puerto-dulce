@@ -147,51 +147,13 @@ function setDiaActivo(k) {
 // ── BANNER DÍA ──
 // Muestra el banner del día actual con fecha y modo especial
 function renderDiaBanner() {
-  const hoy = fechaKey(new Date());
-  const esHoy = diaActual === hoy;
   const [y, m, d] = diaActual.split("-").map(Number);
-  const f = new Date(y, m - 1, d);
-  const dow = f.getDay();
-  const nombreDia = DIAS_FULL[dow].toUpperCase();
-  const fechaStr = `${d} de ${MESES[m - 1]} de ${y}`;
-  const dd = diaData();
-  const especial = dd.especial || false;
-
+  const dow = new Date(y, m - 1, d).getDay();
   const banner = document.getElementById("dia-principal-banner");
-  banner.className = "dia-principal-banner";
-  banner.classList.add(DIA_CLASES[dow]);
-
-  document.getElementById("dpb-dia").textContent = `${nombreDia} ${d}`;
-  document.getElementById("dpb-fecha").textContent = fechaStr;
-
-  const badgeHoy = document.getElementById("dpb-hoy-badge");
-  badgeHoy.style.display = esHoy ? "" : "none";
-
-  let cfg = document.getElementById("dia-especial-config-bar");
-  if (!cfg) {
-    cfg = document.createElement("div");
-    cfg.id = "dia-especial-config-bar";
-    banner.parentNode.insertBefore(cfg, banner.nextSibling);
+  if (banner) {
+    banner.className = "dia-principal-banner";
+    banner.classList.add(DIA_CLASES[dow]);
   }
-  if (especial) {
-    const corte = dd.corteHora || "15:00";
-    const nombreEsp = dd.nombreEspecial || "";
-    cfg.className = "dia-especial-config";
-    cfg.innerHTML = `
-      <span style="font-size:.9rem">⚡</span>
-      <span class="dec-label">Nombre:</span>
-      <input type="text" value="${esc(nombreEsp)}" placeholder="Día de la madre..." onchange="setDiaEspecialCampo('nombreEspecial',this.value)">
-      <div class="dec-sep"></div>
-      <span class="dec-label">Corte:</span>
-      <input type="time" value="${esc(corte)}" onchange="setDiaEspecialCampo('corteHora',this.value)">
-      <span style="font-size:.62rem;opacity:.6;margin-left:2px;">← divide turnos</span>
-      <button class="btn-dia-normal" onclick="confirmarDiaNormal()">Volver a normal</button>
-    `;
-  } else {
-    cfg.className = "";
-    cfg.innerHTML = "";
-  }
-
   renderDiasNav();
 }
 
