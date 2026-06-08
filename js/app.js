@@ -15,7 +15,7 @@
  * - setInterval(renderEstadoLocal) → Actualiza estado del local cada minuto (con guard typeof)
  * 
  * === INICIALIZACIÓN ===
- * - renderDiasNav(), renderAll(), renderCatalogo(), renderArchivadosGlobal()
+ * - renderDiasNav(), renderAll(), renderCatalogo(), actualizarContadorArchivadosGlobal()
  *
  * 
  * === UI DE USUARIO ===
@@ -40,13 +40,19 @@
  */
 
 // ── TOAST ──
-// Muestra un toast de "Guardado" que desaparece a los 2 segundos
-function mostrarToastGuardado() {
+// Muestra un toast de "Guardado" que desaparece a los 2 segundos.
+// Acepta un texto opcional; si se omite muestra "✅ Pedido guardado".
+function mostrarToastGuardado(texto) {
   const t = document.getElementById("toast-guardado");
   if (!t) return;
+  if (texto) t.textContent = texto;
   t.classList.add("visible");
   clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove("visible"), 2000);
+  t._timer = setTimeout(() => {
+    t.classList.remove("visible");
+    // Restaurar texto original para la próxima vez que se llame sin argumento
+    if (texto) t.textContent = "✅ Pedido guardado";
+  }, 2000);
 }
 
 // ── SYNC ──
@@ -189,7 +195,7 @@ function initMobileUsuarioEnHam() {
     </svg>
     <span class="usuario-nombre" id="ham-usuario-nombre">—</span>`;
   btn.onclick = () => {
-    cerrarMenuHamburguesa();
+    if (typeof cerrarMenuHamburguesa === "function") cerrarMenuHamburguesa();
     toggleUsuarioMenu("btn-usuario-header");
   };
 
@@ -209,6 +215,12 @@ function syncHamUsuarioNombre() {
 document.addEventListener("DOMContentLoaded", () => {
   initMobileUsuarioEnHam();
   actualizarUIUsuario();
+  // FIX 15: abrir modal de bienvenida si data.js detectó que no hay local
+  // configurado. Se hace aquí para garantizar que auth.js ya cargó.
+  if (window._pendingModalBienvenida && typeof abrirModalBienvenida === "function") {
+    window._pendingModalBienvenida = false;
+    abrirModalBienvenida();
+  }
 });
 
 // Re-evalúa componentes mobile al rotar el dispositivo o redimensionar la ventana

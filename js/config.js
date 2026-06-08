@@ -466,28 +466,6 @@ function mostrarSetupLocal() {
   }
 }
 
-// Renderiza panel de configuración del local actual
-function renderCfgLocal() {
-  const actual = document.getElementById("cfg-local-actual");
-  if (actual) {
-    const l = LOCALES_DISPONIBLES.find(x => x.id === datos.localId);
-    actual.innerHTML = l
-      ? `<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--accent);border-radius:var(--radius-sm);background:var(--accent-soft);">
-           <span style="font-size:1.3rem;">${l.emoji}</span>
-           <div style="flex:1;">
-             <div style="font-size:.88rem;font-weight:700;color:var(--accent);">${l.nombre}</div>
-             <div style="font-size:.68rem;color:var(--ink-light);margin-top:1px;">ID: <code>${l.id}</code></div>
-           </div>
-           <div id="local-status-pill" style="font-size:.72rem;font-weight:500;padding:3px 9px;border-radius:12px;background:var(--paper);border:1.5px solid var(--border);white-space:nowrap;"></div>
-         </div>`
-      : `<div style="font-size:.8rem;color:var(--ink-light);font-style:italic;">Sin local configurado.</div>`;
-    renderEstadoLocal();
-  }
-  renderBotonesLocales("cfg-locales-lista", setLocal);
-  renderCfgDiaEspecial();
-  renderHorariosEditor();
-}
-
 // ── HORARIOS ──
 const DIAS_NOMBRES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
@@ -627,8 +605,6 @@ function mostrarToastHorario() {
   }, 2000);
 }
 
-// Hook para renderizar panel Local cuando se abre la subtab
-const _showCfgTabOrig = showCfgTab;
 // ── DÍAS MOVIDOS (panel configuración multi-día) ──
 
 const _DIAS_S_CFG = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -815,4 +791,31 @@ function renderCfgDiaEspecial() {
         }
       </div>
     </div>`;
+}
+
+// FIX 6: renderCfgLocal movida debajo de renderCfgDiaEspecial para garantizar
+// que la función ya esté definida cuando se la invoca (seguro en minificado).
+// FIX 12: cfg-locales-lista tiene display:none en el HTML; renderBotonesLocales
+// lo llena pero no lo muestra — se oculta intencionalmente porque el selector de
+// local se usa solo en setup inicial. Si querés mostrarlo en config, quitá el
+// display:none del HTML en el div#cfg-locales-lista.
+function renderCfgLocal() {
+  const actual = document.getElementById("cfg-local-actual");
+  if (actual) {
+    const l = LOCALES_DISPONIBLES.find(x => x.id === datos.localId);
+    actual.innerHTML = l
+      ? `<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--accent);border-radius:var(--radius-sm);background:var(--accent-soft);">
+           <span style="font-size:1.3rem;">${l.emoji}</span>
+           <div style="flex:1;">
+             <div style="font-size:.88rem;font-weight:700;color:var(--accent);">${l.nombre}</div>
+             <div style="font-size:.68rem;color:var(--ink-light);margin-top:1px;">ID: <code>${l.id}</code></div>
+           </div>
+           <div id="local-status-pill" style="font-size:.72rem;font-weight:500;padding:3px 9px;border-radius:12px;background:var(--paper);border:1.5px solid var(--border);white-space:nowrap;"></div>
+         </div>`
+      : `<div style="font-size:.8rem;color:var(--ink-light);font-style:italic;">Sin local configurado.</div>`;
+    renderEstadoLocal();
+  }
+  renderBotonesLocales("cfg-locales-lista", setLocal);
+  renderCfgDiaEspecial();
+  renderHorariosEditor();
 }

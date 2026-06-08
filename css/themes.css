@@ -83,115 +83,135 @@
   --dia-domingo-soft: color-mix(in srgb, var(--dia-domingo) 20%, transparent);
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+
 /* ══════════════════════════════════════
-   TEMA: girly — Botanical Rose
-   Crema · Rosa Terracota · Verde Bosque
+   TEMA: girly — Oliva & Rosa
+   Verde oliva · Rosa palo · Dorado
    ══════════════════════════════════════ */
 [data-theme="girly"] {
-  --bg:#F5F0E8;
-  --paper:#FDFAF6;
-  --ink:#2D4A2D;
-  --ink-mid:#5A7A5A;
-  --ink-light:#8AAA7A;
-  --border:#E0D8C8;
-  --shadow:rgba(45,74,45,0.08);
+  --bg:#f5ede8;
+  --paper:#fdf8f5;
+  --ink:#2a2a1e;
+  --ink-mid:#5a5a3e;
+  --ink-light:#9a9a7a;
+  --border:#e0d0c0;
+  --shadow:rgba(42,42,30,0.09);
 
-  --accent:#C97A6A;
-  --accent-soft:#F9EDEA;
-  --accent2:#A85A4A;
+  --accent:#c8a84b;
+  --accent-soft:#f7f0d8;
+  --accent2:#b87880;
 
-  --green:#2D4A2D;
-  --green-soft:#EAF0E8;
-  --green-mid:#5A7A5A;
+  --green:#6b7a4a;
+  --green-soft:#eaede0;
+  --green-mid:#7a8c5a;
 
-  --amber:#B8860A;
-  --amber-soft:#FDF6E0;
+  --amber:#c8a84b;
+  --amber-soft:#f7f0d8;
 
-  --blue:#8AAA7A;
-  --blue-soft:#EEF3EB;
+  --blue:#b87880;
+  --blue-soft:#f5eaec;
 
-  --cuba-bg:#FDF8EE;
-  --cuba-border:#B8860A;
-  --cuba-ink:#6A5010;
-  --cuba-soft:#FFFBF0;
+  --cuba-bg:#f7f0d8;
+  --cuba-border:#c8a84b;
+  --cuba-ink:#6a4a10;
+  --cuba-soft:#fdf8ec;
 
-  --tacc-s:#2D4A2D;
-  --tacc-s-soft:#EAF0E8;
-  --tacc-c:#C97A6A;
-  --tacc-c-soft:#F9EDEA;
+  --tacc-s:#6b7a4a;
+  --tacc-s-soft:#eaede0;
+  --tacc-c:#b87880;
+  --tacc-c-soft:#f5eaec;
 
-  --red:#C97A6A;
-  --red-soft:#F9EDEA;
+  --red:#b87880;
+  --red-soft:#f5eaec;
 
-  --header-grad:linear-gradient(135deg,#C97A6A,#A85A4A);
+  --header-grad:linear-gradient(135deg,#6b7a4a,#4a5a32);
 
-  --dia-lunes:#8AAA7A;
+  --dia-lunes:#b87880;
   --dia-lunes-text:#fff;
-  --dia-martes:#C97A6A;
-  --dia-martes-text:#fff;
-  --dia-miercoles:#B8860A;
+  --dia-martes:#c8a84b;
+  --dia-martes-text:#2a2a1e;
+  --dia-miercoles:#6b7a4a;
   --dia-miercoles-text:#fff;
-  --dia-jueves:#2D4A2D;
-  --dia-jueves-text:#FDFAF6;
-  --dia-viernes:#5A7A5A;
-  --dia-viernes-text:#FDFAF6;
-  --dia-sabado:#A85A4A;
-  --dia-sabado-text:#fff;
-  --dia-domingo:#E0D8C8;
-  --dia-domingo-text:#2D4A2D;
+  --dia-jueves:#4a5a32;
+  --dia-jueves-text:#fdf8f5;
+  --dia-viernes:#b87880;
+  --dia-viernes-text:#fff;
+  --dia-sabado:#c8a84b;
+  --dia-sabado-text:#2a2a1e;
+  --dia-domingo:#9a9a7a;
+  --dia-domingo-text:#fff;
+
   --dia-lunes-soft: color-mix(in srgb, var(--dia-lunes) 20%, transparent);
---dia-martes-soft: color-mix(in srgb, var(--dia-martes) 20%, transparent);
---dia-miercoles-soft: color-mix(in srgb, var(--dia-miercoles) 20%, transparent);
---dia-jueves-soft: color-mix(in srgb, var(--dia-jueves) 20%, transparent);
---dia-viernes-soft: color-mix(in srgb, var(--dia-viernes) 20%, transparent);
---dia-sabado-soft: color-mix(in srgb, var(--dia-sabado) 20%, transparent);
---dia-domingo-soft: color-mix(in srgb, var(--dia-domingo) 20%, transparent);
-}
-/* ── GIRLY: fuente serif botánica ── */
-[data-theme="girly"] body {
-  font-family: 'Lora', serif;
+  --dia-martes-soft: color-mix(in srgb, var(--dia-martes) 20%, transparent);
+  --dia-miercoles-soft: color-mix(in srgb, var(--dia-miercoles) 20%, transparent);
+  --dia-jueves-soft: color-mix(in srgb, var(--dia-jueves) 20%, transparent);
+  --dia-viernes-soft: color-mix(in srgb, var(--dia-viernes) 20%, transparent);
+  --dia-sabado-soft: color-mix(in srgb, var(--dia-sabado) 20%, transparent);
+  --dia-domingo-soft: color-mix(in srgb, var(--dia-domingo) 20%, transparent);
 }
 
-/* ── GIRLY: sidebar crema con tinte cálido ── */
+/* ── GIRLY: badges pendiente/prod ── */
+[data-theme="girly"] .po-estado-badge.pendiente,
+[data-theme="girly"] .po-estado-badge.prod {
+  background: #f5eaec !important;
+  border-color: #b87880 !important;
+  color: #7a3a44 !important;
+}
+
+/* ── GIRLY: separador día y hora en dorado ── */
+[data-theme="girly"] .po-day-sep-label {
+  color: #c8a84b !important;
+}
+[data-theme="girly"] .po-td-hora {
+  color: #c8a84b !important;
+}
+
+/* ── GIRLY: fuente serif ── */
+[data-theme="girly"] body {
+  font-family: 'Quicksand', sans-serif;
+}
+
+/* ── GIRLY: sidebar oliva ── */
 [data-theme="girly"] .tabs {
-  background: #fdf6f0;
-  border-right-color: #e0d0c0;
+  background: #7a8c5a;
+  border-right-color: #c8a84b;
 }
 
 /* ── GIRLY: tab activa ── */
 [data-theme="girly"] .tab.active {
-  border-left-color: #C97A6A;
-  background: #F9EDEA;
-  color: #C97A6A;
+  border-left-color: #c8a84b;
+  background: rgba(0,0,0,0.15);
+  color: #f7f0d8;
+}
+
+/* ── GIRLY: texto sidebar ── */
+[data-theme="girly"] .tab {
+  color: rgba(255,255,255,0.75);
 }
 
 /* ── GIRLY: btn nuevo pedido ── */
 [data-theme="girly"] .btn-nuevo-pedido-sidebar {
-  border-color: #C97A6A;
-  background: #F9EDEA;
-  color: #C97A6A;
+  border-color: #c8a84b;
+  background: rgba(0,0,0,0.15);
+  color: #c8a84b;
 }
 [data-theme="girly"] .btn-nuevo-pedido-sidebar:hover {
-  background: #C97A6A;
-  color: #FDFAF6;
+  background: #c8a84b;
+  color: #2a2a1e;
 }
 
-/* ── GIRLY: header logo en cursiva serif ── */
+/* ── GIRLY: header logo ── */
 [data-theme="girly"] .header-logo {
-  font-family: 'Lora', serif;
+  font-family: 'Quicksand', sans-serif;
   font-style: italic;
   font-weight: 600;
+  color: #c8a84b;
 }
 
-/* ── GIRLY: banner día borde suave ── */
+/* ── GIRLY: banner día ── */
 [data-theme="girly"] .dia-principal-banner {
-  border-bottom-color: #d4b8a8;
-}
-
-/* ── GIRLY: pattern floral sutil en fondo ── */
-[data-theme="girly"] body {
-  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><text y='28' font-size='16' opacity='0.07'>🌸</text><text x='55' y='65' font-size='14' opacity='0.06'>🌿</text><text x='10' y='95' font-size='13' opacity='0.06'>🌺</text><text x='80' y='110' font-size='12' opacity='0.05'>🌱</text></svg>");
-  background-repeat: repeat;
+  border-bottom-color: #e0d0c0;
 }
 /* ══════════════════════════════════════
    TEMA: neon — Retro Futuristic Dark

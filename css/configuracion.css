@@ -306,7 +306,6 @@
 .csv-btn.primary{border-color:var(--green);color:var(--green);}
 
 
-cat > /mnt/user-data/outputs/configuracion.css << 'CSSEOF'
 /* ═══════════════════════════════════════════════════════════
    CONFIGURACION - DIA ESPECIAL (panel inline / barra config)
    ══════════════════════════════════════════════════════════ */

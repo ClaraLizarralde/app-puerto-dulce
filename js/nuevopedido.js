@@ -31,7 +31,7 @@
  * 
  * === SELECCIÓN DE TURNO (Cuba especial) ===
  * - npSelTurno(n)                → Selecciona turno 1 o 2 para Cuba
- * - npOnHoraInput()              → Desactiva turnos al editar hora manualmente
+ * - npOnMobileTimeInput(val)     → Desactiva turnos al editar hora manualmente
  * 
  * === CLIENTE / CUBA ===
  * - npToggleCuba()               → Activa/desactiva modo Cuba en nuevo pedido
@@ -43,7 +43,7 @@
  * 
  * === PRODUCTOS DEL PEDIDO ===
  * - npRenderProds()              → Renderiza lista de productos en nuevo pedido
- * - npAgregarProducto()          → Abre selector para agregar producto
+ * - npCambiarProd(rId)           → Abre selector overlay para cambiar un producto existente
  * - npCambiarProd(rId)           → Cambia producto existente
  * - npEliminarProd(rId)          → Elimina producto del pedido
  * - npToggleProdListo(rId)       → Marca/desmarca producto como listo
@@ -62,7 +62,8 @@
  * 
  * === ESTADO / PAGO / NOTA ===
  * - npSelEstado(estado, el)      → Selecciona estado del pedido
- * - npTogglePago()               → Abre modal para confirmar pago
+ * - npUiTogglePago()             → Abre modal para confirmar pago (desde modal NP)
+ * - npInlineTogglePago()         → Confirma pago inline sin modal
  * - npToggleNota()               → Muestra/oculta campo de nota general
  * 
  * === ABRIR / CERRAR MODAL NUEVO PEDIDO ===
@@ -125,6 +126,11 @@
 
 
 // ── MODAL NUEVO PEDIDO ──
+
+// FIX 5: globals del selector de productos — declaradas explícitamente para
+// evitar creación implícita en modo no-strict y posibles errores en producción.
+let _selectorPedidoId = null;
+let _selectorProdId   = null;
 
 let _npDia    = 'hoy';
 let _npDiaKey = null;

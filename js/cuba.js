@@ -352,7 +352,7 @@ function encargoCubaSeparado(pedidoId, prodId) {
   guardar();
   renderEncargos();
   renderPedidos();
-  if (_prodTabActiva === "semana") renderProduccionSemanal();
+  if (_prodTabActiva === "semanal") renderProduccion();
 }
 
 // ── RESUMEN DE CUBA ──

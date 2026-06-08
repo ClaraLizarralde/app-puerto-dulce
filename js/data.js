@@ -450,9 +450,10 @@ if (!datos.localId) {
   datos.localId = "matienzo";
   datos.nombre_local = "Puerto Dulce — Matienzo";
   guardar();
-  setTimeout(() => {
-    if (typeof abrirModalBienvenida === "function") abrirModalBienvenida();
-  }, 400);
+  // FIX 15: en lugar de usar setTimeout aquí (auth.js puede no estar cargado aún),
+  // dejamos una flag que app.js lee en DOMContentLoaded cuando todos los scripts
+  // ya están definidos.
+  window._pendingModalBienvenida = true;
 }
 
 // ── PERMISOS ──

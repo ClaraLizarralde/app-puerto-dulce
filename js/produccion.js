@@ -389,7 +389,6 @@ function _renderProdTabs(activos, futuros) {
 }
 
 function _prodSetTab(key) {
-    console.log("_prodSetTab llamado con:", key);
   _prodTabActiva = key;
   if (key === "libreta" && _lvTabActiva === null) {
     _lvTabActiva = _prodFechaKey(new Date());
@@ -404,11 +403,9 @@ function _prodSetTab(key) {
    ══════════════════════════════════════ */
 
 function _renderProdPanel(map, activos, futuros) {
-  console.log("_renderProdPanel, tab activa:", _prodTabActiva);
   const wrap = document.getElementById("prod-panel-wrap");
   if (!wrap) return;
   if (_prodTabActiva === "libreta") {
-    console.log("entrando a libreta...");
     wrap.innerHTML = "";
     if (!datos.libretaVenta) datos.libretaVenta = {};
     const hoyKey = _prodFechaKey(new Date());
@@ -1245,4 +1242,3 @@ function exportarResumenXLSX() {
   XLSX.utils.book_append_sheet(wbOut, ws, "Producción");
   XLSX.writeFile(wbOut, `produccion_${hoyKey.replace(/-/g,"")}.xlsx`);
 }
-

@@ -617,7 +617,18 @@ function exportarCubaConFormato(diaKeys, fmt) {
   }
 }
 
-function exportarCubaHoy(fmt) { exportarCubaConFormato([diaActual], fmt); }
+// FIX 11: exporta diaActual (el día seleccionado en la UI, no necesariamente hoy).
+// Si el usuario está viendo un día distinto a hoy, se le avisa antes de exportar.
+function exportarCubaHoy(fmt) {
+  const hoy = fechaKey(new Date());
+  if (diaActual !== hoy) {
+    const [y, m, d] = diaActual.split("-").map(Number);
+    const f = new Date(y, m - 1, d);
+    const label = `${DIAS_FULL[f.getDay()]} ${d}/${m}/${y}`;
+    if (!confirm(`Vas a exportar el día activo: ${label}\n¿Continuar?`)) return;
+  }
+  exportarCubaConFormato([diaActual], fmt);
+}
 function exportarCubaTodos(fmt) { const keys = Object.keys(datos.dias).sort(); exportarCubaConFormato(keys, fmt); }
 function exportarCubaDiaSeleccionado(fmt) {
   const sel = document.getElementById("cuba-export-dia-sel");
@@ -806,6 +817,13 @@ function buildRemitoXlsx(diaKey) {
 }
 
 function exportarRemitoEgreso() {
+  const hoy = fechaKey(new Date());
+  if (diaActual !== hoy) {
+    const [y, m, d] = diaActual.split("-").map(Number);
+    const f = new Date(y, m - 1, d);
+    const label = `${DIAS_FULL[f.getDay()]} ${d}/${m}/${y}`;
+    if (!confirm(`Vas a exportar el remito del día activo: ${label}\n¿Continuar?`)) return;
+  }
   const wb = buildRemitoXlsx(diaActual);
   if (!wb) { alert("No hay datos de pedidos a Cuba ni ventas para este día."); return; }
   XLSX.writeFile(wb, `remito_egreso_${diaActual}.xlsx`);

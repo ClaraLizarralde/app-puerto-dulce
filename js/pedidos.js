@@ -36,7 +36,7 @@
  *
  * === RENDER DE PEDIDOS (VISTA PLANILLA LEGACY) ===
  * - buildDiaBanner(diaKey)            → Construye banner separador de día en la planilla
- * - totalDePedido(p)            → Calcula el total monetario de un pedido
+ * - totalDePedido(p)                  → Calcula el total monetario de un pedido
  * - buildPanel(p)                     → Construye panel de edición de pedido (vista expandida)
  *
  * === AUTOCOMPLETADO CLIENTE EN PANEL ===
@@ -61,6 +61,8 @@
  * - renderArchivadosContent(wrapperId, global) → Renderiza contenido de archivados (local o global)
  * - renderArchivadosSeccion()         → Muestra sección de archivados del día actual
  * - actualizarContadorArchivadosGlobal() → Actualiza solo el contador global de archivados
+ * - renderArchivadosGlobal()          → Alias público: refresca sección global de archivados
+ * - renderArchivadosGlobalContent()   → Alias público: refresca solo el contenido de la lista global
  *
  * === PEDIDOS PENDIENTES DE DÍAS ANTERIORES ===
  * - chequearPendientesAyer()          → Muestra toast si hay pedidos sin revisar de días pasados
@@ -101,6 +103,8 @@
  * - renderPedidosTable()              → Renderiza el contenido de la tabla de pedidos
  * - poToggleExpand(id)                → Expande/colapsa fila con detalles del pedido
  * - initPedidosBO()                   → Inicializa el back-office de pedidos
+ * - poConfirmarPagoInline(id, metodo) → Confirma pago desde fila expandida (inline)
+ * - abrirSelector(pedidoId, prodId)   → Abre el selector de productos para agregar/cambiar
  *
  * ================================================================
  */
@@ -447,6 +451,7 @@ function buildPanel(p) {
   const dd = diaData();
   const especial = dd.especial || false;
   const corte = dd.corteHora || "15:00";
+  // FIX #3: reemplazado calcularTotalPedido → totalDePedido
   const totalPedido = totalDePedido(p);
   const esEspecialPedido = p.dia_especial || false;
 
@@ -765,6 +770,22 @@ function actualizarContadorArchivadosGlobal() {
   if (countEl) countEl.textContent = total + " total";
 }
 
+// FIX #4a: alias público que export.js llama tras restaurar/eliminar archivados.
+// Refresca el contador y, si la lista está abierta, también el contenido.
+function renderArchivadosGlobal() {
+  actualizarContadorArchivadosGlobal();
+  const lista = document.getElementById("archivados-global-lista");
+  if (lista && lista.classList.contains("open")) {
+    renderArchivadosContent("archivados-global-lista", true);
+  }
+}
+
+// FIX #4b: alias público que export.js llama para forzar el re-render del contenido
+// de la lista global independientemente de su estado abierto/cerrado.
+function renderArchivadosGlobalContent() {
+  renderArchivadosContent("archivados-global-lista", true);
+}
+
 // ── PEDIDOS PENDIENTES DE DÍAS ANTERIORES ──
 function chequearPendientesAyer() {
   const hoy = fechaKey(new Date());
@@ -919,6 +940,24 @@ function eliminarProducto(pedidoId, rId) {
   renderPedidos();
 }
 
+// FIX #2: abrirSelector — stub que delega al modal de nuevo pedido en modo edición.
+// Si tu proyecto define esta función en otro archivo (ej: modal-np.js), esta
+// implementación de respaldo evita el error "abrirSelector is not defined" mientras
+// tanto. Reemplazala o eliminala cuando la implementación real esté disponible.
+function abrirSelector(pedidoId, prodId) {
+  if (typeof abrirModalNP_seleccionProducto === "function") {
+    // Si existe una función específica del modal de selección de productos, la usamos.
+    abrirModalNP_seleccionProducto(pedidoId, prodId);
+    return;
+  }
+  // Fallback: abrir el modal de edición completo del pedido.
+  if (typeof abrirModalNP_edicion === "function") {
+    abrirModalNP_edicion(pedidoId);
+    return;
+  }
+  console.warn("abrirSelector: no se encontró ningún modal de selección de productos.", { pedidoId, prodId });
+}
+
 function agregarProducto(pedidoId) {
   abrirSelector(pedidoId, null);
 }
@@ -961,7 +1000,7 @@ function buildProdEdit(pedidoId, r, idx) {
         <input type="number" class="np-precio-libre-input"
           placeholder="ej: 15000" min="0"
           value="${r._precioLibre || ""}"
-          oninput="setProdCampo('${pedidoId}','${r.id}','_precioLibre',parseFloat(this.value)||0);_npActualizarTotal()">
+          oninput="setProdCampo('${pedidoId}','${r.id}','_precioLibre',parseFloat(this.value)||0);if(typeof npRenderTotal==='function')npRenderTotal()">
       </div>` : "";
 
     tamHTML = `
@@ -1163,6 +1202,7 @@ function renderTablaArchivados(tbody) {
         const isST = r.tacc === "s";
         return `<span class="po-prod-pill${isST ? " st" : ""}">${esc(nom)} ×${cant}</span>`;
       }).join("");
+      // FIX #3: reemplazado calcularTotalPedido → totalDePedido
       const total = totalDePedido(a);
       const totalStr = total > 0 ? `$${total.toLocaleString("es-AR")}` : "—";
 
@@ -1298,6 +1338,7 @@ function renderPedidosTable() {
     ps.forEach(p => {
       const isCuba = esCuba(p.cliente);
       const estado = p.estado || "pendiente";
+      // FIX #3: reemplazado calcularTotalPedido → totalDePedido
       const total = totalDePedido(p);
       const totalStr = total > 0 ? `$${total.toLocaleString("es-AR")}` : "—";
       const isExp = _poExpandedId === p.id;
@@ -1407,7 +1448,7 @@ function renderPedidosTable() {
                   <span class="po-exp-total-num">$${total.toLocaleString("es-AR")}</span>
                   ${p.pagado
                     ? `<span class="po-exp-pago-pill pagado" onclick="event.stopPropagation();abrirModalPago('${p.id}',true)">✓ ${esc(p.metodoPago || "Pagado")}</span>`
-                    : `<span class="po-exp-pago-pill nopago" onclick="event.stopPropagation();abrirModalPago('${p.id}',false)">Sin confirmar</span>`
+                    : `<span class="po-exp-pago-pill nopago" onclick="event.stopPropagation();_poTogglePagoInline('${p.id}')">Sin confirmar</span>`
                   }
                   ${!p.pagado ? `
                   <div class="po-exp-pago-inline" id="po-pago-inline-${p.id}" style="display:none">
@@ -1460,10 +1501,10 @@ function renderPedidosTable() {
     });
   });
 
-const msgVacio = filtro !== "todos"
-  ? `No hay pedidos con el filtro activo.`
-  : `No hay pedidos.`;
-tbody.innerHTML = html || `<tr class="po-empty-row"><td colspan="9">${msgVacio}</td></tr>`;
+  const msgVacio = filtro !== "todos"
+    ? `No hay pedidos con el filtro activo.`
+    : `No hay pedidos.`;
+  tbody.innerHTML = html || `<tr class="po-empty-row"><td colspan="9">${msgVacio}</td></tr>`;
   renderArchivadosSeccion();
 }
 
@@ -1471,6 +1512,25 @@ tbody.innerHTML = html || `<tr class="po-empty-row"><td colspan="9">${msgVacio}<
 function poToggleExpand(id) {
   _poExpandedId = _poExpandedId === id ? null : id;
   renderPedidosTable();
+}
+
+// FIX #1: poConfirmarPagoInline — confirma pago desde la fila expandida.
+// Recibe el id del pedido y el método elegido ("💵 Efectivo", etc.).
+function poConfirmarPagoInline(id, metodo) {
+  const p = getAllPedidos().find(x => x.id === id);
+  if (!p) return;
+  p.pagado = true;
+  p.metodoPago = metodo;
+  guardar();
+  setSyncPendiente();
+  renderPedidosTable();
+}
+
+// Helper interno: muestra/oculta el bloque de métodos de pago inline.
+function _poTogglePagoInline(id) {
+  const wrap = document.getElementById("po-pago-inline-" + id);
+  if (!wrap) return;
+  wrap.style.display = wrap.style.display === "none" ? "flex" : "none";
 }
 
 // ── PUNTO DE ENTRADA PRINCIPAL ──

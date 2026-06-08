@@ -18,7 +18,7 @@
 - [ ] **Favicon e ícono de app** — Favicon `.ico` o `.png` 32px + apple-touch-icon 180px. Rápido, impacto visual grande.
 - [ ] **Logo como imagen en la sidebar/header**
   - Desktop (sidebar): `320 × 64px` — logo completo con "Puerto Dulce" + "sistema de pedidos"
-  - Mobile (header): solo el ícono/símbolo — `64 × 64px`, sin texto
+  - Mobile (header): solo eque l ícono/símbolo — `64 × 64px`, sin texto
   - Asegurarse de que funcione en temas claros y oscuros
 - [ ] **Paletas de colores — terminar los temas** — Revisar cada tema: badges de estado, chips y botones. Especialmente los temas oscuros.
 - [ ] **Tabs mobile — mejorar estética** — Revisar tamaño de íconos, padding, el FAB central. Probar en un teléfono real.
