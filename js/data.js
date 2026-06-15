@@ -257,9 +257,9 @@ function guardar() {
     const {db} = window._fb;
     import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
     .then(({doc, setDoc}) => {
-      const ref = doc(db, 'locales', datos.localId, 'datos', 'main');
-      setDoc(ref, datos).catch(e => console.warn('Firebase save error:', e));
-    });
+     const ref = doc(db, 'locales', datos.localId, 'datos', 'main');
+const datosLimpios = JSON.parse(JSON.stringify(datos));
+setDoc(ref, datosLimpios).catch(e => console.warn('Firebase save error:', e));
   }
 }
 
