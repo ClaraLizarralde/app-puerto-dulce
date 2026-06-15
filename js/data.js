@@ -253,8 +253,8 @@ function guardar() {
   localStorage.setItem("pd_v8", JSON.stringify(datos));
   if (typeof setSyncGuardado === "function") setSyncGuardado();
   if (typeof autoBackupCheck === "function") autoBackupCheck();
-  if (window._fb && datos.localId) {
-    const {db} = window._fb;
+if (window._fb?.db && datos.localId) {
+      const {db} = window._fb;
     import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
     .then(({doc, setDoc}) => {
       const ref = doc(db, 'locales', datos.localId, 'datos', 'main');
