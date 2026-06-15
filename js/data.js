@@ -253,14 +253,21 @@ function guardar() {
   localStorage.setItem("pd_v8", JSON.stringify(datos));
   if (typeof setSyncGuardado === "function") setSyncGuardado();
   if (typeof autoBackupCheck === "function") autoBackupCheck();
-if (window._fb?.db && datos.localId) {
-      const {db} = window._fb;
+  
+  const subirAFirebase = () => {
+    if (!window._fb?.db || !datos.localId) return;
     import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
     .then(({doc, setDoc}) => {
-      const ref = doc(db, 'locales', datos.localId, 'datos', 'main');
+      const ref = doc(window._fb.db, 'locales', datos.localId, 'datos', 'main');
       const datosLimpios = JSON.parse(JSON.stringify(datos));
       setDoc(ref, datosLimpios).catch(e => console.warn('Firebase save error:', e));
     });
+  };
+
+  if (window._fb?.db) {
+    subirAFirebase();
+  } else {
+    window.addEventListener('firebase-ready', subirAFirebase, { once: true });
   }
 }
 
