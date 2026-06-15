@@ -17,36 +17,6 @@
 
 <!-- SheetJS para exportar Excel -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<!-- Firebase (DESACTIVADO — descomentar cuando estés lista para conectar) -->
-<!--
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getAuth }     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-  // 1. Pegá tu config de Firebase acá (se obtiene desde la consola de Firebase > Configuración del proyecto)
-  const firebaseConfig = {
-    apiKey:            "TU_API_KEY",
-    authDomain:        "TU_PROYECTO.firebaseapp.com",
-    projectId:         "TU_PROYECTO",
-    storageBucket:     "TU_PROYECTO.appspot.com",
-    messagingSenderId: "TU_SENDER_ID",
-    appId:             "TU_APP_ID"
-  };
-
-  // 2. Inicializar Firebase y exponerlo globalmente (app.js lo usa vía window._fb)
-  const app = initializeApp(firebaseConfig);
-  window._fb = {
-    db:   getFirestore(app),
-    auth: getAuth(app),
-  };
-
-  // 3. Cuando Firebase está listo, app.js detecta window._fb y usa Firestore en lugar de localStorage.
-  //    La key de datos en Firestore es: collection("locales") > doc(datos.localId) > collection("dias")
-  //    Ver app.js → función guardar() y cargarDatos() para el punto de integración.
-  console.log("[Firebase] Inicializado correctamente 🔥");
-</script>
--->
 </head>
 <body>
 
@@ -1221,6 +1191,28 @@
   </div>
 </div>
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyAN4iWsT0Sw-ogPb-o4so1x1yJgAi6Yf_o",
+    authDomain:        "puerto-dulce-app.firebaseapp.com",
+    projectId:         "puerto-dulce-app",
+    storageBucket:     "puerto-dulce-app.firebasestorage.app",
+    messagingSenderId: "959443083225",
+    appId:             "1:959443083225:web:a05dc520e564e56907c3c8"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  window._fb = {
+    db:   getFirestore(app),
+    auth: getAuth(app),
+  };
+
+  console.log("[Firebase] Inicializado correctamente 🔥");
+</script>
 
 <script src="js/utils.js"></script>
 <script src="js/data.js"></script>
