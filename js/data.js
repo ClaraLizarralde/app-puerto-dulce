@@ -274,6 +274,65 @@ function guardar() {
 }
 
 // ────────────────────────────────────────────────────────────────
+// FUNCIÓN: iniciarSyncFirebase
+// Descripción: Se suscribe a cambios en tiempo real del documento
+//              'locales/{localId}/datos/main' en Firestore. Cuando otro
+//              dispositivo guarda un pedido, esta pestaña recibe el cambio
+//              y actualiza 'datos' + vuelve a renderizar todo.
+//
+//              hasPendingWrites=true significa que el cambio que llegó es
+//              un "eco" de algo que ESTE mismo dispositivo acaba de escribir
+//              (todavía no confirmado por el servidor) → se ignora, porque
+//              ya tenemos esos datos localmente y no hace falta re-renderizar.
+// ────────────────────────────────────────────────────────────────
+let _syncFirebaseIniciado = false;
+
+function iniciarSyncFirebase(intentos) {
+  if (intentos === undefined) intentos = 10;
+  if (_syncFirebaseIniciado) return;
+  if (intentos <= 0) return;
+  if (!window._fb?.db || !datos.localId) {
+    setTimeout(() => iniciarSyncFirebase(intentos - 1), 500);
+    return;
+  }
+  _syncFirebaseIniciado = true;
+
+  import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
+    .then(({ doc, onSnapshot }) => {
+      const ref = doc(window._fb.db, 'locales', datos.localId, 'datos', 'main');
+      onSnapshot(ref, (snap) => {
+        if (snap.metadata.hasPendingWrites) return; // eco de mi propia escritura
+        if (!snap.exists()) return;
+
+        const remoto = snap.data();
+        if (!remoto) return;
+
+        datos = remoto;
+        // Asegurar estructuras mínimas por si el remoto viene incompleto
+        if (!datos.catalogo) datos.catalogo = [];
+        if (!datos.clientes) datos.clientes = [];
+        if (!datos.archivados) datos.archivados = [];
+        if (!datos.itemEstados) datos.itemEstados = {};
+        if (!datos.dias) datos.dias = {};
+
+        localStorage.setItem("pd_v8", JSON.stringify(datos));
+
+        if (typeof renderAll === "function") renderAll();
+        if (typeof renderDiasNav === "function") renderDiasNav();
+        if (typeof renderCatalogo === "function") renderCatalogo();
+        if (typeof renderProduccion === "function") renderProduccion();
+
+        console.log('🔄 Datos actualizados desde otro dispositivo');
+      });
+      console.log('[Firebase] Sincronización en tiempo real activa 🔥');
+    });
+}
+
+window.addEventListener('firebase-ready', () => iniciarSyncFirebase());
+// Por si firebase-ready ya se disparó antes de que este script corriera
+if (window._fb) iniciarSyncFirebase();
+
+// ────────────────────────────────────────────────────────────────
 // FUNCIÓN: autoBackupCheck
 // Descripción: Verifica si ha pasado al menos 1 hora desde el último backup.
 //              Si es así, guarda un snapshot rotativo en localStorage.
